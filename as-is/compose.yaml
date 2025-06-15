@@ -7,7 +7,8 @@ services:
 
   pymongo_api:
     container_name: pymongo_api
-    build: 
+    platform: linux/arm64
+    build:
       context: api_app
       dockerfile: Dockerfile
     image: kazhem/pymongo_api:1.0.0
@@ -18,7 +19,6 @@ services:
     environment:
       MONGODB_URL: "mongodb://mongodb1"
       MONGODB_DATABASE_NAME: "somedb"
-
 
 volumes:
   mongodb1_data_container:
