@@ -1,0 +1,165 @@
+name: mongo-sharding
+
+services:
+  configsrv:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: configsrv
+    restart: always
+    ports:
+      - "27017:27017"
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.10
+    volumes:
+      - config-data:/data/db
+    command:
+      [
+        "--configsvr",
+        "--replSet",
+        "config_server",
+        "--bind_ip_all",
+        "--port",
+        "27017"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+  configsrvSetup:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    depends_on:
+      - configsrv
+    restart: "no"
+    networks:
+      - app-network
+    entrypoint: [ "bash", "-c", "sleep 10 && mongosh --host configsrv:27017 --eval 'rs.initiate({_id : \"config_server\",configsvr: true,members: [{ _id : 0, host : \"configsrv:27017\"}]})'"]
+
+  shard1:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: shard1
+    restart: always
+    ports:
+      - "27018:27018"
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.9
+    volumes:
+      - shard1-data:/data/db
+    command:
+      [
+        "--shardsvr",
+        "--replSet",
+        "shard1",
+        "--bind_ip_all",
+        "--port",
+        "27018"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+  shard1Setup:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    depends_on:
+      - shard1
+    restart: "no"
+    networks:
+      - app-network
+    entrypoint: [ "bash", "-c", "sleep 10 && mongosh --host shard1:27018 --eval 'rs.initiate({_id : \"shard1\",members: [{ _id : 0, host : \"shard1:27018\" }]})'" ]
+
+  shard2:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: shard2
+    restart: always
+    ports:
+      - "27019:27019"
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.8
+    volumes:
+      - shard2-data:/data/db
+    command:
+      [
+        "--shardsvr",
+        "--replSet",
+        "shard2",
+        "--bind_ip_all",
+        "--port",
+        "27019"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+  shard2Setup:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    depends_on:
+      - shard2
+    restart: "no"
+    networks:
+      - app-network
+    entrypoint: [ "bash", "-c", "sleep 10 && mongosh --host shard2:27019 --eval 'rs.initiate({_id : \"shard2\",members: [{ _id: 1, host : \"shard2:27019\" }]})'" ]
+
+  router:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: router
+    restart: always
+    depends_on:
+      - configsrv
+    ports:
+      - "27020:27017"
+    expose:
+      - "27017"
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.7
+    command:
+      [
+        "mongos",
+        "--configdb",
+        "config_server/configsrv:27017",
+        "--bind_ip_all",
+        "--port",
+        "27017"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+  routerSetup:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    depends_on:
+      - router
+    restart: "no"
+    networks:
+      - app-network
+    entrypoint: [ "bash", "-c", "sleep 20 && mongosh --host router:27017 --eval 'sh.addShard(\"shard1/shard1:27018\"); sh.addShard(\"shard2/shard2:27019\"); sh.enableSharding(\"somedb\"); sh.shardCollection(\"somedb.helloDoc\", { \"name\" : \"hashed\" } ); db = db.getSiblingDB(\"somedb\"); for(var i = 0; i < 5000; i++) { db.helloDoc.insert({num:i, name:\"vasya_pupkin_\"+i}); };'" ]
+
+  pymongo_api:
+    container_name: pymongo_api
+    build:
+      context: api_app
+      dockerfile: Dockerfile
+    image: kazhem/pymongo_api:1.0.0
+    depends_on:
+      - routerSetup
+    networks:
+      - app-network
+    ports:
+      - 8080:8080
+    environment:
+      MONGODB_URL: "mongodb://router:27017"
+      MONGODB_DATABASE_NAME: "somedb"
+
+networks:
+  app-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 173.17.0.0/16
+
+volumes:
+  config-data:
+  shard1-data:
+  shard2-data:
