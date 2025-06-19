@@ -10,8 +10,11 @@
         <mxCell id="tWGMZ3M52HPP_QXDfdmS-14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="zA23MoTUsTF4_91t8viU-3" target="tWGMZ3M52HPP_QXDfdmS-5" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
+        <mxCell id="rvkwCucdAWL0D3_kAxR9-10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="zA23MoTUsTF4_91t8viU-3" target="rvkwCucdAWL0D3_kAxR9-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <mxCell id="zA23MoTUsTF4_91t8viU-3" value="pymongo-api" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="300" y="280" width="120" height="60" as="geometry" />
+          <mxGeometry x="254" y="280" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="tWGMZ3M52HPP_QXDfdmS-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" target="tWGMZ3M52HPP_QXDfdmS-8" edge="1">
           <mxGeometry relative="1" as="geometry">
@@ -67,6 +70,9 @@
         </mxCell>
         <mxCell id="rvkwCucdAWL0D3_kAxR9-7" value="&lt;div&gt;&lt;span style=&quot;caret-color: rgb(73, 73, 73); color: rgb(73, 73, 73); font-family: var(--ds-font-family-code); font-size: 12.573px; text-align: start; background-color: rgb(250, 250, 250);&quot;&gt;Secondary&amp;nbsp;&lt;/span&gt;shard2-2&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="720" y="511" width="120" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="rvkwCucdAWL0D3_kAxR9-9" value="Redis" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="275" y="414" width="78" height="106" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
