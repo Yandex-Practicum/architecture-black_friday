@@ -1,4 +1,4 @@
-name: mongo-sharding-repl
+name: sharding-repl-cache
 
 services:
   configsrv:
@@ -271,6 +271,14 @@ services:
       - app-network
     entrypoint: [ "bash", "-c", "sleep 20 && mongosh --host router:27017 --eval 'sh.addShard(\"shard1/shard1:27018\"); sh.addShard(\"shard2/shard2:27019\"); sh.enableSharding(\"somedb\"); sh.shardCollection(\"somedb.helloDoc\", { \"name\" : \"hashed\" } ); db = db.getSiblingDB(\"somedb\"); for(var i = 0; i < 2000; i++) { db.helloDoc.insert({num:i, name:\"vasya_pupkin_\"+i}); };'" ]
 
+  redis:
+    image: redis:6.2.6-alpine
+    container_name: redis
+    networks:
+      - app-network
+    volumes:
+      - redis-data:/data
+
   pymongo_api:
     container_name: pymongo_api
     build:
@@ -279,6 +287,7 @@ services:
     image: kazhem/pymongo_api:1.0.0
     depends_on:
       - routerSetup
+      - redis
     networks:
       - app-network
     ports:
@@ -286,6 +295,7 @@ services:
     environment:
       MONGODB_URL: "mongodb://router:27017"
       MONGODB_DATABASE_NAME: "somedb"
+      REDIS_URL: "redis://redis:6379"
 
 networks:
   app-network:
@@ -305,4 +315,4 @@ volumes:
   shard2repl1-data:
   shard2repl2-data:
   shard2repl3-data:
-
+  redis-data:
