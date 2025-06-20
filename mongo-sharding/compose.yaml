@@ -1,0 +1,49 @@
+name: mongo-sharding
+
+services:
+  configsvr:
+    container_name: configsvr
+    image: dh-mirror.gitverse.ru/mongo:latest
+    command: mongod --configsvr --replSet cfgrs --port 27018 --bind_ip_all
+    volumes:
+      - configsvr_data:/data/db
+
+  mongos:
+    container_name: mongos
+    image: dh-mirror.gitverse.ru/mongo:latest
+    command: mongos --configdb cfgrs/configsvr:27018 --port 27017 --bind_ip_all
+    depends_on:
+      - configsvr
+
+  shard1:
+    container_name: shard1
+    image: dh-mirror.gitverse.ru/mongo:latest
+    command: mongod --shardsvr --replSet shard1rs --port 27019 --bind_ip_all
+    volumes:
+      - shard1_data:/data/db
+
+  shard2:
+    container_name: shard2
+    image: dh-mirror.gitverse.ru/mongo:latest
+    command: mongod --shardsvr --replSet shard2rs --port 27020 --bind_ip_all
+    volumes:
+      - shard2_data:/data/db
+
+  pymongo_api:
+    container_name: pymongo_api
+    build: 
+      context: api_app
+      dockerfile: Dockerfile
+    image: kazhem/pymongo_api:1.0.0
+    depends_on:
+      - mongos
+    ports:
+      - "8080:8080"
+    environment:
+      MONGODB_URL: "mongodb://mongos:27017"
+      MONGODB_DATABASE_NAME: "somedb"
+
+volumes:
+  configsvr_data:
+  shard1_data:
+  shard2_data:
