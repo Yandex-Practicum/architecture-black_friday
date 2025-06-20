@@ -5,7 +5,6 @@
 Запускаем шардированный кластер с репликацией mongodb, кеширование redis и приложение
 
 ```shell
-cd sharding-repl-cache
 docker compose up -d
 ```
 
