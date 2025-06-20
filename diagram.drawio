@@ -99,6 +99,9 @@
         <mxCell id="rvkwCucdAWL0D3_kAxR9-19" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="rvkwCucdAWL0D3_kAxR9-17" target="rvkwCucdAWL0D3_kAxR9-18">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
+        <mxCell id="rvkwCucdAWL0D3_kAxR9-39" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="rvkwCucdAWL0D3_kAxR9-17" target="rvkwCucdAWL0D3_kAxR9-38">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <mxCell id="rvkwCucdAWL0D3_kAxR9-17" value="React/Nginx" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="-176" y="280" width="120" height="60" as="geometry" />
         </mxCell>
@@ -140,6 +143,9 @@
               <mxPoint x="314" y="258" />
             </Array>
           </mxGeometry>
+        </mxCell>
+        <mxCell id="rvkwCucdAWL0D3_kAxR9-38" value="CDN" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-176" y="105" width="120" height="60" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
