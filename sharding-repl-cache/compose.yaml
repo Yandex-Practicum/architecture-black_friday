@@ -1,5 +1,19 @@
 name: mongo-sharding-repl
 services:
+  redis-node-1:
+    image: redis:7.2
+    container_name: redis-node-1
+    command: redis-server /usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+      - "16379:16379"  # Cluster bus port
+    volumes:
+      - redis-data-1:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - app-network
+
+
   shard1:
     image: dh-mirror.gitverse.ru/mongo:latest
     container_name: shard1
@@ -84,16 +98,16 @@ services:
       - shard2-r2-data:/data/db
     command: mongod --shardsvr --replSet shard2 --port 27018
 
-  shard2-repl3:
+  shard2-r3:
     image: dh-mirror.gitverse.ru/mongo:latest
-    container_name: shard2-repl3
+    container_name: shard2-r3
     restart: always
     ports:
       - "27019:27019"
     networks:
       - app-network
     volumes:
-      - shard2-repl3-data:/data/db
+      - shard2-r3-data:/data/db
     command: mongod --shardsvr --replSet shard2 --port 27019
 
   configSrv:
@@ -144,12 +158,17 @@ services:
     environment:
       MONGODB_URL: "mongodb://mongos_router:27017"
       MONGODB_DATABASE_NAME: "somedb"
+      REDIS_URL: "redis://redis-node-1:6379"
     networks:
       - app-network
 
 networks:
   app-network:
     driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 173.17.0.0/16
 
 volumes:
   config-data:
@@ -160,4 +179,5 @@ volumes:
   shard2-data:
   shard2-r1-data:
   shard2-r2-data:
-  shard2-repl3-data:
+  shard2-r3-data:
+  redis-data-1: {}
