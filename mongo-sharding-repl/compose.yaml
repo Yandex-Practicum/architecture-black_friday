@@ -1,0 +1,163 @@
+name: mongo-sharding-repl
+services:
+  shard1:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: shard1
+    restart: always
+    ports:
+      - "27011:27011"
+    networks:
+      - app-network
+    volumes:
+      - shard1-data:/data/db
+    command: mongod --shardsvr --replSet shard1 --port 27011
+
+  shard1-r1:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: shard1-r1
+    restart: always
+    ports:
+      - "27013:27013"
+    networks:
+      - app-network
+    volumes:
+      - shard1-r1-data:/data/db
+    command: mongod --shardsvr --replSet shard1 --port 27013
+
+  shard1-r2:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: shard1-r2
+    restart: always
+    ports:
+      - "27014:27014"
+    networks:
+      - app-network
+    volumes:
+      - shard1-r2-data:/data/db
+    command: mongod --shardsvr --replSet shard1 --port 27014
+
+  shard1-r3:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: shard1-r3
+    restart: always
+    ports:
+      - "27015:27015"
+    networks:
+      - app-network
+    volumes:
+      - shard1-r3-data:/data/db
+    command: mongod --shardsvr --replSet shard1 --port 27015
+
+  shard2:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: shard2
+    restart: always
+    ports:
+      - "27012:27012"
+    networks:
+      - app-network
+    volumes:
+      - shard2-data:/data/db
+    command: mongod --shardsvr --replSet shard2 --port 27012
+
+  shard2-r1:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: shard2-r1
+    restart: always
+    ports:
+      - "27016:27016"
+    networks:
+      - app-network
+    volumes:
+      - shard2-r1-data:/data/db
+    command: mongod --shardsvr --replSet shard2 --port 27016
+
+  shard2-r2:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: shard2-r2
+    restart: always
+    ports:
+      - "27018:27018"
+    networks:
+      - app-network
+    volumes:
+      - shard2-r2-data:/data/db
+    command: mongod --shardsvr --replSet shard2 --port 27018
+
+  shard2-r3:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: shard2-r3
+    restart: always
+    ports:
+      - "27019:27019"
+    networks:
+      - app-network
+    volumes:
+      - shard2-r3-data:/data/db
+    command: mongod --shardsvr --replSet shard2 --port 27019
+
+  configSrv:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: configSrv 
+    restart: always
+    ports:
+      - "27017:27017"
+    networks:
+      - app-network
+    volumes:
+      - config-data:/data/db
+      - ./scripts/configsvr:/docker-entrypoint-initdb.d
+    command: mongod --configsvr --replSet config_server --port 27017
+
+  mongos_router:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: mongos_router
+    restart: always
+    ports:
+      - "27021:27017"
+    networks:
+      - app-network
+    volumes:
+      - ./scripts/router:/docker-entrypoint-initdb.d
+    command: mongos --configdb config_server/configSrv:27017 --bind_ip_all
+    depends_on:
+      - configSrv
+      - shard1
+      - shard1-r1
+      - shard1-r2
+      - shard1-r3
+      - shard2
+      - shard2-r1
+      - shard2-r2
+      - shard2-r3
+
+  pymongo_api:
+    container_name: pymongo_api
+    build: 
+      context: api_app
+      dockerfile: Dockerfile
+    image: kazhem/pymongo_api:1.0.0
+    depends_on:
+      - mongos_router
+    ports:
+      - 8080:8080
+    environment:
+      MONGODB_URL: "mongodb://mongos_router:27017"
+      MONGODB_DATABASE_NAME: "somedb"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  config-data:
+  shard1-data:
+  shard1-r1-data:
+  shard1-r2-data:
+  shard1-r3-data:
+  shard2-data:
+  shard2-r1-data:
+  shard2-r2-data:
+  shard2-r3-data:
