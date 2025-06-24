@@ -34,7 +34,6 @@ services:
       - app-network
     volumes:
       - config-data:/data/db
-      - ./scripts/configsvr:/docker-entrypoint-initdb.d
     command: mongod --configsvr --replSet config_server --port 27017
 
   mongos_router:
@@ -45,8 +44,6 @@ services:
       - "27021:27017"
     networks:
       - app-network
-    volumes:
-      - ./scripts/router:/docker-entrypoint-initdb.d
     command: mongos --configdb config_server/configSrv:27017 --bind_ip_all
     depends_on:
       - configSrv
@@ -75,5 +72,5 @@ networks:
 
 volumes:
   config-data:
-  shard1-data:
-  shard2-data:
+  shard1-data: {}
+  shard2-data: {}

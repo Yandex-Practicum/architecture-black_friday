@@ -22,8 +22,6 @@ services:
       - "27011:27011"
     networks:
       - app-network
-    volumes:
-      - shard1-data:/data/db
     command: mongod --shardsvr --replSet shard1 --port 27011
 
   shard1-r1:
@@ -34,8 +32,6 @@ services:
       - "27013:27013"
     networks:
       - app-network
-    volumes:
-      - shard1-r1-data:/data/db
     command: mongod --shardsvr --replSet shard1 --port 27013
 
   shard1-r2:
@@ -46,8 +42,6 @@ services:
       - "27014:27014"
     networks:
       - app-network
-    volumes:
-      - shard1-r2-data:/data/db
     command: mongod --shardsvr --replSet shard1 --port 27014
 
   shard1-r3:
@@ -58,8 +52,6 @@ services:
       - "27015:27015"
     networks:
       - app-network
-    volumes:
-      - shard1-r3-data:/data/db
     command: mongod --shardsvr --replSet shard1 --port 27015
 
   shard2:
@@ -70,8 +62,6 @@ services:
       - "27012:27012"
     networks:
       - app-network
-    volumes:
-      - shard2-data:/data/db
     command: mongod --shardsvr --replSet shard2 --port 27012
 
   shard2-r1:
@@ -82,8 +72,6 @@ services:
       - "27016:27016"
     networks:
       - app-network
-    volumes:
-      - shard2-r1-data:/data/db
     command: mongod --shardsvr --replSet shard2 --port 27016
 
   shard2-r2:
@@ -94,8 +82,6 @@ services:
       - "27018:27018"
     networks:
       - app-network
-    volumes:
-      - shard2-r2-data:/data/db
     command: mongod --shardsvr --replSet shard2 --port 27018
 
   shard2-r3:
@@ -106,8 +92,6 @@ services:
       - "27019:27019"
     networks:
       - app-network
-    volumes:
-      - shard2-r3-data:/data/db
     command: mongod --shardsvr --replSet shard2 --port 27019
 
   configSrv:
@@ -172,12 +156,4 @@ networks:
 
 volumes:
   config-data:
-  shard1-data:
-  shard1-r1-data:
-  shard1-r2-data:
-  shard1-r3-data:
-  shard2-data:
-  shard2-r1-data:
-  shard2-r2-data:
-  shard2-r3-data:
   redis-data-1: {}
