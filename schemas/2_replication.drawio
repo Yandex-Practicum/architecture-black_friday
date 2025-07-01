@@ -1,0 +1,43 @@
+<mxfile host="Electron" modified="2025-07-01T12:00:00.000Z" agent="ChatGPT" etag="schema" version="24.6.4" type="device">
+  <diagram name="Replication" id="diagram-2">
+    <mxGraphModel dx="954" dy="674" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+<mxCell id="mongo1" value="Shard 1 - Master" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#d5e8d4;" vertex="1" parent="1">
+  <mxGeometry x="560" y="200" width="100" height="60" as="geometry" />
+</mxCell>
+<mxCell id="mongo2" value="Shard 2 - Master" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#d5e8d4;" vertex="1" parent="1">
+  <mxGeometry x="560" y="320" width="100" height="60" as="geometry" />
+</mxCell>
+<mxCell id="api" value="pymongo-api" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+  <mxGeometry x="360" y="260" width="120" height="60" as="geometry" />
+</mxCell>
+<mxCell id="edge1" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="api" target="mongo1">
+  <mxGeometry relative="1" as="geometry" />
+</mxCell>
+<mxCell id="edge2" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="api" target="mongo2">
+  <mxGeometry relative="1" as="geometry" />
+</mxCell>
+<mxCell id="replica1a" value="Shard 1 - Slave 1" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#fff2cc;" vertex="1" parent="1">
+  <mxGeometry x="700" y="180" width="100" height="40" as="geometry" />
+</mxCell>
+<mxCell id="replica1b" value="Shard 1 - Slave 2" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#fff2cc;" vertex="1" parent="1">
+  <mxGeometry x="700" y="240" width="100" height="40" as="geometry" />
+</mxCell>
+<mxCell id="replica2a" value="Shard 2 - Slave 1" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#fff2cc;" vertex="1" parent="1">
+  <mxGeometry x="700" y="300" width="100" height="40" as="geometry" />
+</mxCell>
+<mxCell id="replica2b" value="Shard 2 - Slave 2" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#fff2cc;" vertex="1" parent="1">
+  <mxGeometry x="700" y="360" width="100" height="40" as="geometry" />
+</mxCell>
+<mxCell id="edge1a" style="endArrow=block;html=1;" edge="1" parent="1" source="mongo1" target="replica1a"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="edge1b" style="endArrow=block;html=1;" edge="1" parent="1" source="mongo1" target="replica1b"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="edge2a" style="endArrow=block;html=1;" edge="1" parent="1" source="mongo2" target="replica2a"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="edge2b" style="endArrow=block;html=1;" edge="1" parent="1" source="mongo2" target="replica2b"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
