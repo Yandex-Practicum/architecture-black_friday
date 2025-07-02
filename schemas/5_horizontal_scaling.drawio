@@ -1,0 +1,89 @@
+<?xml version="1.0" ?>
+<mxfile host="Electron" modified="2025-07-01T12:30:00.000Z" agent="ChatGPT" version="24.6.4" type="device">
+  <diagram name="Horizontal Scaling" id="64c83309-606c-4d88-ac2a-46870344a50f">
+    <mxGraphModel dx="954" dy="674" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="redis" parent="1" value="Redis Cache" style="shape=ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;" vertex="1">
+          <mxGeometry x="200" y="260" width="100" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="api1" parent="1" value="pymongo-api #1" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1">
+          <mxGeometry x="360" y="200" width="120" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="api2" parent="1" value="pymongo-api #2" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1">
+          <mxGeometry x="360" y="320" width="120" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_r1" parent="1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" source="api1" target="redis">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_r2" parent="1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" source="api2" target="redis">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="mongo1" parent="1" value="Shard 1 - Master" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#d5e8d4;" vertex="1">
+          <mxGeometry x="560" y="200" width="100" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="mongo2" parent="1" value="Shard 2 - Master" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#d5e8d4;" vertex="1">
+          <mxGeometry x="560" y="320" width="100" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_m1" parent="1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" source="api1" target="mongo1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_m2" parent="1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" source="api1" target="mongo2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_m3" parent="1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" source="api2" target="mongo1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_m4" parent="1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" source="api2" target="mongo2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="replica1a" parent="1" value="Shard 1 - Slave 1" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#fff2cc;" vertex="1">
+          <mxGeometry x="700" y="180" width="100" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="replica1b" parent="1" value="Shard 1 - Slave 2" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#fff2cc;" vertex="1">
+          <mxGeometry x="700" y="240" width="100" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="replica2a" parent="1" value="Shard 2 - Slave 1" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#fff2cc;" vertex="1">
+          <mxGeometry x="700" y="300" width="100" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="replica2b" parent="1" value="Shard 2 - Slave 2" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#fff2cc;" vertex="1">
+          <mxGeometry x="700" y="360" width="100" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge1a" parent="1" style="endArrow=block;html=1;" edge="1" source="mongo1" target="replica1a">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge1b" parent="1" style="endArrow=block;html=1;" edge="1" source="mongo1" target="replica1b">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge2a" parent="1" style="endArrow=block;html=1;" edge="1" source="mongo2" target="replica2a">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge2b" parent="1" style="endArrow=block;html=1;" edge="1" source="mongo2" target="replica2b">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="consul" parent="1" value="Consul (Service Discovery)" style="shape=hexagon;whiteSpace=wrap;html=1;fillColor=#dae8fc;" vertex="1">
+          <mxGeometry x="200" y="100" width="120" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_c1" parent="1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" source="api1" target="consul">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_c2" parent="1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" source="api2" target="consul">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="gateway" parent="1" value="API Gateway" style="shape=rhombus;whiteSpace=wrap;html=1;fillColor=#e1d5e7;" vertex="1">
+          <mxGeometry x="360" y="100" width="120" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_g1" parent="1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" source="gateway" target="api1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_g2" parent="1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" source="gateway" target="api2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_gc" parent="1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" source="consul" target="gateway">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
