@@ -124,7 +124,7 @@ docker compose up -d pymongo_api
 
 ---
 
-## 🎉 Результат
+## Результат
 
 Окружение готово. Можно обращаться к API по адресу:
 
@@ -135,4 +135,4 @@ http://localhost:8080
 ---
 ***Для удобства тестирования я создал init скрипт по пути:***
 
-./mongo-sharding/init.sh
+./mongo-sharding-repl/init.sh
