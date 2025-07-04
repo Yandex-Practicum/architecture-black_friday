@@ -1,0 +1,85 @@
+name: mongo_sharding
+services:
+  pymongo_api:
+    container_name: pymongo_api
+    build:
+      context: api_app
+      dockerfile: Dockerfile
+    image: kazhem/pymongo_api:1.0.0
+    platform: linux/amd64
+    depends_on:
+      - mongos_router
+    ports:
+      - 8181:8080
+    environment:
+      MONGODB_URL: "mongodb://mongos_router:27017"
+      MONGODB_DATABASE_NAME: "somedb"
+    networks:
+      app-network:
+        ipv4_address: 173.20.0.2
+  config_server:
+    image: arm64v8/mongo:latest
+    container_name: config_server
+    restart: always
+    ports:
+      - "27003:27003"
+    networks:
+      app-network:
+        ipv4_address: 173.20.0.3
+    volumes:
+      - config-data:/data/db
+    command: mongod --configsvr --replSet config_server --port 27003
+  shard1:
+    image: arm64v8/mongo:latest
+    container_name: shard1
+    restart: always
+    ports:
+      - "27004:27004"
+    networks:
+      app-network:
+        ipv4_address: 173.20.0.4
+    volumes:
+      - shard1-data:/data/db
+    command: mongod --shardsvr --replSet shard1 --port 27004
+
+  shard2:
+    image: arm64v8/mongo:latest
+    container_name: shard2
+    restart: always
+    ports:
+      - "27005:27005"
+    networks:
+      app-network:
+        ipv4_address: 173.20.0.5
+    volumes:
+      - shard2-data:/data/db
+    command: mongod --shardsvr --replSet shard2 --port 27005
+
+  mongos_router:
+    image: arm64v8/mongo:latest
+    container_name: mongos_router
+    restart: always
+    ports:
+      - "27017:27017"
+    networks:
+      app-network:
+        ipv4_address: 173.20.0.6
+    command: mongos --configdb config_server/config_server:27003 --bind_ip_all
+    depends_on:
+      - config_server
+      - shard1
+      - shard2
+
+networks:
+  app-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 173.20.0.0/21
+
+
+volumes:
+  config-data:
+  shard1-data: {}
+  shard2-data: {}

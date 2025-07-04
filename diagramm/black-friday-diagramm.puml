@@ -1,0 +1,65 @@
+@startuml
+!define RECTANGLE class
+!define AWSPUML https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v14.0/Advanced/AWSCommon.puml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+skinparam rectangle {
+  BackgroundColor White
+  BorderColor Black
+}
+
+' Добавляем горизонтальную компоновку для лучшего отображения
+left to right direction
+
+Person(Users, "Внешние пользователи")
+Person(Sellers, "Продавцы")
+
+' Добавляем компонент CDN
+Container_Ext(CDN, "CDN", "Cloudflare/Akamai", "Кеширование и доставка статического контента")
+
+System_Boundary(s1, "Мобильный мир") {
+  Container(WebSite, "Сайт", "React/Nginx", "Веб-интерфейс")
+  Container(Admin, "Админка", "React/Nginx", "Панель управления")
+  System_Boundary(gw,"Gateway & Discovery") {
+    Container(Gateway, "APISIX Gateway", "Nginx+APISIX", "Входная точка для всех запросов")
+    Container(Consul, "Consul", "Consul", "Service Discovery и хранилище конфигов")
+  }
+
+  ' Группируем Java-сервисы
+  together {
+    Container(Service1, " Cервис 1", "Java", "Бизнес-логика 1")
+    Container(Service2, " Cервис 2", "Java", "Бизнес-логика 2")
+  }
+
+  ' Группируем базы данных для лучшего выравнивания
+  together {
+    ContainerDb(ContainerDb1, "MongoDB 1", "MongoDB", "Основная база данных", "url")
+    ContainerDb(ContainerDb2, "MongoDB 2", "MongoDB", "Резервная база", "url")
+  }
+
+  together {
+    ContainerDb(ContainerRedis1, "Redis 1", "Redis", "Кеш 1", "url")
+    ContainerDb(ContainerRedis2, "Redis 2", "Redis", "Кеш 2", "url")
+  }
+}
+
+' Связи CDN
+Rel(Users, CDN, "Запрашивают статический контент")
+Rel(CDN, WebSite, "Загружает и кеширует контент")
+
+Rel_R(Gateway, Consul, "Service Discovery\n/ Получение списка доступных сервисов")
+
+Rel_U(Service1, Consul, "Регистрируется и обновляет состояние")
+Rel_U(Service2, Consul, "Регистрируется и обновляет состояние")
+
+Rel(Users, WebSite, "Динамические запросы")
+Rel(Sellers, Admin, "Управляют")
+Rel(WebSite, Gateway, "REST")
+Rel(Admin, Gateway, "REST")
+Rel(Gateway, Service1, "gRPC/HTTP")
+Rel(Gateway, Service2, "gRPC/HTTP")
+Rel(Service1, ContainerDb1, "MongoDB")
+Rel(Service2, ContainerDb2, "MongoDB")
+Rel(Service1, ContainerRedis1, "Redis")
+Rel(Service2, ContainerRedis2, "Redis")
+@enduml
