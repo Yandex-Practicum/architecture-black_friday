@@ -1,0 +1,129 @@
+name: mongo-sharding
+
+services:
+  pymongo_api:
+    container_name: pymongo_api
+    build: 
+      context: api_app
+      dockerfile: Dockerfile
+    depends_on:
+      - mongos_router
+    ports:
+      - "8080:8080"
+    environment:
+      MONGODB_URL: "mongodb://mongos_router:27020"
+      MONGODB_DATABASE_NAME: "somedb"
+    networks:
+      - app-network
+
+  # Сервер конфигурации (Config Server)
+  configSrv:
+    image: mongo:latest
+    container_name: configSrv 
+    restart: always
+    ports:
+      - "27017:27017"  # Порт для подключения
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.10  # Фиксированный IP
+    volumes:
+      - config-data:/data/db  # Постоянное хранилище данных
+    command:
+      - "--configsvr"  # Режим сервера конфигурации
+      - "--replSet"
+      - "config_server"  # Имя набора реплик
+      - "--bind_ip_all"  # Слушать все интерфейсы
+      - "--port"
+      - "27017"
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+
+  # Маршрутизатор (mongos)
+  mongos_router:
+    image: mongo:latest
+    container_name: mongos_router
+    restart: always
+    ports:
+      - "27020:27020"  # Основной порт для подключения приложений
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.7
+    depends_on:
+      - configSrv  # Ожидать запуска config сервера
+      - shard1     # Ожидать запуска шардов
+      - shard2
+    command:
+      - "mongos"  # Режим маршрутизатора
+      - "--configdb"
+      - "config_server/configSrv:27017"  # Ссылка на config сервер
+      - "--bind_ip_all"
+      - "--port"
+      - "27020"
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+
+  # Первый шард (Shard 1)
+  shard1:
+    container_name: shard1
+    image: dh-mirror.gitverse.ru/mongo:latest
+    volumes:
+      - shard1_data_container:/data/db
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.3
+    ports:
+      - "27018"  # Добавлено
+    command:
+      - "--shardsvr"  # Режим шарда
+      - "--replSet"
+      - "shard1"  # Имя набора реплик
+      - "--bind_ip_all"
+      - "--port"
+      - "27018"
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+
+  # Второй шард (Shard 2)
+  shard2:
+    container_name: shard2
+    image: dh-mirror.gitverse.ru/mongo:latest
+    volumes:
+      - shard2_data_container:/data/db
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.4
+    ports:
+      - "27019"  # Добавлено
+    command:
+      - "--shardsvr"  # Режим шарда
+      - "--replSet"
+      - "shard2"  # Имя набора реплик
+      - "--bind_ip_all"
+      - "--port"
+      - "27019"
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+
+# Настройки сети
+networks:
+  app-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 173.17.0.0/16  # Подсеть для контейнеров
+
+# Тома для постоянного хранения данных
+volumes:
+  shard1_data_container:
+  shard2_data_container:
+  config-data:
+

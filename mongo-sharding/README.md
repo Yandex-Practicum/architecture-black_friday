@@ -8,10 +8,10 @@
 docker compose up -d
 ```
 
-Заполняем mongodb данными
+Настраиваем шардирование, заполняем mongodb данными и проверяем результат
 
 ```shell
-./scripts/mongo-init.sh
+./scripts/sharding-init.sh
 ```
 
 ## Как проверить
