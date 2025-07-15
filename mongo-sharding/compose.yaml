@@ -85,7 +85,7 @@ services:
       - "--port"
       - "27018"
     healthcheck:
-      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD", "mongo", --eval", "db.adminCommand('ping')"]
       interval: 5s
       start_period: 10s
 
