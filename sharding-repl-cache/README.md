@@ -60,7 +60,7 @@ done
 ### Проверяем состояние кэша
 Проверки состояния кэша были выполнены при инициализации. Их можно произвести вручную запустив команды
 ```shell
-echo "Redis репликация настроена:"
+echo "Статус Redis:"
 for redis_node in redis_1 redis_2 redis_3 redis_4; do
 role=$(docker exec -i $redis_node redis-cli INFO replication | grep -E '^role')
 echo "  $redis_node: $role"
