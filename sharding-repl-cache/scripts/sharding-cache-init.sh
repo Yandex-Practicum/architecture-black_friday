@@ -1,0 +1,188 @@
+#!/bin/bash
+
+# Функция для проверки инициализации репликасета
+function is_replica_set_initialized() {
+  local container=$1
+  local port=$2
+  docker exec -i $container mongosh --port $port --quiet --eval \
+    "try { rs.status().ok } catch(e) { 0 }" 2>/dev/null | grep -q 1
+}
+
+# Функция для проверки доступности сервиса
+function is_service_ready() {
+  local container=$1
+  local port=$2
+  docker exec -i $container mongosh --port $port --quiet --eval \
+    "try { db.adminCommand({ping:1}).ok } catch(e) { 0 }" 2>/dev/null | grep -q 1
+}
+
+# 1. Config Server
+echo "1. Настройка Config Server (3 узла)"
+if ! is_replica_set_initialized configSrv 27017; then
+  echo "Инициализация Config Server..."
+  docker exec -i configSrv mongosh --port 27017 --eval 'rs.initiate({
+    _id: "config_server",
+    configsvr: true,
+    members: [
+      {_id: 0, host: "configSrv:27017", priority: 2},
+      {_id: 1, host: "configSrv2:27017", priority: 1},
+      {_id: 2, host: "configSrv3:27017", priority: 1}
+    ]
+  })'
+  echo "Ожидание инициализации Config Server (20 секунд)..."
+  sleep 20
+else
+  echo "Config Server уже инициализирован"
+fi
+
+# 2. Шарды
+echo "2. Настройка Shard 1 (3 узла)"
+if ! is_replica_set_initialized shard1-1 27018; then
+  echo "Инициализация Shard 1..."
+  docker exec -i shard1-1 mongosh --port 27018 --eval 'rs.initiate({
+    _id: "shard1",
+    members: [
+      {_id: 0, host: "shard1-1:27018", priority: 2},
+      {_id: 1, host: "shard1-2:27018", priority: 1},
+      {_id: 2, host: "shard1-3:27018", priority: 1}
+    ]
+  })'
+  echo "Ожидание инициализации Shard 1 (20 секунд)..."
+  sleep 20
+else
+  echo "Shard 1 уже инициализирован"
+fi
+
+echo "3. Настройка Shard 2 (3 узла)"
+if ! is_replica_set_initialized shard2-1 27019; then
+  echo "Инициализация Shard 2..."
+  docker exec -i shard2-1 mongosh --port 27019 --eval 'rs.initiate({
+    _id: "shard2",
+    members: [
+      {_id: 0, host: "shard2-1:27019", priority: 2},
+      {_id: 1, host: "shard2-2:27019", priority: 1},
+      {_id: 2, host: "shard2-3:27019", priority: 1}
+    ]
+  })'
+  echo "Ожидание инициализации Shard 2 (20 секунд)..."
+  sleep 20
+else
+  echo "Shard 2 уже инициализирован"
+fi
+
+echo "Очистка БД 'somedb'"
+docker exec -i shard1-1 mongosh --port 27018 --eval '
+  const dbs = db.adminCommand("listDatabases").databases.map(d => d.name);
+  if (dbs.includes("somedb")) {
+    print("База somedb найдена на shard1. Удаляем все коллекции...");
+    const collections = db.getSiblingDB("somedb").getCollectionNames();
+    collections.forEach(coll => db.getSiblingDB("somedb")[coll].drop());
+    print("База очищена.");
+  } else {
+    print("База somedb не найдена — пропускаем очистку.");
+  }
+'
+docker exec -i shard2-1 mongosh --port 27019 --eval '
+  const dbs = db.adminCommand("listDatabases").databases.map(d => d.name);
+  if (dbs.includes("somedb")) {
+    print("База somedb найдена на shard2. Удаляем все коллекции...");
+    const collections = db.getSiblingDB("somedb").getCollectionNames();
+    collections.forEach(coll => db.getSiblingDB("somedb")[coll].drop());
+    print("База очищена.");
+  } else {
+    print("База somedb не найдена — пропускаем очистку.");
+  }
+'
+echo "Ожидание готовности сервисов (30 секунд)..."
+sleep 30
+
+# 4. Настройка mongos (3 роутера)
+echo "4. Настройка mongos router"
+
+# Проверка и настройка каждого роутера
+for router in mongos_router mongos_router2 mongos_router3; do
+  echo -e "\nПроверка роутера $router..."
+
+  if is_service_ready $router 27020; then
+    echo "Статус: ONLINE"
+
+    # Добавление шардов
+    echo "Добавление шардов..."
+    docker exec -i $router mongosh --port 27020 --eval '
+      sh.addShard("shard1/shard1-1:27018,shard1-2:27018,shard1-3:27018")'
+    docker exec -i $router mongosh --port 27020 --eval '
+      sh.addShard("shard2/shard2-1:27019,shard2-2:27019,shard2-3:27019")'
+
+    # Настройка шардинга
+    echo "Настройка шардинга..."
+    docker exec -i $router mongosh --port 27020 --eval '
+      sh.enableSharding("somedb")'
+    docker exec -i $router mongosh --port 27020 --eval '
+      sh.shardCollection("somedb.helloDoc", { "name" : "hashed" } )'
+
+    # Проверка конфигурации
+    echo "Конфигурация $router:"
+    docker exec -i $router mongosh --port 27020 --eval '
+      sh.status({
+        verbose: true,
+        filter: {
+          "shards.name": /shard/
+        }
+      })'
+  else
+    echo "Статус: OFFLINE (роутер недоступен)"
+  fi
+done
+
+echo "5. Генерация тестовых данных"
+docker exec -i mongos_router mongosh --port 27020 --eval '
+  db = db.getSiblingDB("somedb");
+  for(var i = 0; i < 1000; i++) db.helloDoc.insert({age:i, name:"ly"+i});
+'
+echo "Записей в somedb:"
+docker exec -i mongos_router mongosh --port 27020 --eval '
+  db = db.getSiblingDB("somedb");
+  db.helloDoc.countDocuments();
+'
+
+echo "6. Проверка количества тестовых данных в шардах"
+echo "Записей в Shard1:"
+docker exec -i shard1-1 mongosh --port 27018 --eval '
+  db = db.getSiblingDB("somedb");
+  db.helloDoc.countDocuments();
+'
+echo "Записей в Shard2:"
+docker exec -i shard2-1 mongosh --port 27019 --eval '
+  db = db.getSiblingDB("somedb");
+  db.helloDoc.countDocuments();
+'
+echo "7. Проверка репликации"
+echo "Статус Config Server:"
+docker exec -i configSrv mongosh --port 27017 --eval 'rs.status().members.map(m => `${m.name}: ${m.stateStr}`).join("\n")'
+echo "Статус Shard1:"
+docker exec -i shard1-1 mongosh --port 27018 --eval 'rs.status().members.map(m => `${m.name}: ${m.stateStr}`).join("\n")'
+echo "Статус Shard2:"
+docker exec -i shard2-1 mongosh --port 27019 --eval 'rs.status().members.map(m => `${m.name}: ${m.stateStr}`).join("\n")'
+echo "Cтатус Routers:"
+for router in mongos_router mongos_router2 mongos_router3; do
+  status=$(docker exec -i $router mongosh --port 27020 --quiet --eval '
+    try {
+      db.adminCommand({ping:1}).ok ? "ONLINE" : "DEGRADED"
+    } catch(e) {
+      "OFFLINE"
+    }')
+  echo "  $router: $status"
+done
+
+echo "8. Настройка Redis репликации"
+# Настройка реплик redis
+docker exec -i redis_2 redis-cli REPLICAOF redis_1 6379
+docker exec -i redis_4 redis-cli REPLICAOF redis_3 6379
+
+echo "Redis репликация настроена:"
+for redis_node in redis_1 redis_2 redis_3 redis_4; do
+  role=$(docker exec -i $redis_node redis-cli INFO replication | grep -E '^role')
+  echo "  $redis_node: $role"
+done
+
+echo "Настройка завершена!"
