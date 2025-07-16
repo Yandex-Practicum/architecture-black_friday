@@ -125,6 +125,12 @@ services:
       - configSrv
       - configSrv2
       - configSrv3
+      - shard1-1
+      - shard1-2
+      - shard1-3
+      - shard2-1
+      - shard2-2
+      - shard2-3
     command:
       - "mongos"
       - "--configdb"
@@ -150,6 +156,12 @@ services:
       - configSrv
       - configSrv2
       - configSrv3
+      - shard1-1
+      - shard1-2
+      - shard1-3
+      - shard2-1
+      - shard2-2
+      - shard2-3
     command:
       - "mongos"
       - "--configdb"

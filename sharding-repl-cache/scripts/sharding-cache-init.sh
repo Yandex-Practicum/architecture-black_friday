@@ -70,7 +70,7 @@ else
   echo "Shard 2 уже инициализирован"
 fi
 
-echo "Очистка БД 'somedb'"
+echo "Очистка БД somedb"
 docker exec -i shard1-1 mongosh --port 27018 --eval '
   const dbs = db.adminCommand("listDatabases").databases.map(d => d.name);
   if (dbs.includes("somedb")) {

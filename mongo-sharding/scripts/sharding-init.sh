@@ -50,8 +50,32 @@ else
   echo "Shard 2 уже инициализирован"
 fi
 
-echo "Ожидание готовности сервисов (10 секунд)..."
-sleep 10
+echo "Очистка БД somedb"
+docker exec -i shard1 mongosh --port 27018 --eval '
+  const dbs = db.adminCommand("listDatabases").databases.map(d => d.name);
+  if (dbs.includes("somedb")) {
+    print("База somedb найдена на shard1. Удаляем все коллекции...");
+    const collections = db.getSiblingDB("somedb").getCollectionNames();
+    collections.forEach(coll => db.getSiblingDB("somedb")[coll].drop());
+    print("База очищена.");
+  } else {
+    print("База somedb не найдена — пропускаем очистку.");
+  }
+'
+docker exec -i shard2 mongosh --port 27019 --eval '
+  const dbs = db.adminCommand("listDatabases").databases.map(d => d.name);
+  if (dbs.includes("somedb")) {
+    print("База somedb найдена на shard2. Удаляем все коллекции...");
+    const collections = db.getSiblingDB("somedb").getCollectionNames();
+    collections.forEach(coll => db.getSiblingDB("somedb")[coll].drop());
+    print("База очищена.");
+  } else {
+    print("База somedb не найдена — пропускаем очистку.");
+  }
+'
+
+echo "Ожидание готовности сервисов (30 секунд)..."
+sleep 30
 
 # 4. Настройка mongos
 echo "4. Настройка mongos router"
@@ -84,7 +108,6 @@ echo "Записей в somedb:"
 docker exec -i mongos_router mongosh "mongodb://localhost:27020/somedb" --eval '
   db.helloDoc.countDocuments();
 '
-echo "Настройка завершена!"
 
 echo "6. Проверка количества тестовых данных в шардах"
 echo "Записей в Shard1"
@@ -97,3 +120,5 @@ docker exec -i shard2 mongosh --port 27019 --eval '
   db = db.getSiblingDB("somedb");
   db.helloDoc.countDocuments();
 '
+
+echo "Настройка завершена!"
