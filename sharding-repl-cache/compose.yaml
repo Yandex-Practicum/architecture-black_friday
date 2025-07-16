@@ -1,0 +1,386 @@
+name: sharding-repl-cache
+
+services:
+  pymongo_api:
+    container_name: pymongo_api
+    build: 
+      context: api_app
+      dockerfile: Dockerfile
+    depends_on:
+      - mongos_router
+    ports:
+      - "8080:8080"
+    environment:
+      MONGODB_URL: "mongodb://mongos_router:27020,mongos_router2:27020,mongos_router3:27020"  # Подключение ко всем роутерам
+      MONGODB_DATABASE_NAME: "somedb"
+      REDIS_URL: "redis://redis_1:6379"
+    networks:
+      - app-network
+
+  # Сервер конфигурации (Config Server) с репликацией
+  configSrv:
+    image: mongo:latest
+    container_name: configSrv 
+    restart: always
+    ports:
+      - "27017:27017"  # Порт для подключения
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.10  # Фиксированный IP
+    volumes:
+      - config-data_1:/data/db  # Постоянное хранилище данных
+    command:
+      - "--configsvr"  # Режим сервера конфигурации
+      - "--replSet"
+      - "config_server"  # Имя набора реплик
+      - "--bind_ip_all"  # Слушать все интерфейсы
+      - "--port"
+      - "27017"
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+
+  # Реплики сервера конфигурации
+  configSrv2:
+    image: mongo:latest
+    container_name: configSrv2
+    restart: always
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.11
+    volumes:
+      - config-data_2:/data/db
+    command:
+      - "--configsvr"
+      - "--replSet"
+      - "config_server"
+      - "--bind_ip_all"
+      - "--port"
+      - "27017"
+    depends_on:
+      - configSrv
+
+  configSrv3:
+    image: mongo:latest
+    container_name: configSrv3
+    restart: always
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.12
+    volumes:
+      - config-data_3:/data/db
+    command:
+      - "--configsvr"
+      - "--replSet"
+      - "config_server"
+      - "--bind_ip_all"
+      - "--port"
+      - "27017"
+    depends_on:
+      - configSrv
+
+  # Маршрутизатор (mongos)
+  mongos_router:
+    image: mongo:latest
+    container_name: mongos_router
+    restart: always
+    ports:
+      - "27020:27020"  # Основной порт для подключения приложений
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.7
+    depends_on:
+      - configSrv
+      - configSrv2
+      - configSrv3
+      - shard1-1
+      - shard1-2
+      - shard1-3
+      - shard2-1
+      - shard2-2
+      - shard2-3
+    command:
+      - "mongos"  # Режим маршрутизатора
+      - "--configdb"
+      - "config_server/configSrv:27017,configSrv2:27017,configSrv3:27017"  # Все узлы config сервера
+      - "--bind_ip_all"
+      - "--port"
+      - "27020"
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+
+  # Реплики mongos-роутера для отказоустойчивости
+  mongos_router2:
+    image: mongo:latest
+    container_name: mongos_router2
+    restart: always
+    ports:
+      - "27025:27020"  # Уникальный внешний порт
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.13
+    depends_on:
+      - configSrv
+      - configSrv2
+      - configSrv3
+      - shard1-1
+      - shard1-2
+      - shard1-3
+      - shard2-1
+      - shard2-2
+      - shard2-3
+    command:
+      - "mongos"
+      - "--configdb"
+      - "config_server/configSrv:27017,configSrv2:27017,configSrv3:27017"
+      - "--bind_ip_all"
+      - "--port"
+      - "27020"
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+
+  mongos_router3:
+    image: mongo:latest
+    container_name: mongos_router3
+    restart: always
+    ports:
+      - "27026:27020"  # Уникальный внешний порт
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.14
+    depends_on:
+      - configSrv
+      - configSrv2
+      - configSrv3
+      - shard1-1
+      - shard1-2
+      - shard1-3
+      - shard2-1
+      - shard2-2
+      - shard2-3
+    command:
+      - "mongos"
+      - "--configdb"
+      - "config_server/configSrv:27017,configSrv2:27017,configSrv3:27017"
+      - "--bind_ip_all"
+      - "--port"
+      - "27020"
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+
+  # Первый шард (Shard 1) с репликацией
+  shard1-1:
+    container_name: shard1-1
+    image: dh-mirror.gitverse.ru/mongo:latest
+    volumes:
+      - shard1_1_data:/data/db
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.3
+    ports:
+      - "27018:27018"  # Добавлено
+    command:
+      - "--shardsvr"  # Режим шарда
+      - "--replSet"
+      - "shard1"  # Имя набора реплик
+      - "--bind_ip_all"
+      - "--port"
+      - "27018"
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "27018", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+
+  # Реплики первого шарда
+  shard1-2:
+    container_name: shard1-2
+    image: dh-mirror.gitverse.ru/mongo:latest
+    volumes:
+      - shard1_2_data:/data/db
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.5
+    ports:
+      - "27021:27018"
+    command:
+      - "--shardsvr"
+      - "--replSet"
+      - "shard1"
+      - "--bind_ip_all"
+      - "--port"
+      - "27018"
+    depends_on:
+      - shard1-1
+
+  shard1-3:
+    container_name: shard1-3
+    image: dh-mirror.gitverse.ru/mongo:latest
+    volumes:
+      - shard1_3_data:/data/db
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.6
+    ports:
+      - "27022:27018"
+    command:
+      - "--shardsvr"
+      - "--replSet"
+      - "shard1"
+      - "--bind_ip_all"
+      - "--port"
+      - "27018"
+    depends_on:
+      - shard1-1
+
+  # Второй шард (Shard 2)
+  shard2-1:
+    container_name: shard2-1
+    image: dh-mirror.gitverse.ru/mongo:latest
+    volumes:
+      - shard2_1_data:/data/db
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.4
+    ports:
+      - "27019:27019"  # Добавлено
+    command:
+      - "--shardsvr"  # Режим шарда
+      - "--replSet"
+      - "shard2"  # Имя набора реплик
+      - "--bind_ip_all"
+      - "--port"
+      - "27019"
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "27019", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+
+  # Реплики второго шарда
+  shard2-2:
+    container_name: shard2-2
+    image: dh-mirror.gitverse.ru/mongo:latest
+    volumes:
+      - shard2_2_data:/data/db
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.8
+    ports:
+      - "27023:27019"
+    command:
+      - "--shardsvr"
+      - "--replSet"
+      - "shard2"
+      - "--bind_ip_all"
+      - "--port"
+      - "27019"
+    depends_on:
+      - shard2-1
+
+  shard2-3:
+    container_name: shard2-3
+    image: dh-mirror.gitverse.ru/mongo:latest
+    volumes:
+      - shard2_3_data:/data/db
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.9
+    ports:
+      - "27024:27019"
+    command:
+      - "--shardsvr"
+      - "--replSet"
+      - "shard2"
+      - "--bind_ip_all"
+      - "--port"
+      - "27019"
+    depends_on:
+      - shard2-1
+  
+  # MASTER для shard1
+  redis_1: 
+    image: "redis:latest"
+    container_name: redis_1
+    ports:
+      - "6379"
+    volumes:
+      - redis_1_data:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.20
+
+  # REPLICA для redis_1
+  redis_2:
+    image: "redis:latest"
+    container_name: redis_2
+    ports:
+      - "6379"
+    volumes:
+      - redis_2_data:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.21
+
+  # MASTER для shard2
+  redis_3:
+    image: "redis:latest"
+    container_name: redis_3
+    ports:
+      - "6379"
+    volumes:
+      - redis_3_data:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.22
+        
+  # REPLICA для redis_3
+  redis_4:
+    image: "redis:latest"
+    container_name: redis_4
+    ports:
+      - "6379"
+    volumes:
+      - redis_4_data:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.23
+
+# Настройки сети
+networks:
+  app-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 173.17.0.0/16  # Подсеть для контейнеров
+
+# Тома для постоянного хранения данных
+volumes:
+  shard1_1_data:
+  shard1_2_data:
+  shard1_3_data:
+  shard2_1_data:
+  shard2_2_data:
+  shard2_3_data:
+  config-data_1:
+  config-data_2:
+  config-data_3:
+  redis_1_data:
+  redis_2_data:
+  redis_3_data:
+  redis_4_data:
+
