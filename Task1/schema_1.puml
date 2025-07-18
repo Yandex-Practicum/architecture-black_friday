@@ -12,18 +12,18 @@ skinparam shadowing false
 !define SHARD_COLOR #E1F5FE
 !define PRIMARY_COLOR #4CAF50
 
-rectangle "Приложение\n(pymongo-api)" as app APP_COLOR
+rectangle "pymongo-api" as app APP_COLOR
 
 package "MongoDB" {
     rectangle "Драйвер" as driver DRIVER_COLOR
-    rectangle "Конфигурационный сервер" as config CONFIG_COLOR
+    rectangle "configSrv" as config CONFIG_COLOR
     rectangle "Роутер" as router1 ROUTER_COLOR
     rectangle "Роутер" as router2 ROUTER_COLOR
-    rectangle "Шард-1" as shard1 SHARD_COLOR {
-        rectangle "Первичный сервер" as s1_primary PRIMARY_COLOR
+    rectangle "shard1" as shard1 SHARD_COLOR {
+        rectangle "master" as s1_1 PRIMARY_COLOR
     }
-    rectangle "Шард-2" as shard2 SHARD_COLOR {
-        rectangle "Первичный сервер" as s2_primary PRIMARY_COLOR
+    rectangle "shard2" as shard2 SHARD_COLOR {
+        rectangle "master" as s2_1 PRIMARY_COLOR
     }
 }
 
