@@ -1,0 +1,252 @@
+name: mongo-sharding
+
+services:
+
+  pymongo_api:
+    container_name: pymongo_api
+    build: 
+      context: api_app
+      dockerfile: Dockerfile
+    depends_on:
+      cluster-init:
+        condition: service_completed_successfully
+      mongos_router:
+        condition: service_healthy
+    ports:
+      - 8080:8080
+    networks:
+      - app-network
+    environment:
+      MONGODB_URL: "mongodb://mongos_router:27020"
+      MONGODB_DATABASE_NAME: "somedb"
+    restart: always
+
+  config-init:
+    image: mongo:latest
+    container_name: config-init
+    depends_on:
+      configSrv:
+        condition: service_healthy
+    networks:
+      - app-network
+    volumes:
+      - ./scripts:/scripts
+    working_dir: /
+    command: >
+      bash -c "
+        echo '🔧 Инициализация Config Server...'
+        chmod +x /scripts/mongo-config-init.sh
+        /scripts/mongo-config-init.sh
+        echo '✅ Config Server инициализирован!'
+      "
+    restart: "no"
+
+  shard1-init:
+    image: mongo:latest
+    container_name: shard1-init
+    depends_on:
+      shard1:
+        condition: service_healthy
+    networks:
+      - app-network
+    volumes:
+      - ./scripts:/scripts
+    working_dir: /
+    command: >
+      bash -c "
+        echo '🔧 Инициализация Shard1...'
+        chmod +x /scripts/mongo-shard1-init.sh
+        /scripts/mongo-shard1-init.sh
+        echo '✅ Shard1 инициализирован!'
+      "
+    restart: "no"
+
+  # Этап 3: Инициализация Shard2
+  shard2-init:
+    image: mongo:latest
+    container_name: shard2-init
+    depends_on:
+      shard2:
+        condition: service_healthy
+    networks:
+      - app-network
+    volumes:
+      - ./scripts:/scripts
+    working_dir: /
+    command: >
+      bash -c "
+        echo '🔧 Инициализация Shard2...'
+        chmod +x /scripts/mongo-shard2-init.sh
+        /scripts/mongo-shard2-init.sh
+        echo '✅ Shard2 инициализирован!'
+      "
+    restart: "no"
+
+  cluster-init:
+    image: mongo:latest
+    container_name: cluster-init
+    depends_on:
+      mongos_router:
+        condition: service_healthy
+      shard1-init:
+        condition: service_completed_successfully
+      shard2-init:
+        condition: service_completed_successfully
+    networks:
+      - app-network
+    volumes:
+      - ./scripts:/scripts
+    working_dir: /
+    command: >
+      bash -c "
+        echo '🔧 Настройка кластера...'
+        chmod +x /scripts/mongo-router-init.sh
+        /scripts/mongo-router-init.sh
+        echo '✅ Кластер полностью инициализирован!'
+      "
+    restart: "no"
+
+  configSrv:
+    image: mongo:latest
+    container_name: configSrv 
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.10
+    expose:
+      - 27017
+    volumes:
+      - config-data:/data/db
+    command: [
+        "--configsvr",
+        "--replSet",
+        "config_server",
+        "--bind_ip_all",
+        "--port",
+        "27017"
+      ]
+    healthcheck:
+      test: [
+        "CMD",
+        "mongosh",
+        "--port", "27017",
+        "--eval",
+        "db.adminCommand('ping')"
+      ]
+      interval: 5s
+      start_period: 10s
+      timeout: 5s
+      retries: 3
+    restart: always
+
+  mongos_router:
+    image: mongo:latest
+    container_name: mongos_router
+    depends_on:
+      config-init:
+        condition: service_completed_successfully
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.7
+    expose:
+      - 27020
+    command:
+      [
+        "mongos",
+        "--configdb", 
+        "config_server/configSrv:27017",
+        "--bind_ip_all",
+        "--port",
+        "27020"
+      ]
+    healthcheck:
+      test: [
+        "CMD",
+        "mongosh",
+        "--port", "27020",
+        "--eval",
+        "db.adminCommand('ping')"
+      ]
+      interval: 5s
+      start_period: 15s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  shard1:
+    image: mongo:latest
+    container_name: shard1
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.9
+    expose:
+      - 27018
+    volumes:
+      - shard1-data:/data/db
+    command:
+      [
+        "--shardsvr",
+        "--replSet",
+        "shard1",
+        "--bind_ip_all",
+        "--port",
+        "27018"
+      ]
+    healthcheck:
+      test: [
+        "CMD",
+        "mongosh",
+        "--port", "27018",
+        "--eval",
+        "db.adminCommand('ping')"
+      ]
+      interval: 5s
+      start_period: 10s
+      timeout: 5s
+      retries: 3
+    restart: always
+
+  shard2:
+    image: mongo:latest
+    container_name: shard2
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.8
+    expose:
+      - 27019
+    volumes:
+      - shard2-data:/data/db
+    command:
+      [
+        "--shardsvr",
+        "--replSet",
+        "shard2",
+        "--bind_ip_all",
+        "--port",
+        "27019"
+      ]
+    healthcheck:
+      test: [
+        "CMD",
+        "mongosh",
+        "--port", "27019",
+        "--eval",
+        "db.adminCommand('ping')"
+      ]
+      interval: 5s
+      start_period: 10s
+      timeout: 5s
+      retries: 3
+    restart: always
+
+networks:
+  app-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 173.17.0.0/16
+
+volumes:
+  config-data:
+  shard1-data:
+  shard2-data:
