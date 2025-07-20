@@ -1,0 +1,95 @@
+name: sharding-repl-cache
+
+services:
+
+  shard-1_init:
+    image: mongo:latest
+    container_name: shard-1_init
+    depends_on:
+      shard-1-1:
+        condition: service_healthy
+      shard-1-2:
+        condition: service_healthy
+      shard-1-3:
+        condition: service_healthy
+    networks:
+      - app-network
+    volumes:
+      - ./scripts:/scripts
+    working_dir: /
+    command: >
+      bash -c "
+        echo '🔧 Инициализация shard-1...'
+        chmod +x /scripts/mongo_shard-1_init.sh
+        /scripts/mongo_shard-1_init.sh
+        echo '✅ shard-1 инициализирован!'
+      "
+    restart: "no"
+
+  shard-2_init:
+    image: mongo:latest
+    container_name: shard-2_init
+    depends_on:
+      shard-2-1:
+        condition: service_healthy
+      shard-2-2:
+        condition: service_healthy
+      shard-2-3:
+        condition: service_healthy
+    networks:
+      - app-network
+    volumes:
+      - ./scripts:/scripts
+    working_dir: /
+    command: >
+      bash -c "
+        echo '🔧 Инициализация shard-2...'
+        chmod +x /scripts/mongo_shard-2_init.sh
+        /scripts/mongo_shard-2_init.sh
+        echo '✅ shard-2 инициализирован!'
+      "
+    restart: "no"
+
+  config_init:
+    image: mongo:latest
+    container_name: config_init
+    depends_on:
+      config:
+        condition: service_healthy
+    networks:
+      - app-network
+    volumes:
+      - ./scripts:/scripts
+    working_dir: /
+    command: >
+      bash -c "
+        echo '🔧 Инициализация config...'
+        chmod +x /scripts/mongo_config_init.sh
+        /scripts/mongo_config_init.sh
+        echo '✅ config инициализирован!'
+      "
+    restart: "no"
+
+  router_init:
+    image: mongo:latest
+    container_name: router_init
+    depends_on:
+      router:
+        condition: service_healthy
+      shard-1_init:
+        condition: service_completed_successfully
+      shard-2_init:
+        condition: service_completed_successfully
+    networks:
+      - app-network
+    volumes:
+      - ./scripts:/scripts
+    working_dir: /
+    command: >
+      bash -c "
+        echo '🔧 Настройка mongos-router...'
+        chmod +x /scripts/mongo_router_init.sh
+        /scripts/mongo_router_init.sh
+        echo '✅ router инициализирован!'
+      "
+    restart: "no"

@@ -1,0 +1,23 @@
+name: sharding-repl-cache
+
+services:
+
+  pymongo-api:
+    container_name: pymongo-api
+    build:
+      context: api_app
+      dockerfile: Dockerfile
+    depends_on:
+      router_init:
+        condition: service_completed_successfully
+      redis: 
+        condition: service_healthy
+    ports:    
+      - 8080:8080
+    networks:
+      - app-network
+    environment:
+      MONGODB_URL: "mongodb://router:27017"
+      MONGODB_DATABASE_NAME: "somedb"
+      REDIS_URL: "redis://redis:6379"
+    restart: always
