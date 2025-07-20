@@ -1,0 +1,13 @@
+name: mongo-sharding-repl
+
+networks:
+  app-network:
+
+volumes:
+  config_data:
+  shard-1-1_data:
+  shard-1-2_data:
+  shard-1-3_data:
+  shard-2-1_data:
+  shard-2-2_data:
+  shard-2-3_data:

@@ -1,0 +1,20 @@
+name: mongo-sharding-repl
+
+services:
+
+  pymongo-api:
+    container_name: pymongo-api
+    build:
+      context: api_app
+      dockerfile: Dockerfile
+    depends_on:
+      router_init:
+        condition: service_completed_successfully
+    ports:
+      - 8080:8080
+    networks:
+      - app-network
+    environment:
+      MONGODB_URL: "mongodb://router:27017"
+      MONGODB_DATABASE_NAME: "somedb"
+    restart: always
