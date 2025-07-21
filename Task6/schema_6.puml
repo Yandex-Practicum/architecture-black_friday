@@ -1,0 +1,82 @@
+@startuml
+
+title CDN
+left to right direction
+skinparam componentStyle rectangle
+skinparam backgroundColor white
+skinparam shadowing false
+
+!define CDN_COLOR #b017b3
+!define API_GATEWAY_COLOR #FF1722
+!define SERVICE_DISCOVERY_COLOR#19a84d
+!define APP_COLOR#86c2ff
+!define REDIS_COLOR #FF5722
+!define DRIVER_COLOR #9E9E9E
+!define CONFIG_COLOR #E91E63
+!define ROUTER_COLOR #FF9800
+!define SHARD_COLOR #E1F5FE
+!define PRIMARY_COLOR #4CAF50
+!define SECONDARY_COLOR #FFEB3B
+
+actor "Client" as client
+
+package "CDN" {
+    rectangle "CDN 1" as cdn1 CDN_COLOR
+    rectangle "CDN N" as cdnN CDN_COLOR
+}
+rectangle "API Gateway" as api_gateway API_GATEWAY_COLOR
+rectangle "Service Discovery" as consul SERVICE_DISCOVERY_COLOR
+
+package "Application" {
+    rectangle "pymongo-api 1" as app1 APP_COLOR
+    rectangle "pymongo-api N" as appN APP_COLOR
+}
+
+package "Cache" {
+    rectangle "redis" as redis REDIS_COLOR
+}
+
+package "MongoDB" {
+    rectangle "Драйвер" as driver DRIVER_COLOR
+    rectangle "configSrv" as config CONFIG_COLOR
+    rectangle "Роутер" as router1 ROUTER_COLOR
+    rectangle "Роутер" as router2 ROUTER_COLOR
+    rectangle "shard1" as shard1 SHARD_COLOR {
+        rectangle "master" as s1_1 PRIMARY_COLOR
+        rectangle "slave" as s1_2 SECONDARY_COLOR
+        rectangle "slave" as s1_3 SECONDARY_COLOR
+    }
+    rectangle "shard2" as shard2 SHARD_COLOR {
+        rectangle "master" as s2_1 PRIMARY_COLOR
+        rectangle "slave" as s2_2 SECONDARY_COLOR
+        rectangle "slave" as s2_3 SECONDARY_COLOR
+    }
+}
+
+client -down-> CDN : "HTTPS"
+
+CDN -down-> api_gateway : "Cache Miss / Origin Pull"
+
+api_gateway -right-> consul : "Service Lookup/Health Check"
+api_gateway -down-> Application : "Запросы"
+
+Application -up-> consul : "Регистрация"
+Application -down-> Cache : "Get/Update cache"
+Application -down-> driver : "Get/Update data"
+
+driver -down-> router1
+driver -down-> router2
+router1 -up-> config
+router2 -up-> config
+router1 -down-> shard1
+router2 -down-> shard2
+
+s1_1 <-down-> s1_2 : "heartbeat/replication"
+s1_1 <-down-> s1_3 : "heartbeat/replication" 
+s1_2 <-right-> s1_3 : "heartbeat"
+
+s2_1 <-down-> s2_2 : "heartbeat/replication"
+s2_1 <-down-> s2_3 : "heartbeat/replication" 
+s2_2 <-right-> s2_3 : "heartbeat"
+
+@enduml
