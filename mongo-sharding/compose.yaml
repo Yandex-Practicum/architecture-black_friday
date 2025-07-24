@@ -1,0 +1,58 @@
+name: mongo-sharding
+services:
+  shard1:
+    image: mongo:6.0
+    container_name: shard1
+    command: mongod --shardsvr --replSet rs-shard1 --port 27018
+    ports:
+      - 27018:27018
+    volumes:
+      - shard1_data:/data/db
+
+  shard2:
+    image: mongo:6.0
+    container_name: shard2
+    command: mongod --shardsvr --replSet rs-shard2 --port 27019
+    ports:
+      - 27019:27019
+    volumes:
+      - shard2_data:/data/db
+
+  configsvr:
+    image: mongo:6.0
+    container_name: configsvr
+    command: mongod --configsvr --replSet rs-config --port 27017
+    ports:
+      - 27017:27017
+    volumes:
+      - config_data:/data/db
+
+  mongos:
+    image: mongo:6.0
+    container_name: mongos
+    depends_on:
+      - shard1
+      - shard2
+      - configsvr
+    command: >
+      bash -c 'sleep 10 && mongos --configdb rs-config/configsvr:27017 --bind_ip_all'
+    ports:
+      - 27020:27017
+
+  pymongo_api:
+    container_name: pymongo_api
+    build:
+      context: api_app
+      dockerfile: Dockerfile
+    depends_on:
+      - mongos
+    ports:
+      - 8080:8080
+    environment:
+      MONGODB_URL: "mongodb://mongos:27017"
+      MONGODB_DATABASE_NAME: "somedb"
+
+volumes:
+  shard1_data:
+  shard2_data:
+  config_data:
