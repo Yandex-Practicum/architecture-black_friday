@@ -1,0 +1,176 @@
+name: service-discovery-gateway
+
+services:
+
+  configsvr:
+    image: mongo:5.0
+    container_name: configsvr
+    command: mongod --configsvr --replSet configReplSet --port 27019
+    ports:
+      - 27019:27019
+    volumes:
+      - configdb_data:/data/db
+
+  # основной шард1
+  shard1:
+    image: mongo:5.0
+    container_name: shard1
+    command: mongod --shardsvr --replSet shard1ReplSet --port 27018
+    ports:
+      - 27018:27018
+    volumes:
+      - shard1_data:/data/db
+
+  # копия шарда1 номер 1
+  shard1-secondary1:
+    image: mongo:5.0
+    container_name: shard1-secondary1
+    command: mongod --shardsvr --replSet shard1ReplSet --port 27028
+    ports:
+      - 27028:27028
+    volumes:
+      - shard1_secondary1_data:/data/db
+
+  # копия шарда1 номер 2
+  shard1-secondary2:
+    image: mongo:5.0
+    container_name: shard1-secondary2
+    command: mongod --shardsvr --replSet shard1ReplSet --port 27038
+    ports:
+      - 27038:27038
+    volumes:
+      - shard1_secondary2_data:/data/db
+
+  # основной шард2
+  shard2:
+    image: mongo:5.0
+    container_name: shard2
+    command: mongod --shardsvr --replSet shard2ReplSet --port 27020
+    ports:
+      - 27020:27020
+    volumes:
+      - shard2_data:/data/db
+
+  # копия шарда2 номер 1
+  shard2-secondary1:
+    image: mongo:5.0
+    container_name: shard2-secondary1
+    command: mongod --shardsvr --replSet shard2ReplSet --port 27030
+    ports:
+      - 27030:27030
+    volumes:
+      - shard2_secondary1_data:/data/db
+
+  # копия шарда2 номер 2
+  shard2-secondary2:
+    image: mongo:5.0
+    container_name: shard2-secondary2
+    command: mongod --shardsvr --replSet shard2ReplSet --port 27040
+    ports:
+      - 27040:27040
+    volumes:
+      - shard2_secondary2_data:/data/db
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_data:/data
+
+  # Consul сервер для service discovery
+  consul:
+    image: consul:1.15
+    container_name: consul
+    ports:
+      - 8500:8500
+      - 8600:8600/udp
+    command: consul agent -server -bootstrap-expect=1 -ui -client=0.0.0.0 -data-dir=/consul/data
+    volumes:
+      - consul_data:/consul/data
+
+  mongos:
+    image: mongo:5.0
+    container_name: mongos
+    command: mongos --configdb configReplSet/configsvr:27019 --port 27017 --bind_ip_all
+    ports:
+      - 27017:27017
+    depends_on:
+      - configsvr
+      - shard1
+      - shard1-secondary1
+      - shard1-secondary2
+      - shard2
+      - shard2-secondary1
+      - shard2-secondary2
+
+  # первый инстанс приложения
+  pymongo-api-1:
+    image: kazhem/pymongo_api:1.0.0
+    container_name: pymongo_api_1
+    ports:
+      - 8001:8080
+    depends_on:
+      - mongos
+      - redis
+      - consul
+    environment:
+      MONGODB_URL: mongodb://mongos:27017/somedb
+      MONGODB_DATABASE_NAME: somedb
+      REDIS_URL: redis://redis:6379
+
+  # второй инстанс приложения
+  pymongo-api-2:
+    image: kazhem/pymongo_api:1.0.0
+    container_name: pymongo_api_2
+    ports:
+      - 8002:8080
+    depends_on:
+      - mongos
+      - redis
+      - consul
+    environment:
+      MONGODB_URL: mongodb://mongos:27017/somedb
+      MONGODB_DATABASE_NAME: somedb
+      REDIS_URL: redis://redis:6379
+
+  # третий инстанс приложения
+  pymongo-api-3:
+    image: kazhem/pymongo_api:1.0.0
+    container_name: pymongo_api_3
+    ports:
+      - 8003:8080
+    depends_on:
+      - mongos
+      - redis
+      - consul
+    environment:
+      MONGODB_URL: mongodb://mongos:27017/somedb
+      MONGODB_DATABASE_NAME: somedb
+      REDIS_URL: redis://redis:6379
+
+  # API Gateway (Nginx) для балансировки нагрузки
+  nginx-gateway:
+    image: nginx:alpine
+    container_name: nginx_gateway
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - consul
+      - pymongo-api-1
+      - pymongo-api-2
+      - pymongo-api-3
+
+volumes:
+  configdb_data:
+  shard1_data:
+  shard1_secondary1_data:
+  shard1_secondary2_data:
+  shard2_data:
+  shard2_secondary1_data:
+  shard2_secondary2_data:
+  redis_data:
+  consul_data:

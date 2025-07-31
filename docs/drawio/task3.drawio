@@ -1,0 +1,109 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.0.4 Chrome/138.0.7204.97 Electron/37.2.1 Safari/537.36" version="28.0.4">
+  <diagram name="Шардирование с репликацией и кешированием" id="sharding-replication-cache-architecture">
+    <mxGraphModel dx="2066" dy="2028" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="replgroup1" value="" style="ellipse;whiteSpace=wrap;html=1;dashed=1;shadow=1;" parent="1" vertex="1">
+          <mxGeometry x="80" y="260" width="270" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="replgroup2" value="" style="ellipse;whiteSpace=wrap;html=1;dashed=1;shadow=1;" parent="1" vertex="1">
+          <mxGeometry x="670" y="260" width="280" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="app" value="pymongo-api" style="rounded=1;whiteSpace=wrap;html=1;shadow=1;" parent="1" vertex="1">
+          <mxGeometry x="480" y="-30" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="redis" value="redis" style="rounded=1;whiteSpace=wrap;html=1;shadow=1;" parent="1" vertex="1">
+          <mxGeometry x="680" y="-30" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="configsvr" value="configsvr" style="rounded=1;whiteSpace=wrap;html=1;shadow=1;" parent="1" vertex="1">
+          <mxGeometry x="200" y="100" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mongos" value="mongos" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;shadow=1;" parent="1" vertex="1">
+          <mxGeometry x="480" y="100" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="shard1-primary" value="shard1 (Primary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;shadow=1;" parent="1" vertex="1">
+          <mxGeometry x="150" y="300" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="shard1-secondary1" value="shard1-secondary1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;shadow=1;" parent="1" vertex="1">
+          <mxGeometry x="150" y="380" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="shard1-secondary2" value="shard1-secondary2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;shadow=1;" parent="1" vertex="1">
+          <mxGeometry x="150" y="460" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="shard2-primary" value="shard2 (Primary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;shadow=1;" parent="1" vertex="1">
+          <mxGeometry x="750" y="300" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="shard2-secondary1" value="shard2-secondary1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;shadow=1;" parent="1" vertex="1">
+          <mxGeometry x="750" y="380" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="shard2-secondary2" value="shard2-secondary2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;shadow=1;" parent="1" vertex="1">
+          <mxGeometry x="750" y="460" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="conn1" value="" style="endArrow=classic;html=1;rounded=0;shadow=1;" parent="1" source="app" target="mongos" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="540" y="200" as="sourcePoint" />
+            <mxPoint x="540" y="160" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn2" value="" style="endArrow=classic;html=1;rounded=0;shadow=1;" parent="1" source="app" target="redis" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="600" y="230" as="sourcePoint" />
+            <mxPoint x="760" y="230" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn3" value="" style="endArrow=classic;html=1;rounded=0;shadow=1;" parent="1" source="mongos" target="configsvr" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="440" y="130" as="sourcePoint" />
+            <mxPoint x="320" y="130" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn4" value="" style="endArrow=classic;html=1;rounded=0;shadow=1;" parent="1" source="mongos" target="shard1-primary" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="440" y="130" as="sourcePoint" />
+            <mxPoint x="210" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn5" value="" style="endArrow=classic;html=1;rounded=0;shadow=1;" parent="1" source="mongos" target="shard2-primary" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="600" y="130" as="sourcePoint" />
+            <mxPoint x="810" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="repl1" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#b85450;shadow=1;" parent="1" source="shard1-primary" target="shard1-secondary1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="210" y="360" as="sourcePoint" />
+            <mxPoint x="210" y="380" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="repl2" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#b85450;shadow=1;" parent="1" source="shard1-secondary1" target="shard1-secondary2" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="210" y="440" as="sourcePoint" />
+            <mxPoint x="210" y="460" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="repl3" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#82b366;shadow=1;" parent="1" source="shard2-primary" target="shard2-secondary1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="810" y="360" as="sourcePoint" />
+            <mxPoint x="810" y="380" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="repl4" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#82b366;shadow=1;" parent="1" source="shard2-secondary1" target="shard2-secondary2" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="810" y="440" as="sourcePoint" />
+            <mxPoint x="810" y="460" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="title" value="Шардирование с репликацией и кешированием" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;shadow=1;" parent="1" vertex="1">
+          <mxGeometry x="400" y="-130" width="280" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="h-GOIqQFG1eEvKribNF8-1" value="Replica&lt;div&gt;Set 1&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;shadow=1;" parent="1" vertex="1">
+          <mxGeometry x="170" y="540" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="h-GOIqQFG1eEvKribNF8-2" value="Replica&lt;div&gt;Set 2&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;shadow=1;" parent="1" vertex="1">
+          <mxGeometry x="790" y="550" width="60" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
