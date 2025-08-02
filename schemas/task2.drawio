@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36" version="28.0.7">
   <diagram name="Страница — 1" id="d0A0_m-24O544CafxdXr">
-    <mxGraphModel dx="689" dy="368" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1181" dy="630" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -58,13 +58,13 @@
         <mxCell id="UdZ55fgdl7yd69Ul25oq-23" value="&lt;div&gt;Secondary&lt;/div&gt;&lt;div&gt;Node&lt;/div&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="UdZ55fgdl7yd69Ul25oq-18" vertex="1">
           <mxGeometry x="100" y="92" width="70" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="QOZ-tlKIytoyQwH3YAfJ-1" value="MongoDB&lt;div&gt;Router&lt;/div&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+        <mxCell id="QOZ-tlKIytoyQwH3YAfJ-1" value="MongoDB&lt;div&gt;Router&lt;/div&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="1" vertex="1">
           <mxGeometry x="340" y="280" width="60" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="QOZ-tlKIytoyQwH3YAfJ-2" value="MongoDB&lt;div&gt;config&lt;/div&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+        <mxCell id="QOZ-tlKIytoyQwH3YAfJ-2" value="MongoDB&lt;div&gt;config&lt;/div&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="1" vertex="1">
           <mxGeometry x="340" y="160" width="60" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="QOZ-tlKIytoyQwH3YAfJ-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="QOZ-tlKIytoyQwH3YAfJ-1" target="QOZ-tlKIytoyQwH3YAfJ-2">
+        <mxCell id="QOZ-tlKIytoyQwH3YAfJ-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="QOZ-tlKIytoyQwH3YAfJ-1" target="QOZ-tlKIytoyQwH3YAfJ-2" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
       </root>

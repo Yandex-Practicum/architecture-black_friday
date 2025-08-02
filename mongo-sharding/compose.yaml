@@ -1,5 +1,5 @@
+name: mongo-sharding
 services:
-
   pymongo_api:
     container_name: pymongo_api
     build:

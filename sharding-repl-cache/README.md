@@ -27,7 +27,7 @@ exit()
 
 #### 3. Инициализация шардов
 ```bash
-docker exec -it shard-1 mongosh --port 27018
+docker exec -it shard-1-primary mongosh --port 27018
 ```
 
 ```bash
@@ -35,7 +35,9 @@ rs.initiate(
     {
       _id : "shard-1",
       members: [
-        { _id : 0, host : "shard-1:27018" },
+        { _id: 0, host: "shard-1-primary:27018"},
+        { _id: 1, host: "shard-1-replica-1:27018"},
+        { _id: 2, host: "shard-1-replica-2:27018"}
       ]
     }
 );
@@ -46,7 +48,7 @@ exit()
 ```
 
 ```bash
-docker exec -it shard-2 mongosh --port 27019
+docker exec -it shard-2-primary mongosh --port 27019
 ```
 
 ```bash
@@ -54,7 +56,9 @@ rs.initiate(
     {
       _id : "shard-2",
       members: [
-        { _id : 1, host : "shard-2:27019" }
+        { _id: 0, host: "shard-2-primary:27019" },
+        { _id: 1, host: "shard-2-replica-1:27019" },
+        { _id: 2, host: "shard-2-replica-2:27019" }
       ]
     }
 );
@@ -70,10 +74,10 @@ docker exec -it mongos-router mongosh --port 27020
 ```
 
 ```bash
-sh.addShard( "shard-1/shard-1:27018");
+sh.addShard("shard-1/shard-1-primary:27018,shard-1-replica-1:27018,shard-1-replica-2:27018");
 ```
 ```bash
-sh.addShard( "shard-2/shard-2:27019");
+sh.addShard("shard-2/shard-2-primary:27019,shard-2-replica-1:27019,shard-2-replica-2:27019");
 ```
 
 ```bash

@@ -1,35 +1,15 @@
 # pymongo-api
 
-## Как запустить
+Для запуска всех версий приложения в каждой директории приложен README.md с последовательным набором команд
 
-Запускаем mongodb и приложение
+### Диаграммы
 
-```shell
-docker compose up -d
-```
+![task1.png](schemas/task1.png)
 
-Заполняем mongodb данными
+![task2.png](schemas/task2.png)
 
-```shell
-./scripts/mongo-init.sh
-```
+![task3.png](schemas/task3.png)
 
-## Как проверить
+![task4.png](schemas/task4.png)
 
-### Если вы запускаете проект на локальной машине
-
-Откройте в браузере http://localhost:8080
-
-### Если вы запускаете проект на предоставленной виртуальной машине
-
-Узнать белый ip виртуальной машины
-
-```shell
-curl --silent http://ifconfig.me
-```
-
-Откройте в браузере http://<ip виртуальной машины>:8080
-
-## Доступные эндпоинты
-
-Список доступных эндпоинтов, swagger http://<ip виртуальной машины>:8080/docs
+![task5.png](schemas/task5.png)
