@@ -1,0 +1,45 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:141.0) Gecko/20100101 Firefox/141.0" version="28.0.9">
+  <diagram name="Page-1" id="-H_mtQnk-PTXWXPvYvuk">
+    <mxGraphModel dx="945" dy="1553" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="wvA5k8sYOJf62LdnIELD-1" value="pymongo-api" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="289" y="50" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="wvA5k8sYOJf62LdnIELD-2" value="mongos&#xa;(router)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="271" y="320.5" width="176" height="101" as="geometry" />
+        </mxCell>
+        <mxCell id="wvA5k8sYOJf62LdnIELD-3" value="configSrv&#xa;(configsvr)" style="rounded=1;dashed=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="530" y="130" width="170" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="wvA5k8sYOJf62LdnIELD-4" value="shard1&#xa;(shardsvr)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="499" y="309" width="131" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="wvA5k8sYOJf62LdnIELD-5" value="shard2&#xa;(shardsvr)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="90" y="313" width="134" height="116" as="geometry" />
+        </mxCell>
+        <mxCell id="wvA5k8sYOJf62LdnIELD-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="wvA5k8sYOJf62LdnIELD-1" target="wvA5k8sYOJf62LdnIELD-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="wvA5k8sYOJf62LdnIELD-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="wvA5k8sYOJf62LdnIELD-2" target="wvA5k8sYOJf62LdnIELD-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="wvA5k8sYOJf62LdnIELD-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="wvA5k8sYOJf62LdnIELD-2" target="wvA5k8sYOJf62LdnIELD-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="wvA5k8sYOJf62LdnIELD-9" value="metadata" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;startArrow=classic;" edge="1" parent="1" source="wvA5k8sYOJf62LdnIELD-2" target="wvA5k8sYOJf62LdnIELD-3">
+          <mxGeometry x="0.5724" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="359" y="180" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wvA5k8sYOJf62LdnIELD-10" value="Коллекция: somedb.helloDoc&#xa;Пример ключа: hashed(user_id)" style="shape=note;whiteSpace=wrap;html=1;size=20;fillColor=#fff2a1;" vertex="1" parent="1">
+          <mxGeometry x="288" y="440" width="159" height="99" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

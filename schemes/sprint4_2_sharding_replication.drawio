@@ -1,0 +1,58 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:141.0) Gecko/20100101 Firefox/141.0" version="28.0.9">
+  <diagram name="B — Sharding + Replication" id="auto-id-1">
+    <mxGraphModel dx="945" dy="1553" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="users" value="pymongo-api" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="437.5" y="70" width="175" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="mongos" value="mongos&#xa;(router)" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="425" y="280" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="config" value="configSrv&#xa;(configsvr)" style="rounded=1;dashed=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="730" y="287.5" width="180" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="rs1" value="ReplicaSet shard1" style="rounded=1;dashed=1;whiteSpace=wrap;html=1;container=1;collapsible=0;" parent="1" vertex="1">
+          <mxGeometry x="185" y="520" width="300" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="shard1-1" value="shard1-1&#xa;(primary)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;size=15;" parent="rs1" vertex="1">
+          <mxGeometry x="20" y="60" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="shard1-2" value="shard1-2&#xa;(secondary)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;size=15;" parent="rs1" vertex="1">
+          <mxGeometry x="115" y="60" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="shard1-3" value="shard1-3&#xa;(secondary)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;size=15;" parent="rs1" vertex="1">
+          <mxGeometry x="210" y="60" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="rs2" value="ReplicaSet shard2" style="rounded=1;dashed=1;whiteSpace=wrap;html=1;container=1;collapsible=0;" parent="1" vertex="1">
+          <mxGeometry x="570" y="520" width="300" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="shard2-1" value="shard2-1&#xa;(primary)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;size=15;" parent="rs2" vertex="1">
+          <mxGeometry x="20" y="60" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="shard2-2" value="shard2-2&#xa;(secondary)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;size=15;" parent="rs2" vertex="1">
+          <mxGeometry x="115" y="60" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="shard2-3" value="shard2-3&#xa;(secondary)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;size=15;" parent="rs2" vertex="1">
+          <mxGeometry x="210" y="60" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="users" target="mongos" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="mongos" target="rs1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="mongos" target="rs2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" value="metadata" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;startArrow=classic;" parent="1" source="mongos" target="config" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="50roVU16g7nIjvcb0__z-2" value="Коллекция: somedb.helloDoc&#xa;Пример ключа: hashed(user_id)" style="shape=note;whiteSpace=wrap;html=1;size=20;fillColor=#fff2a1;" vertex="1" parent="1">
+          <mxGeometry x="230" y="285.5" width="159" height="99" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
