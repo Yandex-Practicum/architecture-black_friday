@@ -2,7 +2,7 @@
 
 ## Что разворачивается
 - MongoDB config server (RS `config_server`, порт 27017)
-- Два шарда (`shard1:27018`, `shard2:27019`), каждый как **replicaset** из одного члена
+- Два шарда (`shard1:27018`, `shard2:27019`), каждый как **replicaset** из одной ноды
 - Роутер `mongos` (порт 27020)
 - Приложение `kazhem/pymongo_api:1.0.0` (порт 8080)
 
@@ -16,7 +16,7 @@
 docker compose up -d
 ```
 
-## Проверка количества документов
+## Общее число документов и распределение по шардам
 
 ```bash
 docker compose exec -T mongos_router mongosh --port 27020 --quiet <<'EOF'

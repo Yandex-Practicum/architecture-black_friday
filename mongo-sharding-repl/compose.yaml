@@ -1,7 +1,7 @@
-name: mongo-sharding
+name: mongo-sharding-repl
 
 services:
-  # ---------------- Core Mongo nodes ----------------
+  # --------- Config server (RS из 1 ноды) ---------
   configSrv:
     image: mongo:6
     hostname: configSrv
@@ -32,12 +32,13 @@ services:
       start_period: 20s
     networks: [mesh]
 
-  shard1:
+  # ---------------- Shard1 (RS из 3 нод) ----------------
+  shard1-1:
     image: mongo:6
-    hostname: shard1
+    hostname: shard1-1
     command:
       ["--shardsvr", "--replSet", "shard1", "--bind_ip_all", "--port", "27018"]
-    volumes: ["shard1-data:/data/db"]
+    volumes: ["shard1-1-data:/data/db"]
     healthcheck:
       test:
         [
@@ -55,12 +56,59 @@ services:
       start_period: 20s
     networks: [mesh]
 
-  shard2:
+  shard1-2:
     image: mongo:6
-    hostname: shard2
+    hostname: shard1-2
+    command:
+      ["--shardsvr", "--replSet", "shard1", "--bind_ip_all", "--port", "27018"]
+    volumes: ["shard1-2-data:/data/db"]
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mongosh",
+          "--port",
+          "27018",
+          "--quiet",
+          "--eval",
+          "db.adminCommand('ping').ok",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 20s
+    networks: [mesh]
+
+  shard1-3:
+    image: mongo:6
+    hostname: shard1-3
+    command:
+      ["--shardsvr", "--replSet", "shard1", "--bind_ip_all", "--port", "27018"]
+    volumes: ["shard1-3-data:/data/db"]
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mongosh",
+          "--port",
+          "27018",
+          "--quiet",
+          "--eval",
+          "db.adminCommand('ping').ok",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 20s
+    networks: [mesh]
+
+  # ---------------- Shard2 (RS из 3 узлов) ----------------
+  shard2-1:
+    image: mongo:6
+    hostname: shard2-1
     command:
       ["--shardsvr", "--replSet", "shard2", "--bind_ip_all", "--port", "27019"]
-    volumes: ["shard2-data:/data/db"]
+    volumes: ["shard2-1-data:/data/db"]
     healthcheck:
       test:
         [
@@ -73,7 +121,53 @@ services:
           "db.adminCommand('ping').ok",
         ]
       interval: 5s
-      timeout: 3ssett
+      timeout: 3s
+      retries: 30
+      start_period: 20s
+    networks: [mesh]
+
+  shard2-2:
+    image: mongo:6
+    hostname: shard2-2
+    command:
+      ["--shardsvr", "--replSet", "shard2", "--bind_ip_all", "--port", "27019"]
+    volumes: ["shard2-2-data:/data/db"]
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mongosh",
+          "--port",
+          "27019",
+          "--quiet",
+          "--eval",
+          "db.adminCommand('ping').ok",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 20s
+    networks: [mesh]
+
+  shard2-3:
+    image: mongo:6
+    hostname: shard2-3
+    command:
+      ["--shardsvr", "--replSet", "shard2", "--bind_ip_all", "--port", "27019"]
+    volumes: ["shard2-3-data:/data/db"]
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mongosh",
+          "--port",
+          "27019",
+          "--quiet",
+          "--eval",
+          "db.adminCommand('ping').ok",
+        ]
+      interval: 5s
+      timeout: 3s
       retries: 30
       start_period: 20s
     networks: [mesh]
@@ -83,15 +177,18 @@ services:
     image: mongo:6
     depends_on:
       configSrv: { condition: service_healthy }
-      shard1: { condition: service_healthy }
-      shard2: { condition: service_healthy }
+      shard1-1: { condition: service_healthy }
+      shard1-2: { condition: service_healthy }
+      shard1-3: { condition: service_healthy }
+      shard2-1: { condition: service_healthy }
+      shard2-2: { condition: service_healthy }
+      shard2-3: { condition: service_healthy }
     command: ["bash", "-lc", "/scripts/init-rs.sh"]
-    volumes:
-      - ./scripts:/scripts:ro
+    volumes: ["./scripts:/scripts:ro"]
     networks: [mesh]
     restart: "no"
 
-  # ----------------- Mongos router (after RS) ----------------
+  # ----------------- Mongos router -----------------
   mongos_router:
     image: mongo:6
     depends_on:
@@ -126,10 +223,8 @@ services:
     image: mongo:6
     depends_on:
       mongos_router: { condition: service_healthy }
-      init_config: { condition: service_completed_successfully }
     command: ["bash", "-lc", "/scripts/init-sharding.sh"]
-    volumes:
-      - ./scripts:/scripts:ro
+    volumes: ["./scripts:/scripts:ro"]
     networks: [mesh]
     restart: "no"
 
@@ -150,5 +245,9 @@ networks:
 
 volumes:
   config-data:
-  shard1-data:
-  shard2-data:
+  shard1-1-data:
+  shard1-2-data:
+  shard1-3-data:
+  shard2-1-data:
+  shard2-2-data:
+  shard2-3-data:
