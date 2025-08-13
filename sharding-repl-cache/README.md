@@ -12,6 +12,8 @@
 
 ## Запуск
 ```bash
+# Если проблемы при повторном запуске, лучше очистить вольюмы
+# docker compose down -v
 docker compose up -d
 ```
 
