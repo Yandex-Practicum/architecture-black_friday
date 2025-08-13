@@ -27,7 +27,7 @@ db.helloDoc.getShardDistribution()
 EOF
 ```
 
-## Кол-во членов RS для каждого шарда (должно быть 3)
+## Кол-во нод RS для каждого шарда (должно быть 3)
 
 ```bash
 docker compose exec -T shard1-1 mongosh --port 27018 --quiet --eval "rs.status().members.length"
