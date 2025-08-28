@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  # Config Server
+  configsvr:
+    container_name: configsvr
+    image: mongo:latest
+    privileged: true
+    command: mongod --configsvr --replSet configrs --port 27017 --bind_ip_all
+    ports:
+      - "27017:27017"
+    volumes:
+      - configsvr_data:/data/db
+    networks:
+      - mongodb_network
+
+  # Shard 1
+  shard1:
+    container_name: shard1
+    image: mongo:latest
+    privileged: true
+    command: mongod --shardsvr --replSet shard1rs --port 27017 --bind_ip_all
+    ports:
+      - "27018:27017"
+    volumes:
+      - shard1_data:/data/db
+    networks:
+      - mongodb_network
+
+  # Shard 2
+  shard2:
+    container_name: shard2
+    image: mongo:latest
+    privileged: true
+    command: mongod --shardsvr --replSet shard2rs --port 27017 --bind_ip_all
+    ports:
+      - "27019:27017"
+    volumes:
+      - shard2_data:/data/db
+    networks:
+      - mongodb_network
+
+  # Mongos Router
+  mongos:
+    container_name: mongos
+    image: mongo:latest
+    privileged: true
+    command: mongos --configdb configrs/configsvr:27017 --bind_ip_all
+    ports:
+      - "27016:27017"
+    depends_on:
+      - configsvr
+    networks:
+      - mongodb_network
+
+  # Redis Cache
+  redis:
+    container_name: redis
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - mongodb_network
+
+  # API Service
+  api:
+    container_name: api
+    build:
+      context: ./api_app
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - MONGODB_URL=mongodb://mongos:27017
+      - REDIS_URL=redis://redis:6379
+      - MONGODB_DATABASE_NAME=somedb
+    depends_on:
+      - mongos
+      - redis
+    networks:
+      - mongodb_network
+
+networks:
+  mongodb_network:
+    driver: bridge
+
+volumes:
+  configsvr_data:
+  shard1_data:
+  shard2_data:
+  redis_data:
