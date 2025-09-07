@@ -1,0 +1,93 @@
+name: mongo-sharding
+
+services:
+  # ---- MongoDB config server (обязателен, RS) ----
+  configsvr:
+    image: mongo:7
+    command: >
+      mongod --configsvr
+             --replSet cfgRS
+             --port 27019
+             --bind_ip_all
+    ports:
+      - "27019:27019"
+    volumes:
+      - configdb:/data/configdb
+    networks: [mongo-net]
+
+  # ---- Shard1: shardsvr + RS ----
+  shard1:
+    image: mongo:7
+    command: >
+      mongod --shardsvr
+             --replSet shard1RS
+             --port 27018
+             --bind_ip_all
+    ports:
+      - "27018:27018"
+    volumes:
+      - shard1db:/data/db
+    networks: [mongo-net]
+    depends_on: [configsvr]
+
+  # ---- Shard2: shardsvr + RS ----
+  shard2:
+    image: mongo:7
+    command: >
+      mongod --shardsvr
+             --replSet shard2RS
+             --port 27018
+             --bind_ip_all
+    ports:
+      - "27020:27018"
+    volumes:
+      - shard2db:/data/db
+    networks: [mongo-net]
+    depends_on: [configsvr]
+
+  # ---- mongos (роутер) ----
+  mongos:
+    image: mongo:7
+    command: >
+      mongos --configdb cfgRS/configsvr:27019
+             --bind_ip_all
+             --port 27017
+    ports:
+      - "27017:27017"
+    networks: [mongo-net]
+    depends_on: [configsvr, shard1, shard2]
+    # (опционально) healthcheck, чтобы depends_on: condition работал
+    healthcheck:
+      test: ["CMD", "mongosh", "--port", "27017", "--host", "localhost", "--eval", "db.runCommand({ ping: 1 })"]
+      interval: 5s
+      timeout: 2s
+      retries: 40
+
+  # ---- API (твое приложение) ----
+  api:
+    build:
+      context: ./api_app
+    environment:
+      MONGODB_URL: "mongodb://mongos:27017"     # без /somedb — имя базы ниже
+      MONGODB_DATABASE_NAME: "somedb"
+      MONGODB_COLLECTION_NAME: "helloDoc"
+    depends_on:
+      mongos:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    networks: [mongo-net]
+    # (опционально) healthcheck, чтобы видеть статус
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/"]
+      interval: 5s
+      timeout: 2s
+      retries: 40
+
+networks:
+  mongo-net:
+
+volumes:
+  configdb:
+  shard1db:
+  shard2db:

@@ -1,0 +1,142 @@
+name: sharding-repl-cache
+
+services:
+  # ---- MongoDB config server (RS) ----
+  configsvr:
+    image: mongo:7
+    command: >
+      mongod --configsvr
+             --replSet cfgRS
+             --port 27019
+             --bind_ip_all
+    ports:
+      - "27019:27019"
+    volumes:
+      - configdb:/data/configdb
+    networks: [mongo-net]
+
+  # ---- Shard 1 RS (3 members) ----
+  shard1a:
+    image: mongo:7
+    command: >
+      mongod --shardsvr
+             --replSet shard1RS
+             --port 27018
+             --bind_ip_all
+    volumes: [shard1a:/data/db]
+    networks: [mongo-net]
+    depends_on: [configsvr]
+
+  shard1b:
+    image: mongo:7
+    command: >
+      mongod --shardsvr
+             --replSet shard1RS
+             --port 27018
+             --bind_ip_all
+    volumes: [shard1b:/data/db]
+    networks: [mongo-net]
+    depends_on: [configsvr]
+
+  shard1c:
+    image: mongo:7
+    command: >
+      mongod --shardsvr
+             --replSet shard1RS
+             --port 27018
+             --bind_ip_all
+    volumes: [shard1c:/data/db]
+    networks: [mongo-net]
+    depends_on: [configsvr]
+
+  # ---- Shard 2 RS (3 members) ----
+  shard2a:
+    image: mongo:7
+    command: >
+      mongod --shardsvr
+             --replSet shard2RS
+             --port 27018
+             --bind_ip_all
+    volumes: [shard2a:/data/db]
+    networks: [mongo-net]
+    depends_on: [configsvr]
+
+  shard2b:
+    image: mongo:7
+    command: >
+      mongod --shardsvr
+             --replSet shard2RS
+             --port 27018
+             --bind_ip_all
+    volumes: [shard2b:/data/db]
+    networks: [mongo-net]
+    depends_on: [configsvr]
+
+  shard2c:
+    image: mongo:7
+    command: >
+      mongod --shardsvr
+             --replSet shard2RS
+             --port 27018
+             --bind_ip_all
+    volumes: [shard2c:/data/db]
+    networks: [mongo-net]
+    depends_on: [configsvr]
+
+  # ---- mongos (router) ----
+  mongos:
+    image: mongo:7
+    command: >
+      mongos --configdb cfgRS/configsvr:27019
+             --bind_ip_all
+             --port 27017
+    ports:
+      - "27017:27017"
+    networks: [mongo-net]
+    depends_on:
+      - configsvr
+      - shard1a
+      - shard1b
+      - shard1c
+      - shard2a
+      - shard2b
+      - shard2c
+
+  # ---- Redis cache ----
+  redis:
+    image: redis:7
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    networks: [mongo-net]
+    volumes:
+      - redisdata:/data
+
+  # ---- API (your app) ----
+  api:
+    build:
+      context: ./api_app
+    environment:
+      MONGODB_URL: "mongodb://mongos:27017"
+      MONGODB_DATABASE_NAME: "somedb"
+      MONGODB_COLLECTION_NAME: "helloDoc"
+      REDIS_URL: "redis://redis:6379"
+    depends_on:
+      - mongos
+      - redis
+    ports:
+      - "8080:8080"
+    networks: [mongo-net]
+
+networks:
+  mongo-net:
+
+volumes:
+  configdb:
+  shard1a:
+  shard1b:
+  shard1c:
+  shard2a:
+  shard2b:
+  shard2c:
+  redisdata:
