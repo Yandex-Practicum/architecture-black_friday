@@ -13,3 +13,7 @@
 Задание 3. Репликация
 
 [Запуск проекта](./mongo-sharding-repl/README.md)
+
+Задание 4. Кэширование
+
+[Запуск проекта](./sharding-repl-cache/README.md)
