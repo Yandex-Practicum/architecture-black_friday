@@ -9,3 +9,7 @@
 Задание 2. Шардирование
 
 [Запуск проекта](./mongo-sharding/README.md)
+
+Задание 3. Репликация
+
+[Запуск проекта](./mongo-sharding-repl/README.md)
