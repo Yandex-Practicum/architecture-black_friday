@@ -17,3 +17,7 @@
 Задание 4. Кэширование
 
 [Запуск проекта](./sharding-repl-cache/README.md)
+
+Задание 5. Service Discovery и балансировка с API Gateway
+
+- [Service Discovery и балансировка с API Gateway](./charts/task5_cd_api_gateway.drawio)
