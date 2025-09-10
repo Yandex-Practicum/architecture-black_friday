@@ -20,4 +20,8 @@
 
 Задание 5. Service Discovery и балансировка с API Gateway
 
-- [Service Discovery и балансировка с API Gateway](./charts/task5_cd_api_gateway.drawio)
+[Service Discovery и балансировка с API Gateway](./charts/task5_cd_api_gateway.drawio)
+
+Задание 6. CDN
+
+[CDN](./charts/task6_cdn.drawio)
