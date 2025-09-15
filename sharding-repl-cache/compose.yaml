@@ -1,0 +1,175 @@
+name: sharding-repl-cache
+
+services:
+  # Config Server
+  configSvr:
+    container_name: configSvr
+    image: dh-mirror.gitverse.ru/mongo:latest
+    command: mongod --configsvr --replSet configrs --port 27018 --dbpath /data/db --bind_ip_all
+    volumes:
+      - configsvr_data:/data/db
+    ports:
+      - "27018:27018"
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27018", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+    networks:
+      - app-network
+
+  # Shard 1 Replica Set
+  shard1_primary:
+    container_name: shard1_primary
+    image: dh-mirror.gitverse.ru/mongo:latest
+    command: mongod --shardsvr --replSet shard1rs --port 27011 --dbpath /data/db --bind_ip_all
+    volumes:
+      - shard1_primary_data:/data/db
+    ports:
+      - "27011:27011"
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27011", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+    networks:
+      - app-network
+
+  shard1_secondary1:
+    container_name: shard1_secondary1
+    image: dh-mirror.gitverse.ru/mongo:latest
+    command: mongod --shardsvr --replSet shard1rs --port 27011 --dbpath /data/db --bind_ip_all
+    volumes:
+      - shard1_secondary1_data:/data/db
+    ports:
+      - "27012:27011"
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27011", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+    networks:
+      - app-network
+
+  shard1_secondary2:
+    container_name: shard1_secondary2
+    image: dh-mirror.gitverse.ru/mongo:latest
+    command: mongod --shardsvr --replSet shard1rs --port 27011 --dbpath /data/db --bind_ip_all
+    volumes:
+      - shard1_secondary2_data:/data/db
+    ports:
+      - "27013:27011"
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27011", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+    networks:
+      - app-network
+
+  # Shard 2 Replica Set
+  shard2_primary:
+    container_name: shard2_primary
+    image: dh-mirror.gitverse.ru/mongo:latest
+    command: mongod --shardsvr --replSet shard2rs --port 27021 --dbpath /data/db --bind_ip_all
+    volumes:
+      - shard2_primary_data:/data/db
+    ports:
+      - "27021:27021"
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27021", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+    networks:
+      - app-network
+
+  shard2_secondary1:
+    container_name: shard2_secondary1
+    image: dh-mirror.gitverse.ru/mongo:latest
+    command: mongod --shardsvr --replSet shard2rs --port 27021 --dbpath /data/db --bind_ip_all
+    volumes:
+      - shard2_secondary1_data:/data/db
+    ports:
+      - "27122:27021"
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27021", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+    networks:
+      - app-network
+
+  shard2_secondary2:
+    container_name: shard2_secondary2
+    image: dh-mirror.gitverse.ru/mongo:latest
+    command: mongod --shardsvr --replSet shard2rs --port 27021 --dbpath /data/db --bind_ip_all
+    volumes:
+      - shard2_secondary2_data:/data/db
+    ports:
+      - "27223:27021"
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27021", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+    networks:
+      - app-network
+
+  # MongoDB Router (mongos)
+  mongos:
+    container_name: mongos
+    image: dh-mirror.gitverse.ru/mongo:latest
+    command: mongos --configdb configrs/configsvr:27018 --port 27017 --bind_ip_all
+    depends_on:
+      - configSvr
+      - shard1_primary
+      - shard1_secondary1
+      - shard1_secondary2
+      - shard2_primary
+      - shard2_secondary1
+      - shard2_secondary2
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27017", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+    networks:
+      - app-network
+
+  redis:
+    container_name: redis
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      start_period: 10s
+    networks:
+      - app-network
+
+  # API Application
+  pymongo_api:
+    container_name: pymongo_api
+    build: 
+      context: api_app
+      dockerfile: Dockerfile
+    depends_on:
+      - mongos
+      - redis
+    ports:
+      - 8080:8080
+    environment:
+      MONGODB_URL: "mongodb://mongos:27017"
+      MONGODB_DATABASE_NAME: "somedb"
+      REDIS_URL: "redis://redis:6379"
+    networks:
+      - app-network
+
+volumes:
+  configsvr_data:
+  shard1_primary_data:
+  shard1_secondary1_data:
+  shard1_secondary2_data:
+  shard2_primary_data:
+  shard2_secondary1_data:
+  shard2_secondary2_data:
+
+networks:
+  app-network:
+    driver: bridge
