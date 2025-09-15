@@ -15,7 +15,7 @@
 Задание 4. Кеширование
 - [sharding-repl-cache/README.md](sharding-repl-cache/README.md)
 
-Задание 5. Service Discovery и балансировка с API GatewayВ
+Задание 5. Service Discovery и балансировка с API Gateway
 - [Схема](schemas/v4_scaling.drawio)
 
 Задание 6. CDN
