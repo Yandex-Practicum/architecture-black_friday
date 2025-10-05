@@ -1,10 +1,12 @@
 # pymongo-api
 
+Схемки можно посмотреть [в папке schemas](./schemas/)
 ## Как запустить
 
 Запускаем mongodb и приложение
 
 ```shell
+cd mongo-sharding-repl-cache
 docker compose up -d
 ```
 
