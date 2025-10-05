@@ -113,6 +113,8 @@ async def root():
             }
         except Exception as e:
             replica_status[shard_name] = f"Error: {str(e)}"
+        finally:
+            shard_client.close()
     
     topology_description = client.topology_description
     read_preference = client.client_options.read_preference
