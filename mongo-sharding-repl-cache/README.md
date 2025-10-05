@@ -1,16 +1,14 @@
 # pymongo-api
 
-Схемки можно посмотреть [в папке schemas](./schemas/)
 ## Как запустить
 
-Запускаем mongodb и приложение
+Запускаем сервер конфигурации, два шарда и роутер, а с ними приложение
 
 ```shell
-cd mongo-sharding-repl-cache
 docker compose up -d
 ```
 
-Заполняем mongodb данными
+Настроим сервер конфигурации, два шарда и роутер и заполним mongodb тестовыми данными
 
 ```shell
 ./scripts/mongo-init.sh
