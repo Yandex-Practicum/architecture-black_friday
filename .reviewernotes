@@ -1,0 +1,38 @@
+# Для ревьюера
+
+## Быстрый старт
+
+```bash
+cd sharding-repl-cache
+docker compose up -d
+./scripts/init-sharding-repl.sh
+curl http://localhost:8080
+```
+
+## Важно
+
+По умолчанию в compose.yaml используется локальная сборка для кросс-платформенной совместимости:
+```yaml
+build:
+  context: api_app
+  dockerfile: Dockerfile
+```
+
+Если хотите использовать готовый образ (как указано в задании):
+1. Откройте compose.yaml
+2. Раскомментируйте строку: `image: kazhem/pymongo_api:1.0.0`
+3. Закомментируйте секцию `build:`
+
+Это нужно для всех трех директорий:
+- mongo-sharding/compose.yaml
+- mongo-sharding-repl/compose.yaml  
+- sharding-repl-cache/compose.yaml
+
+## Проверка
+
+После инициализации:
+- Приложение: http://localhost:8080
+- Должно показывать `"cache_enabled": true`
+- Документов >= 1000
+- 2 шарда с репликами
+
