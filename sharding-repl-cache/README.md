@@ -115,17 +115,3 @@ docker exec -it mongos_router mongosh --port 27024 --eval 'use somedb; db.helloD
 docker exec -it shard1_r1 mongosh --port 27018 --eval 'use somedb; db.helloDoc.countDocuments()'
 docker exec -it shard2_r1 mongosh --port 27021 --eval 'use somedb; db.helloDoc.countDocuments()'
 ```
-
-### Проверка Redis кластера
-
-```bash
-# Проверка состояния кластера
-docker exec -it redis_1 redis-cli cluster info
-
-# Проверка узлов кластера
-docker exec -it redis_1 redis-cli cluster nodes
-
-# Тест записи и чтения
-docker exec -it redis_1 redis-cli -c set test_key "Hello Redis Cluster"
-docker exec -it redis_1 redis-cli -c get test_key
-```
