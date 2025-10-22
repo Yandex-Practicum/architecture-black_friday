@@ -104,6 +104,8 @@ services:
       - mongos_router
     ports:
       - 8080:8080
+    networks:
+      - app-network
     environment:
       MONGODB_URL: "mongodb://mongos_router:27020"
       MONGODB_DATABASE_NAME: "somedb"
