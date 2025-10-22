@@ -1,7 +1,7 @@
 ## Запуск кластера
 
 ```bash
-docker-compose -f compose-mongo-sharding.yaml up -d
+docker-compose up -d
 ```
 
 ## Инициализация шардинга
