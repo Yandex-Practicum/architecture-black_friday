@@ -5,17 +5,18 @@
 Запускаем mongodb и приложение
 
 ```shell
+cd sharding-repl-cache
 docker compose up -d
 ```
 
 Скрипт инициации сервера конфигураций, шард и роутера. Наполнение базы данными
 ```shell
-.sharding-repl-cache/scripts/mongo-init.sh
+.scripts/mongo-init.sh
 ```
 
 Для проверки распределения записей по шардам выполнить скрипт:
 ```shell
-.sharding-repl-cache/scripts/mongo-check.sh
+.scripts/mongo-check.sh
 ```
 
 Для отображения информации о mongo откройте в браузере http://localhost:8080
