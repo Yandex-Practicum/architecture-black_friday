@@ -1,0 +1,105 @@
+name: mongo-sharding
+services:
+  configSrv:
+    container_name: configSrv
+    image: dh-mirror.gitverse.ru/mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - config_data:/data/db
+    command:
+      [
+        "--configsvr",
+        "--replSet",
+        "config_servers",
+        "--bind_ip_all",
+        "--port",
+        "27017"
+      ]
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "27017", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+
+  shard1:
+    container_name: shard1
+    image: dh-mirror.gitverse.ru/mongo:latest
+    ports:
+      - "27018:27018"
+    volumes:
+      - shard1_data:/data/db
+    command:
+      [
+        "--shardsvr",
+        "--replSet",
+        "shard1",
+        "--bind_ip_all",
+        "--port",
+        "27018"
+      ]
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "27018", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+  
+  shard2:
+    container_name: shard2
+    image: dh-mirror.gitverse.ru/mongo:latest
+    ports:
+      - "27019:27019"
+    volumes:
+      - shard2_data:/data/db
+    command:
+      [
+        "--shardsvr",
+        "--replSet",
+        "shard2",
+        "--bind_ip_all",
+        "--port",
+        "27019"
+      ]
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "27019", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+  
+  mongos_router:
+    container_name: mongos_router
+    image: dh-mirror.gitverse.ru/mongo:latest
+    ports:
+      - "27020:27020"
+    command:
+      [
+        "mongos",
+        "--configdb",
+        "config_servers/configSrv:27017",
+        "--bind_ip_all",
+        "--port",
+        "27020"
+      ]
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "27020", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+
+  pymongo_api:
+    container_name: pymongo_api
+    build: 
+      context: api_app
+      dockerfile: Dockerfile
+    depends_on:
+      - configSrv
+      - shard1
+      - shard2
+      - mongos_router
+    ports:
+      - 8080:8080
+    environment:
+      MONGODB_URL: "mongodb://mongos_router:27020"
+      MONGODB_DATABASE_NAME: "somedb"
+
+
+volumes:
+  config_data:
+  shard1_data:
+  shard2_data:
