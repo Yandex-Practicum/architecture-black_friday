@@ -1,0 +1,206 @@
+name: sharding-repl-cache
+services:
+  configSrv:
+    container_name: configSrv
+    image: dh-mirror.gitverse.ru/mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - config_data:/data/db
+    command:
+      [
+        "--configsvr",
+        "--replSet",
+        "config_servers",
+        "--bind_ip_all",
+        "--port",
+        "27017"
+      ]
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "27017", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+
+  shard1-1:
+    container_name: shard1-1
+    image: dh-mirror.gitverse.ru/mongo:latest
+    ports:
+      - "27018:27018"
+    volumes:
+      - shard1_1_data:/data/db
+    command:
+      [
+        "--shardsvr",
+        "--replSet",
+        "shard1",
+        "--bind_ip_all",
+        "--port",
+        "27018"
+      ]
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "27018", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+  
+  shard1-2:
+    container_name: shard1-2
+    image: dh-mirror.gitverse.ru/mongo:latest
+    ports:
+      - "27019:27019"
+    volumes:
+      - shard1_2_data:/data/db
+    command:
+      [
+        "--shardsvr",
+        "--replSet",
+        "shard1",
+        "--bind_ip_all",
+        "--port",
+        "27019"
+      ]
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "27019", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+  
+  shard1-3:
+    container_name: shard1-3
+    image: dh-mirror.gitverse.ru/mongo:latest
+    ports:
+      - "27020:27020"
+    volumes:
+      - shard1_3_data:/data/db
+    command:
+      [
+        "--shardsvr",
+        "--replSet",
+        "shard1",
+        "--bind_ip_all",
+        "--port",
+        "27020"
+      ]
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "27020", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+  
+  shard2-1:
+    container_name: shard2-1
+    image: dh-mirror.gitverse.ru/mongo:latest
+    ports:
+      - "27021:27021"
+    volumes:
+      - shard2_1_data:/data/db
+    command:
+      [
+        "--shardsvr",
+        "--replSet",
+        "shard2",
+        "--bind_ip_all",
+        "--port",
+        "27021"
+      ]
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "27021", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+  
+  shard2-2:
+    container_name: shard2-2
+    image: dh-mirror.gitverse.ru/mongo:latest
+    ports:
+      - "27022:27022"
+    volumes:
+      - shard2_2_data:/data/db
+    command:
+      [
+        "--shardsvr",
+        "--replSet",
+        "shard2",
+        "--bind_ip_all",
+        "--port",
+        "27022"
+      ]
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "27022", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+  
+  shard2-3:
+    container_name: shard2-3
+    image: dh-mirror.gitverse.ru/mongo:latest
+    ports:
+      - "27023:27023"
+    volumes:
+      - shard2_3_data:/data/db
+    command:
+      [
+        "--shardsvr",
+        "--replSet",
+        "shard2",
+        "--bind_ip_all",
+        "--port",
+        "27023"
+      ]
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "27023", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+  
+  mongos_router:
+    container_name: mongos_router
+    image: dh-mirror.gitverse.ru/mongo:latest
+    ports:
+      - "27024:27024"
+    command:
+      [
+        "mongos",
+        "--configdb",
+        "config_servers/configSrv:27017",
+        "--bind_ip_all",
+        "--port",
+        "27024"
+      ]
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "27024", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+  
+  cache:
+    container_name: cache
+    image: dh-mirror.gitverse.ru/redis:latest
+    ports:
+      - "6379:6379"
+    command: ["--loglevel", "verbose"]
+
+  pymongo_api:
+    container_name: pymongo_api
+    build: 
+      context: api_app
+      dockerfile: Dockerfile
+    depends_on:
+      - configSrv
+      - shard1-1
+      - shard1-2
+      - shard1-3
+      - shard2-1
+      - shard2-2
+      - shard2-3
+      - mongos_router
+      - cache
+    ports:
+      - 8080:8080
+    environment:
+      MONGODB_URL: "mongodb://mongos_router:27024"
+      MONGODB_DATABASE_NAME: "somedb"
+      REDIS_URL: "redis://cache:6379"
+
+
+volumes:
+  config_data:
+  shard1_1_data:
+  shard1_2_data:
+  shard1_3_data:
+  shard2_1_data:
+  shard2_2_data:
+  shard2_3_data:
