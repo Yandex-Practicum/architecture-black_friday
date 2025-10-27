@@ -1,18 +1,9 @@
 # pymongo-api
 
-## Как запустить
+## Как запустить стенд
 
-Запускаем mongodb и приложение
-
-```shell
-docker compose up -d
-```
-
-Заполняем mongodb данными
-
-```shell
-./scripts/mongo-init.sh
-```
+1. Для запуска стенда, запустите командную строку.
+2. Перейдите в папку mongo-sharding-cache и выполните инструкции описанные в файле README.md
 
 ## Как проверить
 
@@ -25,7 +16,7 @@ docker compose up -d
 Узнать белый ip виртуальной машины
 
 ```shell
-curl --silent http://ifconfig.me
+   curl --silent http://ifconfig.me
 ```
 
 Откройте в браузере http://<ip виртуальной машины>:8080
