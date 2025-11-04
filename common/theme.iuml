@@ -1,7 +1,5 @@
 'NOTE: order of these is important, later ones override earlier ones
 
-!theme carbon-gray
-
 ' double of default 96, for crisp image on 4k displays
 skinparam dpi 192
 skinparam useBetaStyle true
@@ -16,32 +14,32 @@ skinparam useBetaStyle true
 ' !$COLOR_ELEMENT3 = %lighten($COLOR_ELEMENT2, 25)
 ' !$COLOR_ELEMENT4 = %lighten($COLOR_ELEMENT3, 25)
 ' !$COLOR_ELEMENT_NEW = "Gold"
-' !$FONT_NAME_HUGE = "Century Gothic"
-' !$FONT_SIZE_HUGE = 20
-' !$FONT_NAME_LARGE = "Century Gothic"
-' !$FONT_SIZE_LARGE = 16
-' !$FONT_NAME_MEDIUM = "DejaVu Sans"
-' !$FONT_SIZE_MEDIUM = 12
-' !$FONT_NAME_SMALL = "Trebuchet MS"
-' !$FONT_SIZE_SMALL = 8
+!$FONT_NAME_HUGE = "Century Gothic"
+!$FONT_SIZE_HUGE = 20
+!$FONT_NAME_LARGE = "Century Gothic"
+!$FONT_SIZE_LARGE = 16
+!$FONT_NAME_MEDIUM = "DejaVu Sans"
+!$FONT_SIZE_MEDIUM = 12
+!$FONT_NAME_SMALL = "Trebuchet MS"
+!$FONT_SIZE_SMALL = 8
 
-' <style>
-' root {
-'     FontName: $FONT_NAME_LARGE
-'     Padding: $FONT_SIZE_LARGE
-'     RoundCorner: 32
-'     BackgroundColor: "Ivory"
-' }
-' Title {
-'     Margin: 32
-'     FontName: $FONT_NAME_HUGE
-'     FontSize: 32
-'     FontStyle: Regular
-' }
-' Header {
-'     FontSize: 16
-'     FontStyle: Italic
-' }
-' </style>
+<style>
+root {
+    FontName: $FONT_NAME_LARGE
+    Padding: $FONT_SIZE_LARGE
+    RoundCorner: 32
+    BackgroundColor: "Ivory"
+}
+Title {
+    Margin: 32
+    FontName: $FONT_NAME_HUGE
+    FontSize: 32
+    FontStyle: Regular
+}
+Header {
+    FontSize: 16
+    FontStyle: Italic
+}
+</style>
 
 
