@@ -68,8 +68,8 @@ Rel_D(shard2.r1, shard2.r2, "Репликация", "MongoDB")
 Rel_D(shard2.r1, shard2.r3, "Репликация", "MongoDB")
 
 ' layout trick to space out the arrows
-ARel(shard1.r1, config.srv1, "", "", $arrow="<<-[hidden]->>")
-ARel(shard2.r1, config.srv1, "", "", $arrow="<<-[hidden]->>")
+ARel(shard1.r1, config.srv1, "", "", $arrow="-[hidden]d->>")
+ARel(shard2.r1, config.srv1, "", "", $arrow="-[hidden]d->>")
 
 @enduml
 
