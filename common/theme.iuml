@@ -4,6 +4,13 @@
 skinparam dpi 192
 skinparam useBetaStyle true
 
+' avoid pointy notes
+skinparam style strictuml
+
+' avoid centered notes
+skinparam NoteTextAlignment left
+
+
 ' !$COLOR_TEXT = "Black"
 ' !$COLOR_TEXT_SUB = "Gray"
 ' !$COLOR_TEXT_NEW = "Blue"
@@ -45,6 +52,9 @@ Interface {
     .ext {
         backgroundColor: $EXTERNAL_SYSTEM_BG_COLOR
     }
+}
+Note {
+    FontName: $FONT_NAME_SMALL
 }
 </style>
 
