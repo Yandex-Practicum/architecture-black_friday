@@ -1,0 +1,31 @@
+@startuml
+
+!theme carbon-gray
+!include <C4/C4_Deployment>
+!include common/theme.iuml
+
+title Схема с шардированием MongoDB
+header «Мобильный мир»
+
+Person(user, "Пользователь", "")
+
+Container(pymongo_api, "FastAPI", "pymongo-api")
+
+Container(mongos, "MongoDB Router", "mongos")
+
+Container(configSrv, "Config Server", "mongod")
+
+ContainerDb(shard1, "Shard 1", "mongod")
+ContainerDb(shard2, "Shard 2", "mongod")
+
+Rel(user, pymongo_api, "Запросы API", "HTTPS")
+
+Rel(pymongo_api, mongos, "DB операции", "")
+
+Rel_R(mongos, configSrv, "Получение метаданных", "")
+
+Rel(mongos, shard1, "Чтение/запись данных", "")
+Rel(mongos, shard2, "Чтение/запись данных", "")
+
+@enduml
+

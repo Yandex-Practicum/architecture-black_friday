@@ -1,0 +1,62 @@
+@startuml
+
+!theme carbon-gray
+!include <C4/C4_Deployment>
+!include common/theme.iuml
+
+title Схема с шардированием MongoDB
+header «Мобильный мир»
+
+Person(user, "Пользователь", "")
+
+Container(pymongo_api, "pymongo-api", "FastAPI", "API приложения")
+
+Interface "MongoDB Driver\nБалансирует нагрузку с помощью connection string с перечислением" as driver
+
+Container(mongos1, "mongos-1", "MongoDB Router")
+Container(mongosN, "mongos-N", "MongoDB Router")
+mongos1 <.r.> mongosN : масштабирование\nнагрузки
+note as mongos_note
+Router определяет, в какой
+шард направить запрос на
+основе shard key (хэш-функция)
+end note
+mongos1 -l-> mongos_note
+
+Boundary(configRS, "Config Server Replica Set") {
+    ContainerDb(configSrv1, "mongod", "Config Server", "PRIMARY")
+    ContainerDb(configSrv2, "mongod", "Config Server", "SECONDARY")
+    ContainerDb(configSrv3, "mongod", "Config Server", "SECONDARY")
+}
+
+ContainerDb(shard1, "shard1", "MongoDB Shard 1", "Процесс: mongod\nПервый шард данных")
+ContainerDb(shard2, "shard2", "MongoDB Shard 2", "Процесс: mongod\nВторой шард данных")
+
+Rel(user, pymongo_api, "Запросы API", "HTTPS")
+Rel(pymongo_api, driver, "DB операции", "")
+Rel(driver, mongos1, "", "")
+Rel(driver, mongosN, "", "")
+
+Rel(mongos1, configSrv1, "Получение метаданных", "")
+Rel(mongosN, configSrv1, "Получение метаданных", "")
+
+Rel(mongos1, shard1, "Чтение/запись данных", "")
+Rel(mongos1, shard2, "Чтение/запись данных", "")
+Rel(mongosN, shard1, "Чтение/запись данных", "")
+Rel(mongosN, shard2, "Чтение/запись данных", "")
+
+Rel(configSrv1, configSrv2, "Репликация", "")
+Rel(configSrv1, configSrv3, "Репликация", "")
+Rel(configSrv2, configSrv3, "Heartbeat", "")
+
+note top of configRS
+  Replica Set хранит метаданные:
+  - Структура кластера
+  - Диапазоны ключей (chunks)
+  - Местоположение данных
+  
+  3 ноды для отказоустойчивости
+end note
+
+@enduml
+

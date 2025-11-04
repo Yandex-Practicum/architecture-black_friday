@@ -40,6 +40,12 @@ Header {
     FontSize: 16
     FontStyle: Italic
 }
+Interface {
+    backgroundColor: $SYSTEM_BG_COLOR
+    .ext {
+        backgroundColor: $EXTERNAL_SYSTEM_BG_COLOR
+    }
+}
 </style>
 
 
