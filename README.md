@@ -34,13 +34,19 @@ curl --silent http://ifconfig.me
 
 Список доступных эндпоинтов, swagger http://<ip виртуальной машины>:8080/docs
 
+## Проверить состояние стека
+
+```
+docker compose ps
+```
+
 ## Тестирование
 
 Для проверки корректности работы приложения написаны интеграционные тесты.
 
 Запустить тесты (запустит стек приложения тоже):
 ```shell
-docker compose -f compose.yaml -f compose.test.yaml up api_test --build
+docker compose up api_test
 ```
 
 Результаты тестов будут выведены в консоль.
