@@ -103,11 +103,9 @@ services:
       - shard1
       - shard2
     healthcheck:
-      test: ["CMD", "mongosh", "localhost:27020/admin", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      test: ["CMD", "mongosh", "--port", "27020", "--eval", "db.adminCommand('ping')"]
       interval: 5s
-      timeout: 5s
-      retries: 3
-      start_period: 20s
+      start_period: 10s
 
   # Приложение pymongo_api
   pymongo_api:
