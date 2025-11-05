@@ -1,0 +1,34 @@
+services:
+
+  # Override mongodb1 from compose.yaml to add healthcheck
+  mongodb1:
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Override pymongo_api from compose.yaml to add healthcheck
+  pymongo_api:
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8080/')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # test
+  api_test:
+    container_name: api_test
+    build:
+      context: api_app_test
+      dockerfile: Dockerfile
+    depends_on:
+      mongodb1:
+        condition: service_healthy
+      pymongo_api:
+        condition: service_healthy
+    environment:
+      - PYTHONUNBUFFERED=1
+

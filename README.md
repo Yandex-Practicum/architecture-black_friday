@@ -33,3 +33,19 @@ curl --silent http://ifconfig.me
 ## Доступные эндпоинты
 
 Список доступных эндпоинтов, swagger http://<ip виртуальной машины>:8080/docs
+
+## Тестирование
+
+Для проверки корректности работы приложения используйте интеграционные тесты:
+
+```shell
+docker compose -f compose.yaml -f compose.test.yaml up -d --build
+```
+
+Результаты тестов будут выведены в логи контейнера api_test.
+
+```
+docker compose -f compose.yaml -f compose.test.yaml logs api_test
+```
+
+Подробнее о тестах смотрите в [api_app_test/README.md](api_app_test/README.md)
