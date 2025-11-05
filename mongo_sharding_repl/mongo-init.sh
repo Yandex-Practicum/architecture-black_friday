@@ -28,7 +28,7 @@ set -e
 log_info "Checking if MongoDB container stack is healthy"
 _healthy_containers=$(docker compose ps)
 _mongodb_containers=$(echo "${_healthy_containers}" | grep -v "mongos_router" | grep -v "pymongo_api")
-_count_healthy_containers=$(echo "${_mongodb_containers}" | grep -o "healthy" | wc -l)
+_count_healthy_containers=$(echo "${_mongodb_containers}" | grep -o "(healthy)" | wc -l)
 _count_healthy_containers_expected=9
 if [[ ${_count_healthy_containers} -ne ${_count_healthy_containers_expected} ]]; then
     echo "${_mongodb_containers}"
@@ -308,7 +308,7 @@ fi
 
 log_info "[14/14] Verifying that all containers are now healthy"
 _all_containers=$(docker compose ps)
-_all_healthy_count=$(echo "${_all_containers}" | grep -o "healthy" | wc -l)
+_all_healthy_count=$(echo "${_all_containers}" | grep -o "(healthy)" | wc -l)
 _all_containers_expected=11
 if [[ ${_all_healthy_count} -ne ${_all_containers_expected} ]]; then
     echo "${_all_containers}"

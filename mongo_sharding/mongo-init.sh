@@ -27,7 +27,7 @@ set -e
 
 log_info "Checking if container stack is healthy..."
 _healthy_containers=$(docker compose ps)
-_count_healthy_containers=$(echo "${_healthy_containers}" | grep -o "healthy" | wc -l)
+_count_healthy_containers=$(echo "${_healthy_containers}" | grep -o "(healthy)" | wc -l)
 _count_healthy_containers_expected=5
 if [[ ${_count_healthy_containers} -ne ${_count_healthy_containers_expected} ]]; then
     echo "${_healthy_containers}"
