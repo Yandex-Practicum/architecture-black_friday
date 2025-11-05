@@ -39,7 +39,7 @@
 ### 1. Запустить все сервисы
 
 ```bash
-docker compose up -d
+docker compose up -d --build
 ```
 
 ### 2. Дождаться запуска MongoDB контейнеров
@@ -50,16 +50,16 @@ docker compose up -d
 docker compose ps
 ```
 
-Должны быть в статусе `healthy` все 9 MongoDB инстансов (3 config servers + 3 shard1 + 3 shard2). Это может занять 15-30 секунд.
+Должны быть в статусе `healthy` все 3 контейнера Config Server (`configSrv`, `configSrv2`, `configSrv3`). Это может занять 10-15 секунд.
 
-**Примечание:** `mongos_router` и `pymongo_api` станут `healthy` только после выполнения инициализации (шаг 3).
+**Примечание:** Контейнеры шардов (`shard1-*`, `shard2-*`), `mongos_router` и `pymongo_api` будут в статусе `unhealthy` до выполнения инициализации (шаг 3), так как они настроены как replica sets, которые требуют инициализации.
 
 ### 3. Инициализировать шардирование и репликацию
 
 Выполнить скрипт инициализации:
 
 ```bash
-bash mongo-init-sharding.sh
+bash mongo-init.sh
 ```
 
 Скрипт автоматически выполнит 14 шагов:
@@ -77,6 +77,8 @@ bash mongo-init-sharding.sh
 12. Проверку репликации для shard1
 13. Проверку репликации для shard2
 14. Финальную проверку, что все 11 контейнеров теперь `healthy`
+
+После успешного выполнения скрипта все контейнеры (включая шарды, mongos_router и pymongo_api) перейдут в статус `healthy`.
 
 ### 4. Проверить работу
 
@@ -116,7 +118,7 @@ docker compose exec shard2-1 mongosh --port 27019 --quiet --eval "rs.status()"
 ## Запуск тестов
 
 ```bash
-docker compose --profile test up pymongo_api_test
+docker compose --profile test up --build pymongo_api_test
 ```
 
 Тесты автоматически дождутся, пока все сервисы станут `healthy` перед запуском.

@@ -37,7 +37,7 @@ fi
 log_ok "MongoDB container stack is healthy (${_count_healthy_containers} containers)"
 
 log_info "[1/14] Initializing Config Server Replica Set with 3 members"
-docker compose exec -T configSrv mongosh --port 27017 --quiet <<EOF > /dev/null 2>&1
+docker compose exec -T configSrv mongosh --port 27017 --quiet <<EOF > /dev/null 2>&1 || true
 rs.initiate({
   _id: "config_server",
   configsvr: true,
@@ -65,7 +65,7 @@ fi
 
 
 log_info "[2/14] Initializing Shard 1 Replica Set with 3 members"
-docker compose exec -T shard1-1 mongosh --port 27018 --quiet <<EOF > /dev/null 2>&1
+docker compose exec -T shard1-1 mongosh --port 27018 --quiet <<EOF > /dev/null 2>&1 || true
 rs.initiate({
   _id: "shard1",
   members: [
@@ -92,7 +92,7 @@ fi
 
 
 log_info "[3/14] Initializing Shard 2 Replica Set with 3 members"
-docker compose exec -T shard2-1 mongosh --port 27019 --quiet <<EOF > /dev/null 2>&1
+docker compose exec -T shard2-1 mongosh --port 27019 --quiet <<EOF > /dev/null 2>&1 || true
 rs.initiate({
   _id: "shard2",
   members: [
@@ -119,10 +119,9 @@ fi
 
 
 log_info "[4/14] Adding Shard 1 to cluster"
-_shard1_add_result=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
-sh.addShard("shard1/shard1-1:27018,shard1-2:27018,shard1-3:27018");
-EOF
-)
+log_info "Waiting for mongos router to be ready (10s)"
+sleep 10
+_shard1_add_result=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet --eval 'sh.addShard("shard1/shard1-1:27018,shard1-2:27018,shard1-3:27018")' 2>&1)
 log_info "Checking if Shard 1 was added to cluster"
 _shard1_in_cluster=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
 db.adminCommand({ listShards: 1 })
@@ -140,10 +139,7 @@ fi
 
 
 log_info "[5/14] Adding Shard 2 to cluster"
-_shard2_add_result=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
-sh.addShard("shard2/shard2-1:27019,shard2-2:27019,shard2-3:27019");
-EOF
-)
+_shard2_add_result=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet --eval 'sh.addShard("shard2/shard2-1:27019,shard2-2:27019,shard2-3:27019")' 2>&1)
 log_info "Checking if Shard 2 was added to cluster"
 _shard2_in_cluster=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
 db.adminCommand({ listShards: 1 })

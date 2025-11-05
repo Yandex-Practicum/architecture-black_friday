@@ -15,10 +15,10 @@
 ### 1. Запустить все сервисы
 
 ```bash
-docker compose up -d
+docker compose up -d --build
 ```
 
-### 2. Дождаться запуска всех контейнеров
+### 2. Дождаться запуска контейнера Config Server
 
 Проверить статус контейнеров:
 
@@ -26,14 +26,16 @@ docker compose up -d
 docker compose ps
 ```
 
-Все сервисы должны быть в статусе `healthy`.
+Контейнер `configSrv` должен быть в статусе `healthy`. Это может занять 10-15 секунд.
+
+**Примечание:** `shard1`, `shard2` и `mongos_router` будут в статусе `unhealthy` до выполнения инициализации (шаг 3), так как они настроены как replica sets, которые требуют инициализации.
 
 ### 3. Инициализировать шардирование
 
 Выполнить скрипт инициализации:
 
 ```bash
-bash mongo-init-sharding.sh
+bash mongo-init.sh
 ```
 
 Скрипт автоматически выполнит:
@@ -44,6 +46,8 @@ bash mongo-init-sharding.sh
 - Включение шардирования для базы данных `somedb`
 - Создание шардированной коллекции `helloDoc`
 - Наполнение коллекции 1000 документами
+
+После успешного выполнения скрипта все контейнеры (включая `shard1`, `shard2`, `mongos_router` и `pymongo_api`) перейдут в статус `healthy`.
 
 ### 4. Проверить работу
 
@@ -61,7 +65,7 @@ curl http://localhost:8080/
 ## Запуск тестов
 
 ```bash
-docker compose --profile test up pymongo_api_test
+docker compose --profile test up --build pymongo_api_test
 ```
 
 Тесты автоматически дождутся, пока все сервисы станут `healthy` перед запуском.

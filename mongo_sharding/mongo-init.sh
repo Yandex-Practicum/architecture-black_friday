@@ -25,18 +25,19 @@ function log_ok () {
 
 set -e
 
-log_info "Checking if container stack is healthy..."
+log_info "Checking if Config Server is healthy"
 _healthy_containers=$(docker compose ps)
-_count_healthy_containers=$(echo "${_healthy_containers}" | grep -o "(healthy)" | wc -l)
-_count_healthy_containers_expected=5
+_config_container=$(echo "${_healthy_containers}" | grep "configSrv")
+_count_healthy_containers=$(echo "${_config_container}" | grep -o "(healthy)" | wc -l)
+_count_healthy_containers_expected=1
 if [[ ${_count_healthy_containers} -ne ${_count_healthy_containers_expected} ]]; then
-    echo "${_healthy_containers}"
-    log_fail "Expected ${_count_healthy_containers_expected} healthy containers, but found $_count_healthy_containers:"
+    echo "${_config_container}"
+    log_fail "Expected Config Server to be healthy, but found ${_count_healthy_containers} healthy containers"
 fi
-log_ok "Container stack is healthy"
+log_ok "Config Server is healthy"
 
 log_info "[1/7] Initializing Config Server"
-docker compose exec -T configSrv mongosh --port 27017 --quiet <<EOF > /dev/null 2>&1
+docker compose exec -T configSrv mongosh --port 27017 --quiet <<EOF > /dev/null 2>&1 || true
 rs.initiate({
   _id: "config_server",
   configsvr: true,
@@ -59,7 +60,7 @@ fi
 
 
 log_info "[2/7] Initializing Shard 1"
-docker compose exec -T shard1 mongosh --port 27018 --quiet <<EOF > /dev/null 2>&1
+docker compose exec -T shard1 mongosh --port 27018 --quiet <<EOF > /dev/null 2>&1 || true
 rs.initiate({
   _id: "shard1",
   members: [{ _id: 0, host: "shard1:27018" }]
@@ -81,7 +82,7 @@ fi
 
 
 log_info "[3/7] Initializing Shard 2"
-docker compose exec -T shard2 mongosh --port 27019 --quiet <<EOF > /dev/null 2>&1
+docker compose exec -T shard2 mongosh --port 27019 --quiet <<EOF > /dev/null 2>&1 || true
 rs.initiate({
   _id: "shard2",
   members: [{ _id: 1, host: "shard2:27019" }]
@@ -103,10 +104,9 @@ fi
 
 
 log_info "[4/7] Adding Shard 1 to cluster"
-_shard1_add_result=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
-sh.addShard("shard1/shard1:27018");
-EOF
-)
+log_info "Waiting for mongos router to be ready (10s)"
+sleep 10
+_shard1_add_result=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet --eval 'sh.addShard("shard1/shard1:27018")' 2>&1)
 log_info "Checking if Shard 1 was added to cluster"
 _shard1_in_cluster=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
 db.adminCommand({ listShards: 1 })
@@ -124,10 +124,7 @@ fi
 
 
 log_info "[5/7] Adding Shard 2 to cluster"
-_shard2_add_result=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
-sh.addShard("shard2/shard2:27019");
-EOF
-)
+_shard2_add_result=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet --eval 'sh.addShard("shard2/shard2:27019")' 2>&1)
 log_info "Checking if Shard 2 was added to cluster"
 _shard2_in_cluster=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
 db.adminCommand({ listShards: 1 })
@@ -247,6 +244,19 @@ if [[ -z ${_shard2_docs} || ${_shard2_docs} -lt ${_shard_docs_expected} ]]; then
     log_fail "Shard 2 has ${_shard2_docs} documents, but expected at least ${_shard_docs_expected}. See Shard 2 status above."
 else
     log_ok "Shard 2 has ${_shard2_docs} documents (expected at least ${_shard_docs_expected})"
+fi
+
+
+
+log_info "Verifying that all containers are now healthy"
+_all_containers=$(docker compose ps)
+_all_healthy_count=$(echo "${_all_containers}" | grep -o "(healthy)" | wc -l)
+_all_containers_expected=5
+if [[ ${_all_healthy_count} -ne ${_all_containers_expected} ]]; then
+    echo "${_all_containers}"
+    log_fail "Expected all ${_all_containers_expected} containers to be healthy after initialization, but found ${_all_healthy_count}"
+else
+    log_ok "All ${_all_containers_expected} containers are healthy!"
 fi
 
 
