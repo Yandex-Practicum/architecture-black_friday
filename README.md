@@ -44,8 +44,18 @@ docker compose -f compose.yaml -f compose.test.yaml up -d --build
 
 Результаты тестов будут выведены в логи контейнера api_test.
 
-```
+```shell
 docker compose -f compose.yaml -f compose.test.yaml logs api_test
 ```
 
 Подробнее о тестах смотрите в [api_app_test/README.md](api_app_test/README.md)
+
+## Проверка кода
+
+Для проверки качества кода используется [Ruff](https://docs.astral.sh/ruff/):
+
+```shell
+docker compose -f compose.lint.yaml up --build
+```
+
+Подробнее о линтере смотрите в [linter/README.md](linter/README.md)
