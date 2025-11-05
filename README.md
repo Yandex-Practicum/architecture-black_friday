@@ -52,9 +52,17 @@ docker compose --profile test up api_test
 
 Для проверки качества кода используется [Ruff](https://docs.astral.sh/ruff/):
 
+Проверка с выводом ошибок в консоль:
 ```shell
-docker compose --profile lint up ruff
+docker compose --profile lint run --rm ruff
 ```
+
+С автоматическим исправлением ошибок:
+```shell
+docker compose --profile lint run --rm ruff --fix
+```
+
+Также можно использовать любые другие параметры ruff, например `--show-files`, `--statistics`, `--show-fixes` и т.д.
 
 ## Доступные эндпоинты
 

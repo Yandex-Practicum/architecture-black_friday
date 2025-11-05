@@ -5,4 +5,5 @@ WORKDIR /workspace
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["ruff", "check", ".", "--config", "pyproject.toml"]
+ENTRYPOINT ["ruff", "check", ".", "--config", "pyproject.toml"]
+CMD []
