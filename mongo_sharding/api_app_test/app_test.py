@@ -5,10 +5,15 @@ Tests verify requirements described in README.md
 import time
 
 import requests
+from pymongo import MongoClient
 
 API_BASE_URL = "http://pymongo_api:8080"
 COLLECTION_NAME = "helloDoc"
 EXPECTED_MIN_DOCUMENTS = 1000
+
+# MongoDB shard connection strings
+SHARD1_URL = "mongodb://shard1:27018"
+SHARD2_URL = "mongodb://shard2:27019"
 
 
 class TestAPIAvailability:
@@ -210,13 +215,39 @@ class TestMongoSharding:
         assert "shard2" in shard_names, "shard2 not found in shards"
 
     def test_documents_distributed_across_shards(self):
-        """Verify documents are distributed across multiple shards (not all in one)"""
-        response = requests.get(f"{API_BASE_URL}/")
-        assert response.status_code == 200
-        data = response.json()
-
-        # This test verifies that sharding is working by checking
-        # that the system is aware of multiple shards
-        # Document distribution verification would require direct shard queries
-        shards = data.get("shards", {})
-        assert len(shards) >= 2, "Documents should be distributed across at least 2 shards"
+        """Verify documents are actually distributed across multiple shards"""
+        # Connect directly to each shard and count documents
+        client_shard1 = MongoClient(SHARD1_URL)
+        client_shard2 = MongoClient(SHARD2_URL)
+        
+        try:
+            # Count documents in each shard
+            db1 = client_shard1["somedb"]
+            db2 = client_shard2["somedb"]
+            
+            count_shard1 = db1.helloDoc.count_documents({})
+            count_shard2 = db2.helloDoc.count_documents({})
+            
+            # Verify both shards have documents
+            assert count_shard1 > 0, f"Shard1 should have documents, but has {count_shard1}"
+            assert count_shard2 > 0, f"Shard2 should have documents, but has {count_shard2}"
+            
+            # Verify total is correct
+            total_in_shards = count_shard1 + count_shard2
+            assert total_in_shards >= EXPECTED_MIN_DOCUMENTS, \
+                f"Total documents in shards ({total_in_shards}) should be >= {EXPECTED_MIN_DOCUMENTS}"
+            
+            # Verify documents are distributed (not all in one shard)
+            # Allow some imbalance, but each shard should have at least 30% of documents
+            min_expected_per_shard = EXPECTED_MIN_DOCUMENTS * 0.3
+            assert count_shard1 >= min_expected_per_shard, \
+                f"Shard1 has too few documents: {count_shard1} (expected >= {min_expected_per_shard})"
+            assert count_shard2 >= min_expected_per_shard, \
+                f"Shard2 has too few documents: {count_shard2} (expected >= {min_expected_per_shard})"
+            
+            # Log distribution for debugging
+            print(f"\nDocument distribution: Shard1={count_shard1}, Shard2={count_shard2}, Total={total_in_shards}")
+            
+        finally:
+            client_shard1.close()
+            client_shard2.close()
