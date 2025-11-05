@@ -35,7 +35,7 @@ if [[ ${_count_healthy_containers} -ne ${_count_healthy_containers_expected} ]];
 fi
 log_ok "Container stack is healthy"
 
-log_info "[1/7] Initializing Config Server ..."
+log_info "[1/7] Initializing Config Server"
 docker compose exec -T configSrv mongosh --port 27017 --quiet <<EOF > /dev/null 2>&1
 rs.initiate({
   _id: "config_server",
@@ -43,7 +43,7 @@ rs.initiate({
   members: [{ _id: 0, host: "configSrv:27017" }]
 });
 EOF
-log_info "Checking Config Server status ..."
+log_info "Checking Config Server status"
 _config_status=$(docker compose exec -T configSrv mongosh --port 27017 --quiet <<EOF 2>&1
 rs.status().ok
 EOF
@@ -58,14 +58,14 @@ fi
 
 
 
-log_info "[2/7] Initializing Shard 1 ..."
+log_info "[2/7] Initializing Shard 1"
 docker compose exec -T shard1 mongosh --port 27018 --quiet <<EOF > /dev/null 2>&1
 rs.initiate({
   _id: "shard1",
   members: [{ _id: 0, host: "shard1:27018" }]
 });
 EOF
-log_info "Checking Shard 1 status ..."
+log_info "Checking Shard 1 status"
 _shard1_status=$(docker compose exec -T shard1 mongosh --port 27018 --quiet <<EOF 2>&1
 rs.status().ok
 EOF
@@ -80,14 +80,14 @@ fi
 
 
 
-log_info "[3/7] Initializing Shard 2 ..."
+log_info "[3/7] Initializing Shard 2"
 docker compose exec -T shard2 mongosh --port 27019 --quiet <<EOF > /dev/null 2>&1
 rs.initiate({
   _id: "shard2",
   members: [{ _id: 1, host: "shard2:27019" }]
 });
 EOF
-log_info "Checking Shard 2 status ..."
+log_info "Checking Shard 2 status"
 _shard2_status=$(docker compose exec -T shard2 mongosh --port 27019 --quiet <<EOF 2>&1
 rs.status().ok
 EOF
@@ -102,12 +102,12 @@ fi
 
 
 
-log_info "[4/7] Adding Shard 1 to cluster ..."
+log_info "[4/7] Adding Shard 1 to cluster"
 _shard1_add_result=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
 sh.addShard("shard1/shard1:27018");
 EOF
 )
-log_info "Checking if Shard 1 was added to cluster ..."
+log_info "Checking if Shard 1 was added to cluster"
 _shard1_in_cluster=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
 db.adminCommand({ listShards: 1 })
 EOF
@@ -123,12 +123,12 @@ fi
 
 
 
-log_info "[5/7] Adding Shard 2 to cluster ..."
+log_info "[5/7] Adding Shard 2 to cluster"
 _shard2_add_result=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
 sh.addShard("shard2/shard2:27019");
 EOF
 )
-log_info "Checking if Shard 2 was added to cluster ..."
+log_info "Checking if Shard 2 was added to cluster"
 _shard2_in_cluster=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
 db.adminCommand({ listShards: 1 })
 EOF
@@ -150,7 +150,7 @@ sh.enableSharding("somedb");
 sh.shardCollection("somedb.helloDoc", { "name": "hashed" });
 EOF
 )
-log_info "Checking if sharding is enabled for collection ..."
+log_info "Checking if sharding is enabled for collection"
 _collection_sharded=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
 use somedb
 db.helloDoc.getShardDistribution()
@@ -167,14 +167,14 @@ fi
 
 
 
-log_info "[7/7] Populating collection with 1000 documents ..."
+log_info "[7/7] Populating collection with 1000 documents"
 docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF > /dev/null 2>&1
 use somedb
 for(var i = 0; i < 1000; i++) {
   db.helloDoc.insert({age: 18 + i % 80, name: "name" + i});
 }
 EOF
-log_info "Checking if documents were inserted ..."
+log_info "Checking if documents were inserted"
 _total_docs_str=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
 use somedb
 db.helloDoc.countDocuments();
@@ -192,7 +192,7 @@ fi
 
 
 
-log_info "Checking if mongos router reports sharding metadata ..."
+log_info "Checking if mongos router reports sharding metadata"
 _sharding_status=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
 sh.status()
 EOF
@@ -219,7 +219,7 @@ done
 
 _shard_docs_expected=300
 
-log_info "Checking documents in Shard 1 ..."
+log_info "Checking documents in Shard 1"
 _shard1_docs_str=$(docker compose exec -T shard1 mongosh --port 27018 --quiet <<EOF 2>&1
 use somedb
 db.helloDoc.countDocuments();
@@ -235,7 +235,7 @@ fi
 
 
 
-log_info "Checking documents in Shard 2 ..."
+log_info "Checking documents in Shard 2"
 _shard2_docs_str=$(docker compose exec -T shard2 mongosh --port 27019 --quiet <<EOF 2>&1
 use somedb
 db.helloDoc.countDocuments();

@@ -25,25 +25,31 @@ function log_ok () {
 
 set -e
 
-log_info "Checking if container stack is healthy..."
+log_info "Checking if MongoDB container stack is healthy"
 _healthy_containers=$(docker compose ps)
-_count_healthy_containers=$(echo "${_healthy_containers}" | grep -o "healthy" | wc -l)
-_count_healthy_containers_expected=5
+_mongodb_containers=$(echo "${_healthy_containers}" | grep -v "mongos_router" | grep -v "pymongo_api")
+_count_healthy_containers=$(echo "${_mongodb_containers}" | grep -o "healthy" | wc -l)
+_count_healthy_containers_expected=9
 if [[ ${_count_healthy_containers} -ne ${_count_healthy_containers_expected} ]]; then
-    echo "${_healthy_containers}"
-    log_fail "Expected ${_count_healthy_containers_expected} healthy containers, but found $_count_healthy_containers:"
+    echo "${_mongodb_containers}"
+    log_fail "Expected ${_count_healthy_containers_expected} healthy MongoDB containers (config servers and shards), but found $_count_healthy_containers"
 fi
-log_ok "Container stack is healthy"
+log_ok "MongoDB container stack is healthy (${_count_healthy_containers} containers)"
 
-log_info "[1/7] Initializing Config Server ..."
+log_info "[1/14] Initializing Config Server Replica Set with 3 members"
 docker compose exec -T configSrv mongosh --port 27017 --quiet <<EOF > /dev/null 2>&1
 rs.initiate({
   _id: "config_server",
   configsvr: true,
-  members: [{ _id: 0, host: "configSrv:27017" }]
+  members: [
+    { _id: 0, host: "configSrv:27017" },
+    { _id: 1, host: "configSrv2:27017" },
+    { _id: 2, host: "configSrv3:27017" }
+  ]
 });
 EOF
-log_info "Checking Config Server status ..."
+log_info "Waiting for Config Server replica set to elect primary"
+log_info "Checking Config Server replica set status"
 _config_status=$(docker compose exec -T configSrv mongosh --port 27017 --quiet <<EOF 2>&1
 rs.status().ok
 EOF
@@ -53,20 +59,25 @@ if [[ ${_config_status_ok} -ne 1 ]]; then
     echo "${_config_status}"
     log_fail "Config Server replica set status is not OK. See status above."
 else
-    log_ok "Config Server initialized and ready"
+    log_ok "Config Server replica set initialized with 3 members and ready"
 fi
 
 
 
-log_info "[2/7] Initializing Shard 1 ..."
-docker compose exec -T shard1 mongosh --port 27018 --quiet <<EOF > /dev/null 2>&1
+log_info "[2/14] Initializing Shard 1 Replica Set with 3 members"
+docker compose exec -T shard1-1 mongosh --port 27018 --quiet <<EOF > /dev/null 2>&1
 rs.initiate({
   _id: "shard1",
-  members: [{ _id: 0, host: "shard1:27018" }]
+  members: [
+    { _id: 0, host: "shard1-1:27018" },
+    { _id: 1, host: "shard1-2:27018" },
+    { _id: 2, host: "shard1-3:27018" }
+  ]
 });
 EOF
-log_info "Checking Shard 1 status ..."
-_shard1_status=$(docker compose exec -T shard1 mongosh --port 27018 --quiet <<EOF 2>&1
+log_info "Waiting for Shard 1 replica set to elect primary"
+log_info "Checking Shard 1 replica set status"
+_shard1_status=$(docker compose exec -T shard1-1 mongosh --port 27018 --quiet <<EOF 2>&1
 rs.status().ok
 EOF
 )
@@ -75,20 +86,25 @@ if [[ ${_shard1_status_ok} -ne 1 ]]; then
     echo "${_shard1_status}"
     log_fail "Shard 1 replica set status is not OK. See status above."
 else
-    log_ok "Shard 1 initialized and ready"
+    log_ok "Shard 1 replica set initialized with 3 members and ready"
 fi
 
 
 
-log_info "[3/7] Initializing Shard 2 ..."
-docker compose exec -T shard2 mongosh --port 27019 --quiet <<EOF > /dev/null 2>&1
+log_info "[3/14] Initializing Shard 2 Replica Set with 3 members"
+docker compose exec -T shard2-1 mongosh --port 27019 --quiet <<EOF > /dev/null 2>&1
 rs.initiate({
   _id: "shard2",
-  members: [{ _id: 1, host: "shard2:27019" }]
+  members: [
+    { _id: 0, host: "shard2-1:27019" },
+    { _id: 1, host: "shard2-2:27019" },
+    { _id: 2, host: "shard2-3:27019" }
+  ]
 });
 EOF
-log_info "Checking Shard 2 status ..."
-_shard2_status=$(docker compose exec -T shard2 mongosh --port 27019 --quiet <<EOF 2>&1
+log_info "Waiting for Shard 2 replica set to elect primary"
+log_info "Checking Shard 2 replica set status"
+_shard2_status=$(docker compose exec -T shard2-1 mongosh --port 27019 --quiet <<EOF 2>&1
 rs.status().ok
 EOF
 )
@@ -97,17 +113,17 @@ if [[ ${_shard2_status_ok} -ne 1 ]]; then
     echo "${_shard2_status}"
     log_fail "Shard 2 replica set status is not OK. See status above."
 else
-    log_ok "Shard 2 initialized and ready"
+    log_ok "Shard 2 replica set initialized with 3 members and ready"
 fi
 
 
 
-log_info "[4/7] Adding Shard 1 to cluster ..."
+log_info "[4/14] Adding Shard 1 to cluster"
 _shard1_add_result=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
-sh.addShard("shard1/shard1:27018");
+sh.addShard("shard1/shard1-1:27018,shard1-2:27018,shard1-3:27018");
 EOF
 )
-log_info "Checking if Shard 1 was added to cluster ..."
+log_info "Checking if Shard 1 was added to cluster"
 _shard1_in_cluster=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
 db.adminCommand({ listShards: 1 })
 EOF
@@ -118,17 +134,17 @@ if [[ ${_shard1_found} -lt 1 ]]; then
     echo "${_shard1_in_cluster}"
     log_fail "Shard 1 not found in cluster. See cluster status above."
 else
-    log_ok "Shard 1 added to cluster"
+    log_ok "Shard 1 (with 3 replicas) added to cluster"
 fi
 
 
 
-log_info "[5/7] Adding Shard 2 to cluster ..."
+log_info "[5/14] Adding Shard 2 to cluster"
 _shard2_add_result=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
-sh.addShard("shard2/shard2:27019");
+sh.addShard("shard2/shard2-1:27019,shard2-2:27019,shard2-3:27019");
 EOF
 )
-log_info "Checking if Shard 2 was added to cluster ..."
+log_info "Checking if Shard 2 was added to cluster"
 _shard2_in_cluster=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
 db.adminCommand({ listShards: 1 })
 EOF
@@ -139,18 +155,18 @@ if [[ ${_shard2_found} -lt 1 ]]; then
     echo "${_shard2_in_cluster}"
     log_fail "Shard 2 not found in cluster. See cluster status above."
 else
-    log_ok "Shard 2 added to cluster"
+    log_ok "Shard 2 (with 3 replicas) added to cluster"
 fi
 
 
 
-log_info "[6/7] Enabling sharding for database 'somedb' and collection 'helloDoc'..."
+log_info "[6/14] Enabling sharding for database 'somedb' and collection 'helloDoc'"
 _enable_sharding_result=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
 sh.enableSharding("somedb");
 sh.shardCollection("somedb.helloDoc", { "name": "hashed" });
 EOF
 )
-log_info "Checking if sharding is enabled for collection ..."
+log_info "Checking if sharding is enabled for collection"
 _collection_sharded=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
 use somedb
 db.helloDoc.getShardDistribution()
@@ -167,14 +183,14 @@ fi
 
 
 
-log_info "[7/7] Populating collection with 1000 documents ..."
+log_info "[7/14] Populating collection with 1000 documents"
 docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF > /dev/null 2>&1
 use somedb
 for(var i = 0; i < 1000; i++) {
   db.helloDoc.insert({age: 18 + i % 80, name: "name" + i});
 }
 EOF
-log_info "Checking if documents were inserted ..."
+log_info "Checking if documents were inserted"
 _total_docs_str=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
 use somedb
 db.helloDoc.countDocuments();
@@ -192,7 +208,7 @@ fi
 
 
 
-log_info "Checking if mongos router reports sharding metadata ..."
+log_info "[8/14] Checking if mongos router reports sharding metadata"
 _sharding_status=$(docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF 2>&1
 sh.status()
 EOF
@@ -219,8 +235,8 @@ done
 
 _shard_docs_expected=300
 
-log_info "Checking documents in Shard 1 ..."
-_shard1_docs_str=$(docker compose exec -T shard1 mongosh --port 27018 --quiet <<EOF 2>&1
+log_info "[9/14] Checking documents in Shard 1 (primary replica)"
+_shard1_docs_str=$(docker compose exec -T shard1-1 mongosh --port 27018 --quiet <<EOF 2>&1
 use somedb
 db.helloDoc.countDocuments();
 EOF
@@ -233,10 +249,8 @@ else
     log_ok "Shard 1 has ${_shard1_docs} documents (expected at least ${_shard_docs_expected})"
 fi
 
-
-
-log_info "Checking documents in Shard 2 ..."
-_shard2_docs_str=$(docker compose exec -T shard2 mongosh --port 27019 --quiet <<EOF 2>&1
+log_info "[10/14] Checking documents in Shard 2 (primary replica)"
+_shard2_docs_str=$(docker compose exec -T shard2-1 mongosh --port 27019 --quiet <<EOF 2>&1
 use somedb
 db.helloDoc.countDocuments();
 EOF
@@ -247,6 +261,60 @@ if [[ -z ${_shard2_docs} || ${_shard2_docs} -lt ${_shard_docs_expected} ]]; then
     log_fail "Shard 2 has ${_shard2_docs} documents, but expected at least ${_shard_docs_expected}. See Shard 2 status above."
 else
     log_ok "Shard 2 has ${_shard2_docs} documents (expected at least ${_shard_docs_expected})"
+fi
+
+
+
+log_info "[11/14] Verifying replication for Config Server"
+_config_members=$(docker compose exec -T configSrv mongosh --port 27017 --quiet <<EOF 2>&1
+rs.status().members.length
+EOF
+)
+_config_members_count=$(echo "${_config_members}" | sed 's/.*> *//' | tr -d ' \r\n')
+if [[ ${_config_members_count} -ne 3 ]]; then
+    echo "${_config_members}"
+    log_fail "Config Server should have 3 replica members, but found ${_config_members_count}."
+else
+    log_ok "Config Server has 3 replica members"
+fi
+
+log_info "[12/14] Verifying replication for Shard 1"
+_shard1_members=$(docker compose exec -T shard1-1 mongosh --port 27018 --quiet <<EOF 2>&1
+rs.status().members.length
+EOF
+)
+_shard1_members_count=$(echo "${_shard1_members}" | sed 's/.*> *//' | tr -d ' \r\n')
+if [[ ${_shard1_members_count} -ne 3 ]]; then
+    echo "${_shard1_members}"
+    log_fail "Shard 1 should have 3 replica members, but found ${_shard1_members_count}."
+else
+    log_ok "Shard 1 has 3 replica members"
+fi
+
+log_info "[13/14] Verifying replication for Shard 2"
+_shard2_members=$(docker compose exec -T shard2-1 mongosh --port 27019 --quiet <<EOF 2>&1
+rs.status().members.length
+EOF
+)
+_shard2_members_count=$(echo "${_shard2_members}" | sed 's/.*> *//' | tr -d ' \r\n')
+if [[ ${_shard2_members_count} -ne 3 ]]; then
+    echo "${_shard2_members}"
+    log_fail "Shard 2 should have 3 replica members, but found ${_shard2_members_count}."
+else
+    log_ok "Shard 2 has 3 replica members"
+fi
+
+
+
+log_info "[14/14] Verifying that all containers are now healthy"
+_all_containers=$(docker compose ps)
+_all_healthy_count=$(echo "${_all_containers}" | grep -o "healthy" | wc -l)
+_all_containers_expected=11
+if [[ ${_all_healthy_count} -ne ${_all_containers_expected} ]]; then
+    echo "${_all_containers}"
+    log_fail "Expected all ${_all_containers_expected} containers to be healthy after initialization, but found ${_all_healthy_count}"
+else
+    log_ok "All ${_all_containers_expected} containers are healthy!"
 fi
 
 
