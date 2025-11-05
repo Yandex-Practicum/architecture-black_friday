@@ -1,9 +1,0 @@
-services:
-  ruff:
-    container_name: ruff_linter
-    build:
-      context: linter
-      dockerfile: Dockerfile
-    volumes:
-      - .:/workspace
-    working_dir: /workspace
