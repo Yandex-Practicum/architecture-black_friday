@@ -36,19 +36,14 @@ curl --silent http://ifconfig.me
 
 ## Тестирование
 
-Для проверки корректности работы приложения используйте интеграционные тесты:
+Для проверки корректности работы приложения написаны интеграционные тесты.
 
+Запустить тесты (запустит стек приложения тоже):
 ```shell
-docker compose -f compose.yaml -f compose.test.yaml up -d --build
+docker compose -f compose.yaml -f compose.test.yaml up api_test --build
 ```
 
-Результаты тестов будут выведены в логи контейнера api_test.
-
-```shell
-docker compose -f compose.yaml -f compose.test.yaml logs api_test
-```
-
-Подробнее о тестах смотрите в [api_app_test/README.md](api_app_test/README.md)
+Результаты тестов будут выведены в консоль.
 
 ## Проверка кода
 
@@ -57,5 +52,3 @@ docker compose -f compose.yaml -f compose.test.yaml logs api_test
 ```shell
 docker compose -f compose.lint.yaml up --build
 ```
-
-Подробнее о линтере смотрите в [linter/README.md](linter/README.md)
