@@ -27,7 +27,7 @@
 - [mongo-init.sh](../mongo_sharding/mongo-init.sh) - инициализация кластера
 - [api_app_test](../mongo_sharding/api_app_test/app_test.py) - тесты, подтверждающие выполнение задания
 
-![Схема шардирования](c4/deployment/planning_1_sharding.png)
+![Схема шардирования](./c4/deployment/planning_1_sharding.png)
 
 # Задание 3. Репликация
 
