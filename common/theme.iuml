@@ -49,6 +49,7 @@ Header {
 }
 Interface {
     backgroundColor: $SYSTEM_BG_COLOR
+    backgroundColor: $ARROW_COLOR
     .ext {
         backgroundColor: $EXTERNAL_SYSTEM_BG_COLOR
     }
