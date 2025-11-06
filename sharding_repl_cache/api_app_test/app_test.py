@@ -274,28 +274,28 @@ class TestMongoSharding:
         data = response.json()
 
         shards = data.get("shards", {})
-        
+
         # Check shard1 replica info
         shard1_info = shards.get("shard1", "")
         assert "shard1-1:27018" in shard1_info, "shard1-1 not found in shard1 info"
         assert "shard1-2:27018" in shard1_info, "shard1-2 not found in shard1 info"
         assert "shard1-3:27018" in shard1_info, "shard1-3 not found in shard1 info"
-        
+
         # Check shard2 replica info
         shard2_info = shards.get("shard2", "")
         assert "shard2-1:27019" in shard2_info, "shard2-1 not found in shard2 info"
         assert "shard2-2:27019" in shard2_info, "shard2-2 not found in shard2 info"
         assert "shard2-3:27019" in shard2_info, "shard2-3 not found in shard2 info"
-        
+
         # Count replicas by counting commas (3 replicas = 2 commas)
         shard1_replica_count = shard1_info.count(",") + 1
         shard2_replica_count = shard2_info.count(",") + 1
-        
+
         assert shard1_replica_count == 3, \
             f"Shard1 should show 3 replicas, but shows {shard1_replica_count}"
         assert shard2_replica_count == 3, \
             f"Shard2 should show 3 replicas, but shows {shard2_replica_count}"
-        
+
         print(f"\nShard1 replicas in API: {shard1_info}")
         print(f"Shard2 replicas in API: {shard2_info}")
 
@@ -304,24 +304,24 @@ class TestMongoSharding:
         # Connect directly to each shard and count documents
         client_shard1 = MongoClient(SHARD1_URL)
         client_shard2 = MongoClient(SHARD2_URL)
-        
+
         try:
             # Count documents in each shard
             db1 = client_shard1["somedb"]
             db2 = client_shard2["somedb"]
-            
+
             count_shard1 = db1.helloDoc.count_documents({})
             count_shard2 = db2.helloDoc.count_documents({})
-            
+
             # Verify both shards have documents
             assert count_shard1 > 0, f"Shard1 should have documents, but has {count_shard1}"
             assert count_shard2 > 0, f"Shard2 should have documents, but has {count_shard2}"
-            
+
             # Verify total is correct
             total_in_shards = count_shard1 + count_shard2
             assert total_in_shards >= EXPECTED_MIN_DOCUMENTS, \
                 f"Total documents in shards ({total_in_shards}) should be >= {EXPECTED_MIN_DOCUMENTS}"
-            
+
             # Verify documents are distributed (not all in one shard)
             # Allow some imbalance, but each shard should have at least 30% of documents
             min_expected_per_shard = EXPECTED_MIN_DOCUMENTS * 0.3
@@ -329,10 +329,10 @@ class TestMongoSharding:
                 f"Shard1 has too few documents: {count_shard1} (expected >= {min_expected_per_shard})"
             assert count_shard2 >= min_expected_per_shard, \
                 f"Shard2 has too few documents: {count_shard2} (expected >= {min_expected_per_shard})"
-            
+
             # Log distribution for debugging
             print(f"\nDocument distribution: Shard1={count_shard1}, Shard2={count_shard2}, Total={total_in_shards}")
-            
+
         finally:
             client_shard1.close()
             client_shard2.close()
@@ -346,16 +346,16 @@ class TestMongoReplication:
         client = MongoClient(SHARD1_URL)
         try:
             # Get replica set status
-            result = client.admin.command('replSetGetStatus')
-            members = result.get('members', [])
-            
+            result = client.admin.command("replSetGetStatus")
+            members = result.get("members", [])
+
             assert len(members) == 3, \
                 f"Shard1 should have 3 replica members, got {len(members)}"
-            
+
             # Verify each member is accessible
-            member_states = [m['stateStr'] for m in members]
-            assert 'PRIMARY' in member_states, "Shard1 should have a PRIMARY member"
-            
+            member_states = [m["stateStr"] for m in members]
+            assert "PRIMARY" in member_states, "Shard1 should have a PRIMARY member"
+
             print(f"\nShard1 replica members: {len(members)}, states: {member_states}")
         finally:
             client.close()
@@ -365,16 +365,16 @@ class TestMongoReplication:
         client = MongoClient(SHARD2_URL)
         try:
             # Get replica set status
-            result = client.admin.command('replSetGetStatus')
-            members = result.get('members', [])
-            
+            result = client.admin.command("replSetGetStatus")
+            members = result.get("members", [])
+
             assert len(members) == 3, \
                 f"Shard2 should have 3 replica members, got {len(members)}"
-            
+
             # Verify each member is accessible
-            member_states = [m['stateStr'] for m in members]
-            assert 'PRIMARY' in member_states, "Shard2 should have a PRIMARY member"
-            
+            member_states = [m["stateStr"] for m in members]
+            assert "PRIMARY" in member_states, "Shard2 should have a PRIMARY member"
+
             print(f"\nShard2 replica members: {len(members)}, states: {member_states}")
         finally:
             client.close()
@@ -384,16 +384,16 @@ class TestMongoReplication:
         client = MongoClient(CONFIG_SERVER_URLS[0])
         try:
             # Get replica set status
-            result = client.admin.command('replSetGetStatus')
-            members = result.get('members', [])
-            
+            result = client.admin.command("replSetGetStatus")
+            members = result.get("members", [])
+
             assert len(members) == 3, \
                 f"Config Server should have 3 replica members, got {len(members)}"
-            
+
             # Verify each member is accessible
-            member_states = [m['stateStr'] for m in members]
-            assert 'PRIMARY' in member_states, "Config Server should have a PRIMARY member"
-            
+            member_states = [m["stateStr"] for m in members]
+            assert "PRIMARY" in member_states, "Config Server should have a PRIMARY member"
+
             print(f"\nConfig Server replica members: {len(members)}, states: {member_states}")
         finally:
             client.close()
@@ -402,14 +402,14 @@ class TestMongoReplication:
         """Verify all Shard1 replicas have the same number of documents"""
         # We can only test count, as data should be replicated
         client_primary = MongoClient(SHARD1_URL, directConnection=True)
-        
+
         try:
             primary_count = client_primary["somedb"].helloDoc.count_documents({})
-            
+
             # Note: Secondary replicas might have slight replication lag
             # We verify they exist but don't check exact count to avoid flaky tests
             assert primary_count > 0, "Primary shard1-1 should have documents"
-            
+
             print(f"\nShard1 primary (shard1-1) has {primary_count} documents")
         finally:
             client_primary.close()
@@ -418,14 +418,14 @@ class TestMongoReplication:
         """Verify all Shard2 replicas have the same number of documents"""
         # We can only test count, as data should be replicated
         client_primary = MongoClient(SHARD2_URL, directConnection=True)
-        
+
         try:
             primary_count = client_primary["somedb"].helloDoc.count_documents({})
-            
+
             # Note: Secondary replicas might have slight replication lag
             # We verify they exist but don't check exact count to avoid flaky tests
             assert primary_count > 0, "Primary shard2-1 should have documents"
-            
+
             print(f"\nShard2 primary (shard2-1) has {primary_count} documents")
         finally:
             client_primary.close()
@@ -435,13 +435,13 @@ class TestMongoReplication:
         # Test shard1 replica set configuration
         client = MongoClient(SHARD1_URL)
         try:
-            config = client.admin.command('replSetGetConfig')
-            rs_config = config.get('config', {})
-            
-            assert rs_config.get('_id') == 'shard1', \
+            config = client.admin.command("replSetGetConfig")
+            rs_config = config.get("config", {})
+
+            assert rs_config.get("_id") == "shard1", \
                 f"Shard1 replica set name should be 'shard1', got {rs_config.get('_id')}"
-            
-            members = rs_config.get('members', [])
+
+            members = rs_config.get("members", [])
             assert len(members) == 3, \
                 f"Shard1 replica set should have 3 members in config, got {len(members)}"
         finally:
