@@ -127,11 +127,10 @@ ARel(app.agent1, consul.serverN, "Catalog Sync\n(все инстансы)", "Ser
 ARel(router.1, config.master, "Получение\nметаданных", "MongoDB", $arrow="--d->>")
 ARel(router.n, config.master, "Получение\nметаданных", "MongoDB", $arrow="--d->>")
 
-
-ARel(router.1, shard1.r1, "Чтение\nЗапись", "MongoDB", $arrow="----d->>")
-ARel(router.n, shard1.r1, "Чтение\nЗапись", "MongoDB", $arrow="----d->>")
-ARel(router.1, shard2.r1, "Чтение\nЗапись", "MongoDB", $arrow="----d->>")
-ARel(router.n, shard2.r1, "Чтение\nЗапись", "MongoDB", $arrow="----d->>")
+ARel(router.1, shard1.r1, "Чтение\nЗапись", "MongoDB", $arrow="---d->>")
+ARel(router.n, shard1.r1, "Чтение\nЗапись", "MongoDB", $arrow="---d->>")
+ARel(router.1, shard2.r1, "Чтение\nЗапись", "MongoDB", $arrow="---d->>")
+ARel(router.n, shard2.r1, "Чтение\nЗапись", "MongoDB", $arrow="---d->>")
 
 Rel_D(config.master, config.1, "Репликация", "MongoDB")
 Rel_D(config.master, config.N, "Репликация", "MongoDB")

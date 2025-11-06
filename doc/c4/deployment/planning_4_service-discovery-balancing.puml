@@ -109,10 +109,10 @@ ARel(router.1, config.master, "Получение\nметаданных", "Mongo
 ARel(router.n, config.master, "Получение\nметаданных", "MongoDB", $arrow="--d->>")
 
 
-ARel(router.1, shard1.r1, "Чтение\nЗапись", "MongoDB", $arrow="----d->>")
-ARel(router.n, shard1.r1, "Чтение\nЗапись", "MongoDB", $arrow="----d->>")
-ARel(router.1, shard2.r1, "Чтение\nЗапись", "MongoDB", $arrow="----d->>")
-ARel(router.n, shard2.r1, "Чтение\nЗапись", "MongoDB", $arrow="----d->>")
+ARel(router.1, shard1.r1, "Чтение\nЗапись", "MongoDB", $arrow="---d->>")
+ARel(router.n, shard1.r1, "Чтение\nЗапись", "MongoDB", $arrow="---d->>")
+ARel(router.1, shard2.r1, "Чтение\nЗапись", "MongoDB", $arrow="---d->>")
+ARel(router.n, shard2.r1, "Чтение\nЗапись", "MongoDB", $arrow="---d->>")
 
 Rel_D(config.master, config.1, "Репликация", "MongoDB")
 Rel_D(config.master, config.N, "Репликация", "MongoDB")
@@ -129,8 +129,6 @@ Rel_D(redis.master, redis.n, "Репликация", "Redis")
 ' layout trick to space out the arrows
 ARel(shard1.r1, config.master, "", "", $arrow="-[hidden]d->>")
 ARel(shard2.r1, config.master, "", "", $arrow="-[hidden]d->>")
-
-' Lay_R(redis.master, app.instanceN)
 
 @enduml
 
