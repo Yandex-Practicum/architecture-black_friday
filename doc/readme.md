@@ -11,9 +11,9 @@
 
 Разработаны пять последовательных вариантов архитектурных схем, отражающих эволюцию решения от изначального стенда до финальной инфраструктуры с Service Discovery, балансировкой и CDN:
 
-- [planning_1_sharding.png](c4/deployment/planning_1_sharding.png) — схема шардирования MongoDB.
-- [planning_2_replication.png](c4/deployment/planning_2_replication.png) — добавлена репликация шардов.
-- [planning_3_caching.png](c4/deployment/planning_3_caching.png) — подключён Redis для кеширования.
+- [planning_1_sharding.png](c4/deployment/planning_1_sharding.png) - схема шардирования MongoDB.
+- [planning_2_replication.png](c4/deployment/planning_2_replication.png) - добавлена репликация шардов.
+- [planning_3_caching.png](c4/deployment/planning_3_caching.png) - подключён Redis для кеширования.
 
 Схемы 4 и 5 представлены в последних заданиях.
 
@@ -22,9 +22,9 @@
 Создан проект [mongo_sharding](../mongo_sharding/), реализующий кластер MongoDB с двумя шардами:
 
 - [adr.md](../mongo_sharding/adr.md) - выбор метода шардирования
-- [README.md](../mongo_sharding/README.md) — инструкции по запуску
-- [compose.yaml](../mongo_sharding/compose.yaml) — стек контейнеров
-- [mongo-init.sh](../mongo_sharding/mongo-init.sh) — инициализация кластера
+- [README.md](../mongo_sharding/README.md) - инструкции по запуску
+- [compose.yaml](../mongo_sharding/compose.yaml) - стек контейнеров
+- [mongo-init.sh](../mongo_sharding/mongo-init.sh) - инициализация кластера
 - [api_app_test](../mongo_sharding/api_app_test/app_test.py) - тесты, подтверждающие выполнение задания
 
 ![Схема шардирования](c4/deployment/planning_1_sharding.png)
@@ -33,9 +33,9 @@
 
 Проект [mongo_sharding_repl](../mongo_sharding_repl/) расширяет шардирование репликацией каждого компонента:
 
-- [README.md](../mongo_sharding_repl/README.md) — инструкции по запуску
-- [compose.yaml](../mongo_sharding_repl/compose.yaml) — стек контейнеров
-- [mongo-init.sh](../mongo_sharding_repl/mongo-init.sh) — инициализация кластера
+- [README.md](../mongo_sharding_repl/README.md) - инструкции по запуску
+- [compose.yaml](../mongo_sharding_repl/compose.yaml) - стек контейнеров
+- [mongo-init.sh](../mongo_sharding_repl/mongo-init.sh) - инициализация кластера
 - [api_app_test](../mongo_sharding_repl/api_app_test/app_test.py) - тесты, подтверждающие выполнение задания
 
 ![Схема с репликацией](c4/deployment/planning_2_replication.png)
@@ -45,9 +45,9 @@
 Проект [sharding_repl_cache](../sharding_repl_cache/) добавляет Redis для кеширования ответов:
 
 - [adr.md](../sharding_repl_cache/caching.md) - выбор метода кеширования
-- [README.md](../sharding_repl_cache/README.md) — инструкции по запуску
-- [compose.yaml](../sharding_repl_cache/compose.yaml) — стек контейнеров
-- [mongo-init.sh](../sharding_repl_cache/mongo-init.sh) — инициализация кластера
+- [README.md](../sharding_repl_cache/README.md) - инструкции по запуску
+- [compose.yaml](../sharding_repl_cache/compose.yaml) - стек контейнеров
+- [mongo-init.sh](../sharding_repl_cache/mongo-init.sh) - инициализация кластера
 - [api_app_test](../sharding_repl_cache/api_app_test/app_test.py) - тесты, подтверждающие выполнение задания
 
 ![Схема с кешированием](c4/deployment/planning_3_caching.png)
