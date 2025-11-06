@@ -10,17 +10,6 @@ skinparam style strictuml
 ' avoid centered notes
 skinparam NoteTextAlignment left
 
-
-' !$COLOR_TEXT = "Black"
-' !$COLOR_TEXT_SUB = "Gray"
-' !$COLOR_TEXT_NEW = "Blue"
-' !$COLOR_TEXT_NEW_SUB = %lighten($COLOR_TEXT_NEW, 50)
-' !$COLOR_ELEMENT0 = "SteelBlue"
-' !$COLOR_ELEMENT1 = %lighten($COLOR_ELEMENT0, 25)
-' !$COLOR_ELEMENT2 = %lighten($COLOR_ELEMENT1, 25)
-' !$COLOR_ELEMENT3 = %lighten($COLOR_ELEMENT2, 25)
-' !$COLOR_ELEMENT4 = %lighten($COLOR_ELEMENT3, 25)
-' !$COLOR_ELEMENT_NEW = "Gold"
 !$FONT_NAME_HUGE = "Century Gothic"
 !$FONT_SIZE_HUGE = 20
 !$FONT_NAME_LARGE = "Century Gothic"

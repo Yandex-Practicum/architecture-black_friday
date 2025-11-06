@@ -21,6 +21,7 @@
 
 Создан проект [mongo_sharding](../mongo_sharding/), реализующий кластер MongoDB с двумя шардами:
 
+- [sharding.md](c4/deployment/sharding.md) - выбор метода шардирования
 - [README.md](../mongo_sharding/README.md) — инструкции по запуску
 - [compose.yaml](../mongo_sharding/compose.yaml) — стек контейнеров
 - [mongo-init.sh](../mongo_sharding/mongo-init.sh) — инициализация кластера
@@ -43,6 +44,7 @@
 
 Проект [sharding_repl_cache](../sharding_repl_cache/) добавляет Redis для кеширования ответов:
 
+- [caching.md](c4/deployment/caching.md) - выбор метода кеширования
 - [README.md](../sharding_repl_cache/README.md) — инструкции по запуску
 - [compose.yaml](../sharding_repl_cache/compose.yaml) — стек контейнеров
 - [mongo-init.sh](../sharding_repl_cache/mongo-init.sh) — инициализация кластера
