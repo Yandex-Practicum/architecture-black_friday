@@ -1,4 +1,4 @@
-name: architecture-black_friday-mongo-sharding-repl
+name: architecture-black_friday-sharding-repl-cache
 
 services:
   # Config Server Replica 1 для хранения метаданных о шардах
@@ -277,6 +277,7 @@ services:
       dockerfile: Dockerfile    
     depends_on:
       - mongos_router
+      - redis
     ports:
       - "8080:8080"
     networks:
@@ -285,12 +286,30 @@ services:
     environment:
       MONGODB_URL: "mongodb://mongos_router:27020"
       MONGODB_DATABASE_NAME: "somedb"
+      REDIS_URL: "redis://redis:6379"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/"]
       interval: 10s
       timeout: 5s
       retries: 3
       start_period: 10s
+
+  redis:
+    image: redis:8.2.3-alpine
+    container_name: repl_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.4
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "PING"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
 
   # Тесты приложения
   pymongo_api_test:

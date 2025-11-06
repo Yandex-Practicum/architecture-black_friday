@@ -10,6 +10,7 @@ from pymongo import MongoClient
 API_BASE_URL = "http://pymongo_api:8080"
 COLLECTION_NAME = "helloDoc"
 EXPECTED_MIN_DOCUMENTS = 1000
+CACHE_RESPONSE_THRESHOLD_SECONDS = 0.1
 
 # MongoDB shard connection strings (connect to primary replicas)
 SHARD1_URL = "mongodb://shard1-1:27018"
@@ -90,6 +91,7 @@ class TestRootEndpoint:
 
         assert "cache_enabled" in data, "Missing cache_enabled field"
         assert isinstance(data["cache_enabled"], bool), "cache_enabled should be boolean"
+        assert data["cache_enabled"] is True, "Cache should be enabled when Redis is configured"
 
 
 class TestMongoDBData:
@@ -166,6 +168,41 @@ class TestUsersEndpoints:
         """Verify getting non-existent user returns 404"""
         response = requests.get(f"{API_BASE_URL}/{COLLECTION_NAME}/users/nonexistent_user_12345")
         assert response.status_code == 404, "Expected 404 for non-existent user"
+
+
+class TestCachePerformance:
+    """Test Redis cache behaviour for user list endpoint"""
+
+    @staticmethod
+    def _request_users(timeout: float = 5.0) -> dict:
+        response = requests.get(
+            f"{API_BASE_URL}/{COLLECTION_NAME}/users", timeout=timeout
+        )
+        assert response.status_code == 200, "Users endpoint did not return HTTP 200"
+        payload = response.json()
+        assert "users" in payload, "Response missing users"
+        return payload
+
+    def test_cached_users_requests_are_fast(self):
+        """Verify that cached users endpoint calls stay below the latency threshold"""
+        # Warm cache with initial request (allowed to be slow)
+        initial_payload = self._request_users()
+        assert len(initial_payload.get("users", [])) > 0, "Initial users list is empty"
+
+        # Next calls should hit cache and be faster than CACHE_RESPONSE_THRESHOLD_SECONDS
+        for attempt in range(1, 101):
+            start = time.perf_counter()
+            cached_response = requests.get(
+                f"{API_BASE_URL}/{COLLECTION_NAME}/users", timeout=5.0
+            )
+            elapsed = time.perf_counter() - start
+
+            assert cached_response.status_code == 200, f"Cached request {attempt} failed"
+            cached_payload = cached_response.json()
+            assert len(cached_payload.get("users", [])) > 0, "Cached users list is empty"
+            assert (
+                elapsed < CACHE_RESPONSE_THRESHOLD_SECONDS
+            ), f"Cached response {attempt} too slow: {elapsed:.4f}s"
 
 
 class TestAPIDocumentation:
