@@ -1,0 +1,247 @@
+name: sharding-repl-cache
+
+services:
+  # сервер конфигурации
+  configSrv:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: configSrv
+    restart: always
+    ports:
+      - "27017:27017"
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.10
+    volumes:
+      - config-data:/data/db
+    command:
+      [
+        "--configsvr",  # запуск в режиме конфигурации
+        "--replSet",
+        "config_server",
+        "--bind_ip_all",
+        "--port",
+        "27017"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+  # Init контейнер для инициализации config server
+  configSrv-init:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: configSrv-init
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.6
+    depends_on:
+      configSrv:
+        condition: service_started
+    restart: "no"
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        echo "Ожидание готовности configSrv..."
+        sleep 10
+        until mongosh --host configSrv:27017 --eval "db.adminCommand('ping')" > /dev/null 2>&1; do
+          echo "Ожидание configSrv..."
+          sleep 2
+        done
+        echo "Инициализация config server replica set..."
+        mongosh --host configSrv:27017 --eval "try { rs.status(); } catch(e) { rs.initiate({_id: 'config_server', configsvr: true, members: [{_id: 0, host: 'configSrv:27017'}]}); }"
+        echo "Ожидание, пока config server станет primary..."
+        sleep 5
+        until mongosh --host configSrv:27017 --eval "rs.status().members[0].stateStr" --quiet | grep -q "PRIMARY"; do
+          echo "Ожидание primary..."
+          sleep 2
+        done
+        echo "Config server инициализирован и готов"
+  # 1-й шард
+  shard1:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: shard1
+    restart: always
+    ports:
+      - "27018:27018"
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.9
+    volumes:
+      - shard1-data:/data/db
+    command:
+      [
+        "--shardsvr",  # запуск в режиме шардинга
+        "--replSet",
+        "shard1",  # название реплики
+        "--bind_ip_all",
+        "--port",
+        "27018"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27018", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+  # Init контейнер для инициализации shard1
+  shard1-init:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: shard1-init
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.5
+    depends_on:
+      shard1:
+        condition: service_started
+    restart: "no"
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        echo "Ожидание готовности shard1..."
+        sleep 10
+        until mongosh --host shard1:27018 --eval "db.adminCommand('ping')" > /dev/null 2>&1; do
+          echo "Ожидание shard1..."
+          sleep 2
+        done
+        echo "Инициализация shard1 replica set..."
+        mongosh --host shard1:27018 --eval "try { rs.status(); } catch(e) { rs.initiate({_id: 'shard1', members: [{_id: 0, host: 'shard1:27018'}]}); }"
+        echo "Ожидание, пока shard1 станет primary..."
+        sleep 5
+        until mongosh --host shard1:27018 --eval "rs.status().members[0].stateStr" --quiet | grep -q "PRIMARY"; do
+          echo "Ожидание primary..."
+          sleep 2
+        done
+        echo "Shard1 инициализирован и готов"
+
+  # 2-й шард
+  shard2:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: shard2
+    restart: always
+    ports:
+      - "27019:27019"
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.8
+    volumes:
+      - shard2-data:/data/db
+    command:
+      [
+        "--shardsvr",  # запуск в режиме шардинга
+        "--replSet",
+        "shard2",  # название реплики
+        "--bind_ip_all",  # обратите внимание - она отличается от реплики 1-го шарда
+        "--port",
+        "27019"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27019", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+  # Init контейнер для инициализации shard2
+  shard2-init:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: shard2-init
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.4
+    depends_on:
+      shard2:
+        condition: service_started
+    restart: "no"
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        echo "Ожидание готовности shard2..."
+        sleep 10
+        until mongosh --host shard2:27019 --eval "db.adminCommand('ping')" > /dev/null 2>&1; do
+          echo "Ожидание shard2..."
+          sleep 2
+        done
+        echo "Инициализация shard2 replica set..."
+        mongosh --host shard2:27019 --eval "try { rs.status(); } catch(e) { rs.initiate({_id: 'shard2', members: [{_id: 0, host: 'shard2:27019'}]}); }"
+        echo "Ожидание, пока shard2 станет primary..."
+        sleep 5
+        until mongosh --host shard2:27019 --eval "rs.status().members[0].stateStr" --quiet | grep -q "PRIMARY"; do
+          echo "Ожидание primary..."
+          sleep 2
+        done
+        echo "Shard2 инициализирован и готов"
+
+  # Mongos роутер - направляет запросы к нужным шардам
+  mongos:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: mongos
+    restart: always
+    ports:
+      - "27020:27017"
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.7
+    depends_on:
+      configSrv-init:
+        condition: service_completed_successfully
+      shard1-init:
+        condition: service_completed_successfully
+      shard2-init:
+        condition: service_completed_successfully
+    command:
+      [
+        "mongos",
+        "--configdb",
+        "config_server/configSrv:27017",  # подключение к config server
+        "--bind_ip_all",
+        "--port",
+        "27017"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.3
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  mongo-sharding:
+    container_name: mongo-sharding
+    build: 
+      context: api_app
+      dockerfile: Dockerfile
+    depends_on:
+      mongos:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - 8080:8080
+    environment:
+      MONGODB_URL: "mongodb://mongos:27017"  # подключение к mongos роутеру
+      MONGODB_DATABASE_NAME: "somedb"
+      REDIS_URL: "redis://redis:6379"
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.2
+
+networks:
+  app-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 173.17.0.0/16
+
+volumes:
+  config-data:
+  shard1-data:
+  shard2-data:
