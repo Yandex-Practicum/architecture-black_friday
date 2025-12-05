@@ -100,13 +100,14 @@ async def root():
 
     collection_names = await db.list_collection_names()
     collections = {}
+    shard_distribution_for_collections = await get_shard_distribution_info() if topology_type == "Sharded" else {}
     for collection_name in collection_names:
         collection = db.get_collection(collection_name)
         collection_info = {
-            "documents_count": await collection.count_documents({})
+            "documents_count": await collection.count_documents({}),
+            "shard_distribution": shard_distribution_for_collections.get(f"{DATABASE_NAME}.{collection_name}", [])
         }
-        if topology_type == "Sharded":
-            collection_info["shard_distribution"] = await collection.getShardDistribution()
+
         collections[collection_name] = collection_info
 
     cache_enabled = False
@@ -128,6 +129,14 @@ async def root():
         "cache_enabled": cache_enabled,
         "status": "OK",
     }
+
+async def get_shard_distribution_info() -> dict[str, list]:
+    import pymongo
+    client = pymongo.MongoClient(host="localhost", port=27020)
+    pipeline = [{"$shardedDataDistribution":{}}]
+    c=client["admin"].aggregate(pipeline)
+    return {ns['ns']: ns['shards'] for ns in c}
+
 
 
 @app.get("/{collection_name}/count")

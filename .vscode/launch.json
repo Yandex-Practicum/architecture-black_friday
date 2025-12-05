@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "FastAPI",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "app:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8081",
+        "--reload"
+      ],
+      "cwd": "${workspaceFolder}/mongo-sharding/api_app",
+      "env": {
+        "MONGODB_URL": "mongodb://localhost:27020",
+        "MONGODB_DATABASE_NAME": "somedb",
+        "REDIS_URL": ""
+      },
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "jinja": true
+    }
+  ]
+}
+

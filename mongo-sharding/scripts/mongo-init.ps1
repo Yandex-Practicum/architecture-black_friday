@@ -39,6 +39,6 @@ docker exec mongos_router mongosh --quiet --port 27020 --eval "if(!db.getSibling
 docker exec mongos_router mongosh --quiet --port 27020 --eval "try{sh.shardCollection('somedb.helloDoc',{name:'hashed'})}catch(e){if(!/already/.test(e))throw e}"
 
 # Наполнение тестовыми данными
-docker exec mongos_router mongosh --quiet --port 27020 --eval "db=db.getSiblingDB('somedb');for(var i=0;i<1000;i++)db.helloDoc.insert({age:i,name:'ly'+i})"
+docker exec mongos_router mongosh --quiet --port 27020 --eval "db=db.getSiblingDB('somedb');for(var i=0;i<1000;i++)db.helloDoc.insertOne({age:i,name:'ly'+i})"
 
 Write-Host "Done."
