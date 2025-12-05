@@ -4,7 +4,7 @@ import os
 import time
 from typing import List, Optional
 
-import motor.motor_asyncio
+from pymongo import AsyncMongoClient
 from bson import ObjectId
 from fastapi import Body, FastAPI, HTTPException, status
 from fastapi_cache import FastAPICache
@@ -45,7 +45,7 @@ else:
     cache = nocache
 
 
-client = motor.motor_asyncio.AsyncIOMotorClient(DATABASE_URL)
+client = AsyncMongoClient(DATABASE_URL)
 db = client[DATABASE_NAME]
 
 # Represents an ObjectId field in the database.
@@ -119,11 +119,11 @@ async def root():
         "mongo_replicaset_name": replicaset_name,
         "mongo_db": DATABASE_NAME,
         "read_preference": str(read_preference),
-        "mongo_nodes": client.nodes,
-        "mongo_primary_host": client.primary,
-        "mongo_secondary_hosts": client.secondaries,
-        "mongo_is_primary": client.is_primary,
-        "mongo_is_mongos": client.is_mongos,
+        "mongo_nodes": list(client.nodes),
+        "mongo_primary_host": await client.primary,
+        "mongo_secondary_hosts": await client.secondaries,
+        "mongo_is_primary": await client.is_primary,
+        "mongo_is_mongos": await client.is_mongos,
         "collections": collections,
         "shards": shards,
         "cache_enabled": cache_enabled,
@@ -131,12 +131,9 @@ async def root():
     }
 
 async def get_shard_distribution_info() -> dict[str, list]:
-    import pymongo
-    client = pymongo.MongoClient(host="localhost", port=27020)
     pipeline = [{"$shardedDataDistribution":{}}]
-    c=client["admin"].aggregate(pipeline)
-    return {ns['ns']: ns['shards'] for ns in c}
-
+    cursor = await client["admin"].aggregate(pipeline)
+    return {ns['ns']: ns['shards'] async for ns in cursor}
 
 
 @app.get("/{collection_name}/count")
