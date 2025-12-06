@@ -1,6 +1,21 @@
-param([switch]$Reset)
+param([switch]$Reset, [int]$WaitTimeoutSec = 180)
 
-if ($Reset) { docker compose down -v }
+$Project = 'mongo-sharding-repl'  # из name: в compose.yaml
+
+if ($Reset) {
+  docker compose down -v --remove-orphans
+
+  # Найти и убить любые контейнеры, держащие проектные тома
+  $vols = docker volume ls -q --filter "label=com.docker.compose.project=$Project"
+  if ($vols) {
+    foreach ($v in $vols) {
+      $using = docker ps -aq --filter "volume=$v"
+      if ($using) { docker rm -f $using | Out-Null }
+    }
+    docker volume rm -f $vols | Out-Null
+  }
+}
+
 docker compose up -d
 
 function Wait-Healthy($name) {
@@ -28,7 +43,7 @@ Wait-Healthy mongo_shard2_2
 Wait-Healthy mongo_shard2_3
 
 # Инициализация config server
-docker compose exec -T configSrv mongosh --quiet --port 27017 --eval "try{rs.status()}catch(e){rs.initiate({_id:'config_server',configsvr:true,members:[{_id:0,host:'configSrv:27017'}]})}"
+docker compose exec -T configSrv mongosh --quiet --port 27017 --eval "var ok=false;try{ok=rs.status().ok===1}catch(e){};if(!ok){rs.initiate({_id:'config_server',configsvr:true,members:[{_id:0,host:'configSrv:27017'}]})}"
 docker compose exec -T configSrv mongosh --quiet --port 27017 --eval "for(;;){var h=db.hello();if(h.isWritablePrimary)break;sleep(200);}"
 
 # Перезапустим mongos, чтобы он стабильно приконнектился к PRIMARY config RS
@@ -37,36 +52,39 @@ Wait-Healthy mongos_router
 
 # Инициализация шардов
 docker compose exec -T mongo_shard1_1 mongosh --quiet --port 27018 `
-  --eval "try{rs.status()}catch(e){
+  --eval "var ok=false;try{ok=rs.status().ok===1}catch(e){};if(!ok){
             rs.initiate({_id:'shard1',members:[
               {_id:0,host:'mongo_shard1_1:27018'},
               {_id:1,host:'mongo_shard1_2:27018'},
-              {_id:2,host:'mongo_shard1_3:27018'}]}
-            )}"
+              {_id:2,host:'mongo_shard1_3:27018'}]})
+          }"
 docker compose exec -T mongo_shard1_1 mongosh --quiet --port 27018 `
   --eval "for(;;){var h=db.hello();if(h.isWritablePrimary)break;sleep(200);}"
 
 docker compose exec -T mongo_shard2_1 mongosh --quiet --port 27019 `
-  --eval "try{rs.status()}catch(e){
+  --eval "var ok=false;try{ok=rs.status().ok===1}catch(e){};if(!ok){
             rs.initiate({_id:'shard2',members:[
               {_id:0,host:'mongo_shard2_1:27019'},
               {_id:1,host:'mongo_shard2_2:27019'},
-              {_id:2,host:'mongo_shard2_3:27019'}]}
-            )}"
+              {_id:2,host:'mongo_shard2_3:27019'}]})
+          }"
 docker compose exec -T mongo_shard2_1 mongosh --quiet --port 27019 `
   --eval "for(;;){var h=db.hello();if(h.isWritablePrimary)break;sleep(200);}"
 
 # Добавление шардов, включение шардинга БД и шардирование коллекции
 docker compose exec -T mongos_router mongosh --quiet --port 27020 `
-  --eval "if(!db.getSiblingDB('config').shards.find({_id:'shard1'}).hasNext())sh.addShard('shard1/mongo_shard1_1:27018')"
+  --eval "if(!db.getSiblingDB('config').shards.find({_id:'shard1'}).hasNext())
+            sh.addShard('shard1/mongo_shard1_1:27018,mongo_shard1_2:27018,mongo_shard1_3:27018')"
 docker compose exec -T mongos_router mongosh --quiet --port 27020 `
-  --eval "if(!db.getSiblingDB('config').shards.find({_id:'shard2'}).hasNext())sh.addShard('shard2/mongo_shard2_1:27019')"
+  --eval "if(!db.getSiblingDB('config').shards.find({_id:'shard2'}).hasNext())
+            sh.addShard('shard2/mongo_shard2_1:27019,mongo_shard2_2:27019,mongo_shard2_3:27019')"
 docker compose exec -T mongos_router mongosh --quiet --port 27020 `
   --eval "if(!db.getSiblingDB('config').databases.find({_id:'somedb'}).hasNext())sh.enableSharding('somedb')"
 docker compose exec -T mongos_router mongosh --quiet --port 27020 `
   --eval "try{sh.shardCollection('somedb.helloDoc',{name:'hashed'})}catch(e){if(!/already/.test(e))throw e}"
 
 # Наполнение тестовыми данными
-docker compose exec mongos_router mongosh --quiet --port 27020 --eval "db=db.getSiblingDB('somedb');for(var i=0;i<1000;i++)db.helloDoc.insertOne({age:i,name:'ly'+i})"
+docker compose exec -T mongos_router mongosh --quiet --port 27020 `
+  --eval "db=db.getSiblingDB('somedb');for(var i=0;i<1000;i++)db.helloDoc.insertOne({age:i,name:'ly'+i})"
 
 Write-Host "Done."

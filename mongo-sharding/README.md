@@ -2,10 +2,9 @@
 
 ## Как запустить
 
-Запускаем mongodb и приложение
+Запускаем mongodb и приложение; ждём запуска и конфигурируем; заполняем данными
 
-```shell
-docker compose up -d
+```powershell
+.\scripts\mongo-init.ps1 -Reset
 ```
 
-Заполняем mongodb данными
