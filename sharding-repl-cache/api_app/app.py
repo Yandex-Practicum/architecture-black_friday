@@ -2,10 +2,10 @@ import json
 import logging
 import os
 import time
-from typing import List, Optional
+from typing import List, Optional, Callable, Any
 
 from pymongo import AsyncMongoClient
-from fastapi import Body, FastAPI, HTTPException, status
+from fastapi import Body, FastAPI, HTTPException, status, Request
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_cache.decorator import cache
@@ -16,7 +16,10 @@ from pymongo import errors
 from redis import asyncio as aioredis
 from typing_extensions import Annotated
 
-# Configure JSON logging
+
+fmt = logging_config["formatters"]["json"]["format"]
+if "%(message)s" not in fmt:
+    logging_config["formatters"]["json"]["format"] = f"{fmt} %(message)s"
 logging.config.dictConfig(logging_config)
 logger = logging.getLogger(__name__)
 
@@ -44,6 +47,25 @@ else:
     cache = nocache
 
 
+def collection_ns_key_builder(
+    func: Callable[..., Any],
+    namespace: str | None,
+    request: Request,
+    response: Any,
+    args: tuple[Any, ...],
+    kwargs: dict[str, Any],
+) -> str:
+    prefix = FastAPICache.get_prefix()
+    collection = request.path_params.get("collection_name", "default")
+    # формируем хвост: путь без первого сегмента + query
+    segments = [s for s in request.url.path.split("/") if s]
+    tail = "/".join(segments[1:]) if len(segments) > 1 else ""
+    items = sorted(request.query_params.multi_items())
+    if items:
+        qs = "&".join(f"{k}={v}" for k, v in items)
+        tail = f"{tail}?{qs}" if tail else f"?{qs}"
+    return f"{prefix}:{collection}:{tail}"
+
 client = AsyncMongoClient(DATABASE_URL)
 db = client[DATABASE_NAME]
 
@@ -56,7 +78,7 @@ PyObjectId = Annotated[str, BeforeValidator(str)]
 async def startup():
     if REDIS_URL:
         redis = aioredis.from_url(REDIS_URL, encoding="utf8", decode_responses=True)
-        FastAPICache.init(RedisBackend(redis), prefix="api:cache")
+        FastAPICache.init(RedisBackend(redis), prefix="api:cache", key_builder=collection_ns_key_builder)
 
 
 class UserModel(BaseModel):
@@ -136,11 +158,10 @@ async def get_shard_distribution_info() -> dict[str, list]:
 
 
 @app.get("/{collection_name}/count")
+@cache(expire=60 * 1)
 async def collection_count(collection_name: str):
     collection = db.get_collection(collection_name)
     items_count = await collection.count_documents({})
-    # status = await client.admin.command('replSetGetStatus')
-    # import ipdb; ipdb.set_trace()
     return {"status": "OK", "mongo_db": DATABASE_NAME, "items_count": items_count}
 
 
@@ -196,5 +217,6 @@ async def create_user(collection_name: str, user: UserModel = Body(...)):
     new_user = await collection.insert_one(
         user.model_dump(by_alias=True, exclude=["id"])
     )
+    await FastAPICache.clear(namespace=collection_name)
     created_user = await collection.find_one({"_id": new_user.inserted_id})
     return created_user
