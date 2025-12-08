@@ -1,0 +1,49 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" version="29.2.6">
+  <diagram id="task2" name="task2 - Sharding">
+    <mxGraphModel dx="1426" dy="743" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="user" parent="1" style="shape=mxgraph.basic.user;outlineConnect=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="User" vertex="1">
+          <mxGeometry height="100" width="80" x="60" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="api" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="pymongo_api" vertex="1">
+          <mxGeometry height="60" width="160" x="200" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="mongos" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="mongos_router" vertex="1">
+          <mxGeometry height="60" width="160" x="420" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="configSrv" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="mongo_config_server" vertex="1">
+          <mxGeometry height="50" width="200" x="400" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="shard1Group" parent="1" style="swimlane;rounded=1;childLayout=stackLayout;horizontal=1;startSize=24;fillColor=#f5f5f5;strokeColor=#666666;" value="Shard1" vertex="1">
+          <mxGeometry height="130" width="220" x="660" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="shard1node" parent="shard1Group" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#999999;" value="mongo_shard1 (shardsvr, RS shard1)" vertex="1">
+          <mxGeometry height="60" width="180" x="20" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="shard2Group" parent="1" style="swimlane;rounded=1;childLayout=stackLayout;horizontal=1;startSize=24;fillColor=#f5f5f5;strokeColor=#666666;" value="Shard2" vertex="1">
+          <mxGeometry height="130" width="220" x="660" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="shard2node" parent="shard2Group" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#999999;" value="mongo_shard2 (shardsvr, RS shard2)" vertex="1">
+          <mxGeometry height="60" width="180" x="20" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e_user_api" edge="1" parent="1" source="user" style="endArrow=block;strokeColor=#6c8ebf;" target="api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_api_mongos" edge="1" parent="1" source="api" style="endArrow=block;strokeColor=#82b366;" target="mongos">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_mongos_shard1" edge="1" parent="1" source="mongos" style="endArrow=block;strokeColor=#d6b656;" target="shard1Group">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_mongos_shard2" edge="1" parent="1" source="mongos" style="endArrow=block;strokeColor=#d6b656;" target="shard2Group">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_mongos_config" edge="1" parent="1" source="mongos" style="endArrow=block;dashed=1;strokeColor=#b85450;" target="configSrv" value="metadata/config">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
