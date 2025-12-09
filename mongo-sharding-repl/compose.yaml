@@ -6,6 +6,7 @@ services:
       context: api_app
       dockerfile: Dockerfile
     depends_on:
+      - mongos_router
       - configSrv
     ports:
       - 8080:8080
