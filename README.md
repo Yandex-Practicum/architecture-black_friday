@@ -1,5 +1,7 @@
 # pymongo-api
 
+# !!! Для проверки задания следуйте в sharding-repl-cache/README.md
+
 ## Как запустить
 
 Запускаем mongodb и приложение
