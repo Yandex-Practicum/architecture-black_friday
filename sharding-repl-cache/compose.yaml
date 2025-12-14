@@ -1,0 +1,298 @@
+version: "3.8"
+
+services:
+  configSrv:
+    image: mongo:6.0
+    container_name: configSrv
+    command:
+      [
+        "mongod",
+        "--configsvr",
+        "--replSet",
+        "config_server",
+        "--port",
+        "27017",
+        "--bind_ip_all"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    volumes:
+      - config-data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - app-network
+
+  shard1-1:
+    image: mongo:6.0
+    container_name: shard1-1
+    command:
+      [
+        "mongod",
+        "--shardsvr",
+        "--replSet",
+        "shard1",
+        "--port",
+        "27018",
+        "--bind_ip_all"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    volumes:
+      - shard1-1-data:/data/db
+    networks:
+      - app-network
+
+  shard1-2:
+    image: mongo:6.0
+    container_name: shard1-2
+    command:
+      [
+        "mongod",
+        "--shardsvr",
+        "--replSet",
+        "shard1",
+        "--port",
+        "27018",
+        "--bind_ip_all"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    volumes:
+      - shard1-2-data:/data/db
+    networks:
+      - app-network
+
+  shard1-3:
+    image: mongo:6.0
+    container_name: shard1-3
+    command:
+      [
+        "mongod",
+        "--shardsvr",
+        "--replSet",
+        "shard1",
+        "--port",
+        "27018",
+        "--bind_ip_all"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    volumes:
+      - shard1-3-data:/data/db
+    networks:
+      - app-network
+
+  shard2-1:
+    image: mongo:6.0
+    container_name: shard2-1
+    command:
+      [
+        "mongod",
+        "--shardsvr",
+        "--replSet",
+        "shard2",
+        "--port",
+        "27019",
+        "--bind_ip_all"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    volumes:
+      - shard2-1-data:/data/db
+    networks:
+      - app-network
+
+  shard2-2:
+    image: mongo:6.0
+    container_name: shard2-2
+    command:
+      [
+        "mongod",
+        "--shardsvr",
+        "--replSet",
+        "shard2",
+        "--port",
+        "27019",
+        "--bind_ip_all"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    volumes:
+      - shard2-2-data:/data/db
+    networks:
+      - app-network
+
+  shard2-3:
+    image: mongo:6.0
+    container_name: shard2-3
+    command:
+      [
+        "mongod",
+        "--shardsvr",
+        "--replSet",
+        "shard2",
+        "--port",
+        "27019",
+        "--bind_ip_all"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    volumes:
+      - shard2-3-data:/data/db
+    networks:
+      - app-network
+
+  mongos:
+    image: mongo:6.0
+    container_name: mongos
+    command:
+      [
+        "mongos",
+        "--configdb",
+        "config_server/configSrv:27017",
+        "--bind_ip_all",
+        "--port",
+        "27020"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      retries: 10
+      start_period: 10s
+    ports:
+      - "27020:27020"
+    networks:
+      - app-network
+
+  #api_app не умеет работать с кластером, поэтому Sentinel вариант
+  redis:
+    image: redis:7.2
+    container_name: redis
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    volumes:
+      - redis-data:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - app-network
+
+#  redis-1:
+#    image: redis:7.2
+#    container_name: redis-1
+#    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+#    volumes:
+#      - redis-1-data:/data
+#      - ./redis/redis-cluster.conf:/usr/local/etc/redis/redis.conf
+#    networks:
+#      - app-network
+#
+#  redis-2:
+#    image: redis:7.2
+#    container_name: redis-2
+#    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+#    volumes:
+#      - redis-2-data:/data
+#      - ./redis/redis-cluster.conf:/usr/local/etc/redis/redis.conf
+#    networks:
+#      - app-network
+#
+#  redis-3:
+#    image: redis:7.2
+#    container_name: redis-3
+#    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+#    volumes:
+#      - redis-3-data:/data
+#      - ./redis/redis-cluster.conf:/usr/local/etc/redis/redis.conf
+#    networks:
+#      - app-network
+#
+#  redis-4:
+#    image: redis:7.2
+#    container_name: redis-4
+#    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+#    volumes:
+#      - redis-4-data:/data
+#      - ./redis/redis-cluster.conf:/usr/local/etc/redis/redis.conf
+#    networks:
+#      - app-network
+#
+#  redis-5:
+#    image: redis:7.2
+#    container_name: redis-5
+#    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+#    volumes:
+#      - redis-5-data:/data
+#      - ./redis/redis-cluster.conf:/usr/local/etc/redis/redis.conf
+#    networks:
+#      - app-network
+#
+#  redis-6:
+#    image: redis:7.2
+#    container_name: redis-6
+#    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+#    volumes:
+#      - redis-6-data:/data
+#      - ./redis/redis-cluster.conf:/usr/local/etc/redis/redis.conf
+#    networks:
+#      - app-network
+
+  sharding-repl-cache:
+    build:
+      context: api_app
+    container_name: sharding-repl-cache
+    ports:
+      - "8080:8080"
+    environment:
+      MONGODB_URL: "mongodb://mongos:27020"
+      MONGODB_DATABASE_NAME: "somedb"
+      REDIS_URL: redis://redis:6379
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  config-data:
+  shard1-1-data:
+  shard1-2-data:
+  shard1-3-data:
+  shard2-1-data:
+  shard2-2-data:
+  shard2-3-data:
+  redis-data:
+#  redis-1-data:
+#  redis-2-data:
+#  redis-3-data:
+#  redis-4-data:
+#  redis-5-data:
+#  redis-6-data:
