@@ -1,0 +1,176 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.1 Safari/605.1.15" version="29.0.3">
+  <diagram id="task6-cdn" name="CDN + Service Discovery + API Gateway">
+    <mxGraphModel dx="946" dy="680" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="users_europe" value="Users&#xa;(Europe)" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=13;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="40" y="40" width="60" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="users_asia" value="Users&#xa;(Asia)" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=13;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="40" y="160" width="60" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="users_america" value="Users&#xa;(America)" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=13;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="40" y="280" width="60" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="cdn_group" value="CDN (Content Delivery Network)" style="swimlane;whiteSpace=wrap;html=1;horizontal=1;fillColor=#fff4e6;strokeColor=#ff9900;fontSize=14;startSize=35;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="160" y="30" width="200" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="cdn_europe" value="CDN Europe&#xa;(Static Content)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#ff9900;fontSize=12;fontStyle=1;" parent="cdn_group" vertex="1">
+          <mxGeometry x="20" y="50" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cdn_asia" value="CDN Asia&#xa;(Static Content)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#ff9900;fontSize=12;fontStyle=1;" parent="cdn_group" vertex="1">
+          <mxGeometry x="20" y="140" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cdn_america" value="CDN America&#xa;(Static Content)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#ff9900;fontSize=12;fontStyle=1;" parent="cdn_group" vertex="1">
+          <mxGeometry x="20" y="230" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="api_gateway" value="API Gateway&#xa;(Kong/Nginx)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="420" y="150" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="consul" value="Consul&#xa;(Service Discovery)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=13;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="420" y="260" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="app_group" value="Application Instances" style="swimlane;whiteSpace=wrap;html=1;horizontal=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;startSize=30;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="640" y="120" width="200" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="pymongo_api_1" value="pymongo-api-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#6c8ebf;fontSize=12;" parent="app_group" vertex="1">
+          <mxGeometry x="20" y="45" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="pymongo_api_2" value="pymongo-api-2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#6c8ebf;fontSize=12;" parent="app_group" vertex="1">
+          <mxGeometry x="20" y="100" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="pymongo_api_3" value="pymongo-api-3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#6c8ebf;fontSize=12;" parent="app_group" vertex="1">
+          <mxGeometry x="20" y="155" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="redis" value="redis (Cache)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="890" y="120" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="mongos" value="mongos (Router)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="890" y="200" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="configsrv" value="configSrv&#xa;(Config Server)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="1110" y="160" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="rs1" value="shard1 (Replica Set)" style="swimlane;whiteSpace=wrap;html=1;horizontal=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;startSize=28;" parent="1" vertex="1">
+          <mxGeometry x="1110" y="240" width="280" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="rs1_p" value="shard1-1 (Primary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;fontSize=12;fontStyle=1;" parent="rs1" vertex="1">
+          <mxGeometry x="20" y="40" width="230" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="rs1_s2" value="shard1-2 (Secondary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;fontSize=12;" parent="rs1" vertex="1">
+          <mxGeometry x="20" y="80" width="230" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="rs1_s3" value="shard1-3 (Secondary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;fontSize=12;" parent="rs1" vertex="1">
+          <mxGeometry x="20" y="120" width="230" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="rs2" value="shard2 (Replica Set)" style="swimlane;whiteSpace=wrap;html=1;horizontal=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;startSize=28;" parent="1" vertex="1">
+          <mxGeometry x="1110" y="440" width="280" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="rs2_p" value="shard2-1 (Primary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;fontSize=12;fontStyle=1;" parent="rs2" vertex="1">
+          <mxGeometry x="20" y="40" width="230" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="rs2_s2" value="shard2-2 (Secondary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;fontSize=12;" parent="rs2" vertex="1">
+          <mxGeometry x="20" y="80" width="230" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="rs2_s3" value="shard2-3 (Secondary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;fontSize=12;" parent="rs2" vertex="1">
+          <mxGeometry x="20" y="120" width="230" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="e_users_europe_cdn" value="Static&#xa;Content" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#ff9900;fontSize=10;" parent="1" source="users_europe" target="cdn_europe" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_users_asia_cdn" value="Static&#xa;Content" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#ff9900;fontSize=10;" parent="1" source="users_asia" target="cdn_asia" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_users_america_cdn" value="Static&#xa;Content" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#ff9900;fontSize=10;" parent="1" source="users_america" target="cdn_america" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_cdn_europe_gateway" value="Origin&#xa;Fetch" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#ff9900;dashed=1;fontSize=10;" parent="1" source="cdn_europe" target="api_gateway" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_cdn_asia_gateway" value="Origin&#xa;Fetch" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#ff9900;dashed=1;fontSize=10;" parent="1" source="cdn_asia" target="api_gateway" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_cdn_america_gateway" value="Origin&#xa;Fetch" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#ff9900;dashed=1;fontSize=10;" parent="1" source="cdn_america" target="api_gateway" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_users_europe_gateway" value="Dynamic&#xa;Content" style="endArrow=block;html=1;strokeWidth=1.5;strokeColor=#d79b00;dashed=1;fontSize=9;" parent="1" source="users_europe" target="api_gateway" edge="1">
+          <mxGeometry x="-0.638" y="-14" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="150" y="140" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_users_asia_gateway" value="Dynamic&#xa;Content" style="endArrow=block;html=1;strokeWidth=1.5;strokeColor=#d79b00;dashed=1;fontSize=9;" parent="1" source="users_asia" target="api_gateway" edge="1">
+          <mxGeometry x="-0.6277" y="-7" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="200" y="160" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_users_america_gateway" value="Dynamic&#xa;Content" style="endArrow=block;html=1;strokeWidth=1.5;strokeColor=#d79b00;dashed=1;fontSize=9;" parent="1" source="users_america" target="api_gateway" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="150" y="260" />
+              <mxPoint x="290" y="240" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_gateway_consul" value="Service&#xa;Discovery" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#9673a6;dashed=1;fontSize=10;" parent="1" source="api_gateway" target="consul" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_gateway_app1" value="Load&#xa;Balance" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#6c8ebf;fontSize=10;" parent="1" source="api_gateway" target="pymongo_api_1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_gateway_app2" value="" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#6c8ebf;" parent="1" source="api_gateway" target="pymongo_api_2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_gateway_app3" value="" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#6c8ebf;" parent="1" source="api_gateway" target="pymongo_api_3" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_app1_consul" value="Register" style="endArrow=block;html=1;strokeWidth=1.5;strokeColor=#9673a6;dashed=1;fontSize=10;" parent="1" source="pymongo_api_1" target="consul" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_app2_consul" value="" style="endArrow=block;html=1;strokeWidth=1.5;strokeColor=#9673a6;dashed=1;" parent="1" source="pymongo_api_2" target="consul" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_app3_consul" value="" style="endArrow=block;html=1;strokeWidth=1.5;strokeColor=#9673a6;dashed=1;" parent="1" source="pymongo_api_3" target="consul" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_app1_redis" value="" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#b85450;" parent="1" source="pymongo_api_1" target="redis" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_app2_redis" value="" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#b85450;" parent="1" source="pymongo_api_2" target="redis" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_app3_redis" value="" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#b85450;" parent="1" source="pymongo_api_3" target="redis" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_app1_mongos" value="" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#d6b656;" parent="1" source="pymongo_api_1" target="mongos" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_app2_mongos" value="" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#d6b656;" parent="1" source="pymongo_api_2" target="mongos" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_app3_mongos" value="" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#d6b656;" parent="1" source="pymongo_api_3" target="mongos" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_mongos_cfg" value="" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#9673a6;dashed=1;" parent="1" source="mongos" target="configsrv" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_mongos_rs1" value="" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#82b366;" parent="1" source="mongos" target="rs1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_mongos_rs2" value="" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#82b366;" parent="1" source="mongos" target="rs2" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1050" y="400" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

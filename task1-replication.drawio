@@ -1,0 +1,55 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.1 Safari/605.1.15" version="29.0.3">
+  <diagram id="task1-replication" name="Sharding + Replication (2 shards x 3 replicas)">
+    <mxGraphModel dx="946" dy="680" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="pymongo_api" value="pymongo-api (App)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="40" y="60" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mongos" value="mongos (Router)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="240" y="60" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="configsrv" value="configSrv (Config Server)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="460" y="20" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="rs1" value="shard1 (Replica Set)" style="swimlane;whiteSpace=wrap;html=1;horizontal=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;startSize=28;" parent="1" vertex="1">
+          <mxGeometry x="460" y="100" width="280" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="rs1_p" value="shard1-1 (Primary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;fontSize=12;fontStyle=1;" parent="rs1" vertex="1">
+          <mxGeometry x="20" y="40" width="230" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="rs1_s2" value="shard1-2 (Secondary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;fontSize=12;" parent="rs1" vertex="1">
+          <mxGeometry x="20" y="80" width="230" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="rs1_s3" value="shard1-3 (Secondary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;fontSize=12;" parent="rs1" vertex="1">
+          <mxGeometry x="20" y="120" width="230" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="rs2" value="shard2 (Replica Set)" style="swimlane;whiteSpace=wrap;html=1;horizontal=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;startSize=28;" parent="1" vertex="1">
+          <mxGeometry x="460" y="300" width="280" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="rs2_p" value="shard2-1 (Primary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;fontSize=12;fontStyle=1;" parent="rs2" vertex="1">
+          <mxGeometry x="20" y="40" width="230" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="rs2_s2" value="shard2-2 (Secondary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;fontSize=12;" parent="rs2" vertex="1">
+          <mxGeometry x="20" y="80" width="230" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="rs2_s3" value="shard2-3 (Secondary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;fontSize=12;" parent="rs2" vertex="1">
+          <mxGeometry x="20" y="120" width="230" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="e_app_mongos" value="" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#6c8ebf;" parent="1" source="pymongo_api" target="mongos" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_mongos_cfg" value="" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#d6b656;dashed=1;" parent="1" source="mongos" target="configsrv" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_mongos_rs1" value="" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#82b366;" parent="1" source="mongos" target="rs1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_mongos_rs2" value="" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#82b366;" parent="1" source="mongos" target="rs2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
