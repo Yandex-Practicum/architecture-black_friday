@@ -1,0 +1,144 @@
+name: sharding-repl-cache
+
+services:
+  configSrv:
+    image: mongo:6
+    restart: always
+    ports:
+      - "27017:27017"
+    networks:
+      - app-network
+    volumes:
+      - config-data:/data/db
+    command:
+      ["mongod", "--configsvr", "--replSet", "config_server", "--bind_ip_all", "--port", "27017"]
+    healthcheck:
+      test: ["CMD", "mongosh", "--port", "27017", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      start_period: 10s
+
+  # ===== SHARD 1 (2 members) =====
+  shard1a:
+    image: mongo:6
+    restart: always
+    ports:
+      - "27018:27018"
+    networks:
+      - app-network
+    volumes:
+      - shard1a-data:/data/db
+    command:
+      ["mongod", "--shardsvr", "--replSet", "shard1", "--bind_ip_all", "--port", "27018"]
+    healthcheck:
+      test: ["CMD", "mongosh", "--port", "27018", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      start_period: 10s
+
+  shard1b:
+    image: mongo:6
+    restart: always
+    networks:
+      - app-network
+    volumes:
+      - shard1b-data:/data/db
+    command:
+      ["mongod", "--shardsvr", "--replSet", "shard1", "--bind_ip_all", "--port", "27018"]
+    healthcheck:
+      test: ["CMD", "mongosh", "--port", "27018", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      start_period: 10s
+
+  # ===== SHARD 2 (2 members) =====
+  shard2a:
+    image: mongo:6
+    restart: always
+    ports:
+      - "27019:27019"
+    networks:
+      - app-network
+    volumes:
+      - shard2a-data:/data/db
+    command:
+      ["mongod", "--shardsvr", "--replSet", "shard2", "--bind_ip_all", "--port", "27019"]
+    healthcheck:
+      test: ["CMD", "mongosh", "--port", "27019", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      start_period: 10s
+
+  shard2b:
+    image: mongo:6
+    restart: always
+    networks:
+      - app-network
+    volumes:
+      - shard2b-data:/data/db
+    command:
+      ["mongod", "--shardsvr", "--replSet", "shard2", "--bind_ip_all", "--port", "27019"]
+    healthcheck:
+      test: ["CMD", "mongosh", "--port", "27019", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      start_period: 10s
+
+  # ===== MONGOS =====
+  mongos_router:
+    image: mongo:6
+    restart: always
+    depends_on:
+      - configSrv
+      - shard1a
+      - shard1b
+      - shard2a
+      - shard2b
+    # Порт вовне не публикуем — можно масштабировать без конфликтов.
+    networks:
+      - app-network
+    command:
+      ["mongos", "--configdb", "config_server/configSrv:27017", "--bind_ip_all", "--port", "27020"]
+    healthcheck:
+      test: ["CMD", "mongosh", "--port", "27020", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      start_period: 10s
+
+  api:
+    build:
+      context: ./api_app
+      dockerfile: Dockerfile
+    container_name: pymongo_api
+    depends_on:
+      - mongos_router
+    environment:
+      MONGODB_URL: "mongodb://mongos_router:27020"
+      MONGODB_DATABASE_NAME: "somedb"
+      # Если в приложении где-то используются прямые ссылки на шарды:
+      SHARD1_URL: "mongodb://shard1a:27018"
+      SHARD2_URL: "mongodb://shard2a:27019"
+      REDIS_URL: "redis://redis:6379"
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+
+
+  redis:
+    image: redis:7
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+    volumes:
+      - redis-data:/data
+
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  config-data:
+  shard1a-data:
+  shard1b-data:
+  shard2a-data:
+  shard2b-data:
+  redis-data:
