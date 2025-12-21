@@ -10,7 +10,7 @@ services:
       app-network:
         ipv4_address: 173.17.0.17
     volumes:
-      - config-repl-data:/data/db
+      - config-repl-cache-data:/data/db
     command:
       [
         "--configsvr",  # запуск в режиме конфигурации
@@ -36,7 +36,7 @@ services:
       app-network:
         ipv4_address: 173.17.0.30
     volumes:
-      - shard1-repl1-data:/data/db
+      - shard1-repl1-cache-data:/data/db
     command:
       [
         "--shardsvr", # запуск в режиме шардинга
@@ -61,7 +61,7 @@ services:
       app-network:
         ipv4_address: 173.17.0.31
     volumes:
-      - shard1-repl2-data:/data/db
+      - shard1-repl2-cache-data:/data/db
     command:
       [
         "--shardsvr", # запуск в режиме шардинга
@@ -86,7 +86,7 @@ services:
       app-network:
         ipv4_address: 173.17.0.32
     volumes:
-      - shard1-repl3-data:/data/db
+      - shard1-repl3-cache-data:/data/db
     command:
       [
         "--shardsvr", # запуск в режиме шардинга
@@ -112,7 +112,7 @@ services:
       app-network:
         ipv4_address: 173.17.0.40
     volumes:
-      - shard2-repl1-data:/data/db
+      - shard2-repl1-cache-data:/data/db
     command:
       [
         "--shardsvr", # запуск в режиме шардинга
@@ -137,7 +137,7 @@ services:
       app-network:
         ipv4_address: 173.17.0.41
     volumes:
-      - shard2-repl2-data:/data/db
+      - shard2-repl2-cache-data:/data/db
     command:
       [
         "--shardsvr", # запуск в режиме шардинга
@@ -162,7 +162,7 @@ services:
       app-network:
         ipv4_address: 173.17.0.42
     volumes:
-      - shard2-repl3-data:/data/db
+      - shard2-repl3-cache-data:/data/db
     command:
       [
         "--shardsvr", # запуск в режиме шардинга
@@ -201,8 +201,8 @@ services:
       interval: 5s
       start_period: 10s
 
-  mongo-sharding-repl:
-    container_name: mongo-sharding-repl
+  sharding-repl-cache:
+    container_name: sharding-repl-cache
     build:
       context: api_app
       dockerfile: Dockerfile
@@ -211,8 +211,22 @@ services:
     ports:
       - 8080:8080
     environment:
+      REDIS_URL: "redis://redis_1:6379"
       MONGODB_URL: "mongodb://mongos_router"
       MONGODB_DATABASE_NAME: "somedb"
+
+  redis_1:
+    image: "redis:latest"
+    container_name: redis_1
+    ports:
+      - "6379"
+    volumes:
+      - redis_1_data:/data
+      - /usr/local/etc/redis/redis.conf
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.2
 
 networks:
   app-network:
@@ -223,11 +237,12 @@ networks:
         - subnet: 173.17.0.0/16
 
 volumes:
-  config-repl-data:
-  shard1-repl1-data:
-  shard1-repl2-data:
-  shard1-repl3-data:
-  shard2-repl1-data:
-  shard2-repl2-data:
-  shard2-repl3-data:
+  redis_1_data:
+  config-repl-cache-data:
+  shard1-repl1-cache-data:
+  shard1-repl2-cache-data:
+  shard1-repl3-cache-data:
+  shard2-repl1-cache-data:
+  shard2-repl2-cache-data:
+  shard2-repl3-cache-data:
 
