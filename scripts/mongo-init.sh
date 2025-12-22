@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 ###
 # Инициализируем бд
@@ -9,3 +9,7 @@ use somedb
 for(var i = 0; i < 1000; i++) db.helloDoc.insertOne({age:i, name:"ly"+i})
 EOF
 
+docker compose exec -T mongodb1 mongosh <<EOF
+use somedb;
+db.helloDoc.countDocuments();
+EOF
