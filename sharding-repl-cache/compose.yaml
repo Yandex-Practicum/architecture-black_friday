@@ -210,18 +210,20 @@ services:
       - mongos_router
     ports:
       - 8080:8080
+    networks:
+      - app-network
     environment:
-      REDIS_URL: "redis://redis_1:6379"
-      MONGODB_URL: "mongodb://mongos_router"
+      REDIS_URL: "redis://redis:6379"
+      MONGODB_URL: "mongodb://mongos_router:27020"
       MONGODB_DATABASE_NAME: "somedb"
 
-  redis_1:
+  redis:
     image: "redis:latest"
-    container_name: redis_1
+    container_name: redis
     ports:
       - "6379"
     volumes:
-      - redis_1_data:/data
+      - redis_data:/data
       - /usr/local/etc/redis/redis.conf
     command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
     networks:
@@ -237,7 +239,7 @@ networks:
         - subnet: 173.17.0.0/16
 
 volumes:
-  redis_1_data:
+  redis_data:
   config-repl-cache-data:
   shard1-repl1-cache-data:
   shard1-repl2-cache-data:
