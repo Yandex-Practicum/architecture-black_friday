@@ -1,0 +1,160 @@
+name: mongo-sharding-repl
+
+services:
+  configSvr:
+    container_name: configSvr
+    image: dh-mirror.gitverse.ru/mongo:latest
+    command: mongod --configsvr --replSet configrs --port 27017 --dbpath /data/db --bind_ip_all
+    volumes:
+      - config_data:/data/db
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27017", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+    networks:
+      - app-network
+
+  shard1_master:
+    container_name: shard1_master
+    image: dh-mirror.gitverse.ru/mongo:latest
+    command: mongod --shardsvr --replSet shard1rs --port 27018 --dbpath /data/db --bind_ip_all
+    volumes:
+      - shard1_master_data:/data/db
+    ports:
+      - "27018:27018"
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27018", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+    networks:
+      - app-network
+
+  shard1_slave1:
+    container_name: shard1_slave1
+    image: dh-mirror.gitverse.ru/mongo:latest
+    command: mongod --shardsvr --replSet shard1rs --port 27018 --dbpath /data/db --bind_ip_all
+    volumes:
+      - shard1_slave1_data:/data/db
+    ports:
+      - "27118:27018"
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27018", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+    networks:
+      - app-network
+
+  shard1_slave2:
+    container_name: shard1_slave2
+    image: dh-mirror.gitverse.ru/mongo:latest
+    command: mongod --shardsvr --replSet shard1rs --port 27018 --dbpath /data/db --bind_ip_all
+    volumes:
+      - shard1_slave2_data:/data/db
+    ports:
+      - "27218:27018"
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27018", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+    networks:
+      - app-network
+
+  shard2_master:
+    container_name: shard2_master
+    image: dh-mirror.gitverse.ru/mongo:latest
+    command: mongod --shardsvr --replSet shard2rs --port 27019 --dbpath /data/db --bind_ip_all
+    volumes:
+      - shard2_master_data:/data/db
+    ports:
+      - "27019:27019"
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27019", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+    networks:
+      - app-network
+
+  shard2_slave1:
+    container_name: shard2_slave1
+    image: dh-mirror.gitverse.ru/mongo:latest
+    command: mongod --shardsvr --replSet shard2rs --port 27019 --dbpath /data/db --bind_ip_all
+    volumes:
+      - shard2_slave1_data:/data/db
+    ports:
+      - "27119:27019"
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27019", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+    networks:
+      - app-network
+
+  shard2_slave2:
+    container_name: shard2_slave2
+    image: dh-mirror.gitverse.ru/mongo:latest
+    command: mongod --shardsvr --replSet shard2rs --port 27019 --dbpath /data/db --bind_ip_all
+    volumes:
+      - shard2_slave2_data:/data/db
+    ports:
+      - "27219:27019"
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27019", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+    networks:
+      - app-network
+
+  mongos:
+    container_name: mongos
+    image: dh-mirror.gitverse.ru/mongo:latest
+    command: mongos --configdb configrs/configSvr:27017 --port 27020 --bind_ip_all
+    depends_on:
+      - configSvr
+      - shard1_master
+      - shard1_slave1
+      - shard1_slave2
+      - shard2_master
+      - shard2_slave1
+      - shard2_slave2
+    ports:
+      - "27020:27020"
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27020", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+    networks:
+      - app-network
+
+  pymongo_api:
+    container_name: pymongo_api
+    build:
+      context: api_app
+      dockerfile: Dockerfile
+    depends_on:
+      - mongos
+    ports:
+      - 8080:8080
+    environment:
+      MONGODB_URL: "mongodb://mongos:27020"
+      MONGODB_DATABASE_NAME: "somedb"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 173.17.0.0/16
+
+volumes:
+  config_data:
+  shard1_master_data:
+  shard1_slave1_data:
+  shard1_slave2_data:
+  shard2_master_data:
+  shard2_slave1_data:
+  shard2_slave2_data:
