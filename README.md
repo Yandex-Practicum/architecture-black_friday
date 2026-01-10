@@ -1,35 +1,13 @@
-# pymongo-api
+| Задание | Файл                   |
+| ------- | ---------------------- |
+| 1       | `mongo-caching.drawio` |
+| 5       | `mongo-scaling.drawio` |
+| 6       | `mongo-cdn.drawio`     |
 
-## Как запустить
+### Запуск приложения
 
-Запускаем mongodb и приложение
-
-```shell
-docker compose up -d
+```bash
+cd sharding-repl-cache
 ```
 
-Заполняем mongodb данными
-
-```shell
-./scripts/mongo-init.sh
-```
-
-## Как проверить
-
-### Если вы запускаете проект на локальной машине
-
-Откройте в браузере http://localhost:8080
-
-### Если вы запускаете проект на предоставленной виртуальной машине
-
-Узнать белый ip виртуальной машины
-
-```shell
-curl --silent http://ifconfig.me
-```
-
-Откройте в браузере http://<ip виртуальной машины>:8080
-
-## Доступные эндпоинты
-
-Список доступных эндпоинтов, swagger http://<ip виртуальной машины>:8080/docs
+Дальнейшие инструкции по развёртыванию кластера MongoDB с шардированием, репликацией и кешированием — в [sharding-repl-cache/README.md](./sharding-repl-cache/README.md).
