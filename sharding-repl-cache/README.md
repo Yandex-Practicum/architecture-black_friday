@@ -2,8 +2,9 @@
 
 ## Как запустить Автоматически
 
+- Убедись что перешел в директорю где лежит этот README.md
+
 ```bash
-cd ./sharding-repl-cache
 .\init-sharding.sh
 ```
 
@@ -11,9 +12,7 @@ cd ./sharding-repl-cache
 
 ### 0. переход в директорию
 
-```bash
-cd ./sharding-repl-cache
-```
+- Убедись что перешел в директорю где лежит этот README.md
 
 ### 1
 

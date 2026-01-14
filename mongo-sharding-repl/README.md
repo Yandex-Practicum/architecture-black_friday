@@ -1,9 +1,9 @@
-Схемы лежат в ./docs . Итоговая схема -schema-5.drawio
+# TASK 3
 
 ## Как запустить Автоматически
 
 ```bash
-cd ./sharding-repl-cache
+cd ./mongo-sharding-repl
 .\init-sharding.sh
 ```
 
@@ -12,8 +12,12 @@ cd ./sharding-repl-cache
 ### 0. переход в директорию
 
 ```bash
-cd ./sharding-repl-cache
+cd ./mongo-sharding-repl
 ```
+
+## Как запустить
+
+### 1.Запуск
 
 ### 1
 
