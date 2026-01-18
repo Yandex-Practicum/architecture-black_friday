@@ -1,15 +1,6 @@
 # pymongo-api
 
-## Схема
-
-[Итоговая схема draw.io](schema/schema_5.drawio)
-
-
 ## Как запустить
-
-```shell
-cd sharding-repl-cache
-```
 
 Запускаем mongodb и приложение
 
