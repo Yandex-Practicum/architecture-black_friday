@@ -1,0 +1,63 @@
+@startuml
+!define ER
+
+entity User{
+    *id : int
+    username : string
+    status : int
+    address : string
+}
+
+entity Order{
+    *id : int
+    user_id : int
+    statius : int
+    price : float
+    created_at : timestamp
+    updated_at : timestamp
+    discount : float
+}
+
+entity OrderItems{
+    order_id : int,
+    product_id : int
+    count : int
+    price : float
+}
+
+entity Product{
+    *id : int
+    type : int
+    device_type_id : int
+    name : string
+    image : string
+    count: int
+    description : string
+    price : float
+}
+
+entity ProductType{
+    *id : int
+    name : string
+    status : int
+    device_type_id : int
+}
+
+entity DeviceType{
+    *id : int
+    name : string
+    status : int
+}
+
+entity AddressDictionary{
+    address : string
+}
+
+User ||--o{ Order : User.id
+Order ||--o{ OrderItems : Order.id
+OrderItems ||--o{ Product : product_id
+Product ||--o{ ProductType : ProductType.id
+Product ||--o{ DeviceType : DeviceType.id
+User ||--o{ AddressDictionary : AddressDictionary.address
+
+@enduml
