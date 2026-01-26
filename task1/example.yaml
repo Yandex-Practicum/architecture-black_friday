@@ -1,0 +1,40 @@
+services:
+  service1:
+    # пример конфигурации 1
+    container_name: my_service # задать наименование сервису 
+    image: nginx:latest # образ соберем из готового образа
+    ports: # задать порты 
+      - "8080:8080"
+      - "443:443"
+    networks: my_network
+  service2:
+    container_name: my_container
+    # определение зависимостей контейнера
+    depends_on: 
+      - service1 # service2 запустится после service1, но в такой конфигурации не ждет именно успешного запуска контейнера, а просто после запускается.
+    context: ./app # путь до Dockerfile
+    dockerfile: Dockerfile # наименование dockerfile-а 
+    args:
+      - arg1=My_ARG
+    environment: # задать переменные окружения
+      - env1=my_env
+      - env2=my_env
+    networks: my_network
+  service3:
+    container_name: my_container_ver_3
+    depends_on:
+      service2:
+        condition: service_healthy # в такой конфигурации именно запускаемся после успешного запуска service2, или не запускаемся вовсе
+    restart: always # options: unless-stopped(пока руками не остановят)/on-failure(только при ошибке)/no(никогда)
+    command: npm start # эта команда переопределит то, что написано в Dockerfile
+    enrtypoint: /usr/bin/custom-script.sh # переопределить enrtypoint 
+    networks: my_network
+networks:
+  my_network:
+    driver: bridge # просто определяем тип сети, bridge 
+    internal: true # без доступа наружу
+    #конфигурация
+
+volumes:
+  my_volume:
+    db_data: # определяем тома и присваивание ему переменной db_data

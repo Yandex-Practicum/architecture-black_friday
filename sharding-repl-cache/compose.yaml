@@ -1,0 +1,310 @@
+name: sharding-repl-cache
+
+services:
+  configSvr:
+    container_name: configSvr
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27019:27019"
+    command:
+      [
+        "mongod",
+        "--configsvr",
+        "--replSet",
+        "configReplSet",
+        "--bind_ip_all",
+        "--port",
+        "27019"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27019", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 20s
+      timeout: 3s
+      retries: 3  
+    networks:
+      - black_friday_network
+    volumes:
+      - configSvr-data:/data/db
+  configSvr-replica2:
+    container_name: configSvr-replica2
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27119:27119"
+    command:
+      [
+        "mongod",
+        "--configsvr",
+        "--replSet",
+        "configReplSet",
+        "--bind_ip_all",
+        "--port",
+        "27119"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27119", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 20s
+      timeout: 3s
+      retries: 3  
+    networks:
+      - black_friday_network
+    volumes:
+      - configSvr-replica2-data:/data/db
+  configSvr-replica3:
+    container_name: configSvr-replica3
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27219:27219"
+    command:
+      [
+        "mongod",
+        "--configsvr",
+        "--replSet",
+        "configReplSet",
+        "--bind_ip_all",
+        "--port",
+        "27219"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27219", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 20s
+      timeout: 3s
+      retries: 3  
+    networks:
+      - black_friday_network
+    volumes:
+      - configSvr-replica3-data:/data/db
+  mongodb1: 
+    container_name: mongodb1
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27017:27017"
+    command:
+      [
+        "mongos",
+        "--configdb",
+        "configReplSet/configSvr:27019,configSvr-replica2:27119,configSvr-replica3:27219",
+        "--bind_ip_all",
+        "--port",
+        "27017"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27017", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 20s
+      timeout: 3s
+      retries: 3
+    depends_on:
+      - configSvr
+    networks:
+      - black_friday_network
+  shard1:
+    container_name: shard1
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27018:27018"
+    command:
+      [
+        "mongod",
+        "--shardsvr",
+        "--replSet",
+        "shard1ReplSet",
+        "--bind_ip_all",
+        "--port",
+        "27018"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27018", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 20s
+      timeout: 3s
+      retries: 3
+    networks:
+      - black_friday_network
+    volumes:
+      - shard1-data:/data/db
+  shard1-replica2:
+    container_name: shard1-replica2
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27118:27118"
+    command:
+      [
+        "mongod",
+        "--shardsvr",
+        "--replSet",
+        "shard1ReplSet",
+        "--bind_ip_all",
+        "--port",
+        "27118"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27118", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 20s
+      timeout: 3s
+      retries: 3
+    networks:
+      - black_friday_network
+    volumes:
+      - shard1-replica2-data:/data/db
+  shard1-replica3:
+    container_name: shard1-replica3
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27218:27218"
+    command:
+      [
+        "mongod",
+        "--shardsvr",
+        "--replSet",
+        "shard1ReplSet",
+        "--bind_ip_all",
+        "--port",
+        "27218"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27218", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 20s
+      timeout: 3s
+      retries: 3
+    networks:
+      - black_friday_network
+    volumes:
+      - shard1-replica3-data:/data/db
+  shard2:
+    container_name: shard2
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27020:27020"
+    command:
+      [
+        "mongod",
+        "--shardsvr",
+        "--replSet",
+        "shard2ReplSet",
+        "--bind_ip_all",
+        "--port",
+        "27020"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27020", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 20s
+      timeout: 3s
+      retries: 3
+    networks:
+      - black_friday_network
+    volumes:
+      - shard2-data:/data/db
+  shard2-replica2:
+    container_name: shard2-replica2
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27120:27120"
+    command:
+      [
+        "mongod",
+        "--shardsvr",
+        "--replSet",
+        "shard2ReplSet",
+        "--bind_ip_all",
+        "--port",
+        "27120"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27120", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 20s
+      timeout: 3s
+      retries: 3
+    networks:
+      - black_friday_network
+    volumes:
+      - shard2-replica2-data:/data/db
+  shard2-replica3:
+    container_name: shard2-replica3
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27220:27220"
+    command:
+      [
+        "mongod",
+        "--shardsvr",
+        "--replSet",
+        "shard2ReplSet",
+        "--bind_ip_all",
+        "--port",
+        "27220"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--port", "27220", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 20s
+      timeout: 3s
+      retries: 3
+    networks:
+      - black_friday_network
+    volumes:
+      - shard2-replica3-data:/data/db
+  pymongo_api:
+    container_name: pymongo_api
+    build: 
+      context: api_app
+      dockerfile: Dockerfile
+    depends_on:
+      - mongodb1
+      - redis
+    ports:
+      - 8080:8080
+    environment:
+      MONGODB_URL: "mongodb://mongodb1:27017"
+      MONGODB_DATABASE_NAME: "somedb"
+      REDIS_URL: "redis://redis:6379"
+    networks:
+      - black_friday_network
+  redis:
+    container_name: redis
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    volumes:
+      - redis-data:/data
+    networks:
+      - black_friday_network
+
+networks:
+  black_friday_network:
+    driver: bridge
+
+volumes:
+  configSvr-data:
+  configSvr-replica2-data:
+  configSvr-replica3-data:
+  shard1-data:
+  shard1-replica2-data:
+  shard1-replica3-data:
+  shard2-data:
+  shard2-replica2-data:
+  shard2-replica3-data:
+  redis-data:

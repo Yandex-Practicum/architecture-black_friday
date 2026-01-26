@@ -1,0 +1,76 @@
+services:
+  configSrv:
+    container_name: configSrv
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27019:27019"
+    command:
+      [
+        "--configsrv",
+        "--relpSet",
+        "configSrv",
+        "bind_ip_all",
+        "--port",
+        "27019"
+      ]
+    networks: black_friday_network
+    volumes:
+      - configSrv-data:/data/db
+  mongos_router:
+    container_name: mongos_router
+    restart: always
+    ports:
+      - "27017:27017"
+    command:
+      [
+        "mongos",
+        "--configdb",
+        "configSrv/configSrv:27019",
+        "bind_ip_all",
+        "--port",
+        "27017"
+      ]
+    networks: black_friday_network
+  shard1:
+    container_name: shard1
+    restart: always
+    ports:
+      - "27018:27018"
+    command:
+      [
+        "--shardsrv",
+        "--replSet",
+        "shard1",
+        "bind_ip_all",
+        "--port",
+        "27018"
+      ]
+    networks: black_friday_network
+    volumes:
+      - shard1-data:/data/db
+  shard2:
+    container_name: shard2
+    restart: always
+    ports:
+      - "27020:27020"
+    command:
+      [
+        "--shardsrv",
+        "--replSet",
+        "shard2",
+        "bind_ip_all",
+        "--port",
+        "27020"
+      ]
+    networks: black_friday_network
+    volumes:
+      - shard2-data:/data/db
+networks:
+  black_friday_network:
+    driver: bridge
+
+volumes:
+  configSrv-data:
+  shard1-data:
+  shard2-data: 
