@@ -104,20 +104,6 @@ services:
       - black_friday_network
     volumes:
       - shard2-data:/data/db
-  mongo_db_init:
-    container_name: mongo_db_init
-    build:
-      context: ./mongo_db_init
-      dockerfile: Dockerfile
-    depends_on:
-      configSvr:
-        condition: service_healthy
-      shard1:
-          condition: service_healthy
-      shard2:
-        condition: service_healthy
-    networks:
-      - black_friday_network
   pymongo_api:
     container_name: pymongo_api
     build: 
