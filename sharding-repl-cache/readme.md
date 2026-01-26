@@ -1,4 +1,4 @@
-Инструкция для настройки шардирования MongoDB с репликацией
+Инструкция для настройки шардирования MongoDB с репликацией и кешированием
 #################################
 # Шаг 1: Запустить контейнеры Config Server Replica Set
 #################################
@@ -161,12 +161,96 @@ sh.status();
 exit
 
 #################################
-# Шаг 13: Запустить API приложение
+# Шаг 13: Запустить Redis для кеширования
+#################################
+docker compose up -d redis
+
+# Подождать ~5 секунд для запуска Redis
+
+#################################
+# Шаг 14: Проверить работу Redis (опционально)
+#################################
+docker compose exec -T redis redis-cli ping
+# Ожидаемый ответ: PONG
+
+# Проверить конфигурацию Redis
+docker compose exec -T redis redis-cli INFO memory
+
+#################################
+# Шаг 15: Запустить API приложение
 #################################
 docker compose up -d pymongo_api
+
+# Подождать ~5-10 секунд для запуска API
 
 #################################
 # Проверка работоспособности
 #################################
-# Проверить статус кластера
+# Проверить статус кластера MongoDB
 docker compose exec -T mongodb1 mongosh --port 27017 --quiet --eval "sh.status()"
+
+# Проверить список шардов
+docker compose exec -T mongodb1 mongosh --port 27017 --quiet --eval "db.getSiblingDB('config').shards.find().pretty()"
+
+# Проверить распределение данных
+docker compose exec -T mongodb1 mongosh --port 27017 --quiet --eval "db.getSiblingDB('somedb').helloDoc.getShardDistribution()"
+
+# Проверить подключение к Redis
+docker compose exec -T redis redis-cli ping
+
+# Проверить статистику Redis
+docker compose exec -T redis redis-cli INFO stats
+
+# Проверить работу API (если есть health endpoint)
+curl http://localhost:8080/health
+
+#################################
+# Тестирование кеширования
+#################################
+# Установить тестовое значение в Redis
+docker compose exec -T redis redis-cli SET test_key "test_value"
+
+# Получить значение
+docker compose exec -T redis redis-cli GET test_key
+
+# Проверить все ключи в Redis
+docker compose exec -T redis redis-cli KEYS "*"
+
+# Мониторинг команд Redis в реальном времени
+docker compose exec -T redis redis-cli MONITOR
+
+#################################
+# Тестирование отказоустойчивости MongoDB
+#################################
+# Остановить PRIMARY ноду одного из шардов
+docker compose stop shard1
+
+# Проверить, что кластер продолжает работать (произойдет автоматическое переизбрание PRIMARY)
+docker compose exec -T mongodb1 mongosh --port 27017 --quiet --eval "sh.status()"
+
+# Запустить ноду обратно
+docker compose start shard1
+
+#################################
+# Очистка кеша Redis (если нужно)
+#################################
+# Очистить все ключи в текущей базе данных
+docker compose exec -T redis redis-cli FLUSHDB
+
+# Очистить все базы данных Redis
+docker compose exec -T redis redis-cli FLUSHALL
+
+#################################
+# Примечания
+#################################
+# MongoDB:
+# - Каждый replica set имеет 3 ноды для обеспечения отказоустойчивости
+# - Config Server также реплицируется (3 ноды)
+# - При падении одной ноды, replica set автоматически выберет новую PRIMARY
+# - Минимум 2 ноды должны быть доступны для работы replica set
+# - Данные автоматически реплицируются между всеми нодами в replica set
+
+# Redis:
+# - Используется для кеширования часто запрашиваемых данных
+# - Политика вытеснения: allkeys-lru (удаляет наименее используемые ключи)
+# - Максимальная память: 25
