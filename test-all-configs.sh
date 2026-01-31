@@ -61,4 +61,4 @@ test_config "mongo-sharding" "mongo-sharding"
 test_config "mongo-sharding-repl" "mongo-sharding-repl"
 test_config "sharding-repl-cache" "sharding-repl-cache"
 
-echo "🎉 Тестирование всех конфигураций завершено!" 
+echo "🎉 Тестирование всех конфигураций завершено!"
