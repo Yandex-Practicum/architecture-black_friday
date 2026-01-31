@@ -17,7 +17,6 @@ from pymongo import errors
 from redis import asyncio as aioredis
 from typing_extensions import Annotated
 
-# Configure JSON logging
 logging.config.dictConfig(logging_config)
 logger = logging.getLogger(__name__)
 
@@ -48,8 +47,6 @@ else:
 client = motor.motor_asyncio.AsyncIOMotorClient(DATABASE_URL)
 db = client[DATABASE_NAME]
 
-# Represents an ObjectId field in the database.
-# It will be represented as a `str` on the model so that it can be serialized to JSON.
 PyObjectId = Annotated[str, BeforeValidator(str)]
 
 
@@ -130,8 +127,6 @@ async def root():
 async def collection_count(collection_name: str):
     collection = db.get_collection(collection_name)
     items_count = await collection.count_documents({})
-    # status = await client.admin.command('replSetGetStatus')
-    # import ipdb; ipdb.set_trace()
     return {"status": "OK", "mongo_db": DATABASE_NAME, "items_count": items_count}
 
 
