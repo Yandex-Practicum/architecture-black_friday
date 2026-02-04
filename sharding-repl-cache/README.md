@@ -1,0 +1,25 @@
+# pymongo-api
+
+## Как запустить
+
+1. В .env указать абсолютный путь до конфига Redis (REDIS_CONFIG)
+
+1. Переходим в папку ./Task 1-2-3-4-5-6/sharding-repl-cache
+```shell
+cd ./Task 1-2-3-4-5-6/sharding-repl-cache
+```
+
+3. апускаем mongodb, redis и приложение
+
+```shell
+docker compose up -d
+```
+
+4. Инициализируем и заполняем redis и mongodb данными (возможно понадобиться запустить скрипт еще раз, так как почему-то mongos_router при первом запуске в 9 из 10 случаем недоступен, хотя запущен)
+
+```shell
+./scripts/mongo-redis-init.sh
+```
+## Как проверить
+
+Откройте в браузере http://localhost:8080/helloDoc/users - Второй и последующие вызовы должны выполнятся <100мс.
