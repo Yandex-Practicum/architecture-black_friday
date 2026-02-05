@@ -23,3 +23,9 @@ docker compose up -d
 ## Как проверить
 
 Откройте в браузере http://localhost:8080/helloDoc/users - Второй и последующие вызовы должны выполнятся <100мс.
+
+## Проверка на уровне Redis:
+docker exec -it redis redis-cli INFO STATS
+До вызова запроса:
+После вызова:
+
