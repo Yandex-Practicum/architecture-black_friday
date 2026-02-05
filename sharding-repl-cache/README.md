@@ -2,24 +2,25 @@
 
 ## Как запустить
 
-1. В .env указать абсолютный путь до конфига Redis (REDIS_CONFIG)
-
-1. Переходим в папку ./Task 1-2-3-4-5-6/sharding-repl-cache
+1. Переходим в папку sharding-repl-cache
 ```shell
-cd ./Task 1-2-3-4-5-6/sharding-repl-cache
+cd sharding-repl-cache
 ```
 
-3. апускаем mongodb, redis и приложение
+2. Запускаем mongodb, redis и приложение
 
 ```shell
 docker compose up -d
 ```
 
-4. Инициализируем и заполняем redis и mongodb данными   
+3. Инициализируем mongodb данными   
 
 ```shell
 ./scripts/init.sh
 ```
+
+4. Запустить приложение и этим закешировать данные в redis
+Откройте в браузере http://localhost:8080/helloDoc/users   
 
 ## Как проверить
 
