@@ -3,9 +3,7 @@ WORKDIR /app
 EXPOSE 8080
 COPY requirements.txt ./
 # Устанавливаем зависимости python не пересобирая их
-# TODO: remove proxy
-RUN pip install  --proxy 172.16.0.250:4343 --no-cache --no-cache-dir -r requirements.txt
-#RUN pip install --no-cache --no-cache-dir -r requirements.txt
+RUN pip install --no-cache --no-cache-dir -r requirements.txt
 # Копирование кода приложения
 COPY app.py /app/
 ENTRYPOINT ["uvicorn"]
