@@ -36,11 +36,16 @@ shard2 [direct: primary] somedb> db.helloDoc.countDocuments()
 508  
 ```  
 
+Данные с контейнеров с шардами MongoDB:  
 ![Отображение распределения по шардам](screens/check_mongo.png)  
 ```shell
 docker exec -it mongos_router mongosh somedb --eval "db.helloDoc.getShardDistribution()"  
 ```  
+
+Данные с MongoDB - распределение коллекции по шардам:    
+
 ![Отображение распределения по шардам](screens/check_mongo2.png)  
 
-![Ининциализация mongoDB](screens/init_mongo.png)  
+Инициализация mongoDB  
+![Инициализация mongoDB](screens/init_mongo.png)  
 
