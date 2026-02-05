@@ -22,7 +22,7 @@ docker compose up -d
 Откройте в браузере http://localhost:8080/helloDoc/count - количество записей в базе
 
 ## Проверка внутри контейнеров средствами mongosh:
-
+```shell
 docker compose exec -T shard1 mongosh --port 27018 --quiet  
 shard1 [direct: primary] somed> use somedb  
 switched to db somedb  
@@ -34,12 +34,12 @@ shard2 [direct: primary] test> use somedb
 switched to db somedb  
 shard2 [direct: primary] somedb> db.helloDoc.countDocuments()  
 508  
-
+```
 
 ![Отображение распределения по шардам](screens/check_mongo.png)
-
+```shell
 docker exec -it mongos_router mongosh somedb --eval "db.helloDoc.getShardDistribution()"  
-
+```
 ![Отображение распределения по шардам](screens/check_mongo2.png)
 
 
