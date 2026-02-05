@@ -17,13 +17,15 @@ docker compose up -d
 
 ## Как проверить через pymongo-api:
 
-Откройте в браузере http://localhost:8080 - данные о MongoDB
+Откройте в браузере http://localhost:8080 - данные о MongoDB  
+![replication of mongo](screens/check_pymongoapi.png)  
 
 Откройте в браузере http://localhost:8080/helloDoc/count - колличество записей в базе
 
 ## Проверка внутри контейнеров средствами mongosh:
 
 # Проверить распределение по шардам:
+```shell
 docker compose exec -T shard1 mongosh --port 27018 --quiet  
 shard1 [direct: primary] somed> use somedb  
 switched to db somedb  
@@ -35,12 +37,16 @@ shard2 [direct: primary] test> use somedb
 switched to db somedb  
 shard2 [direct: primary] somedb> db.helloDoc.countDocuments()  
 508  
+```  
 
 
 # Проверить состояние шардов через коллекцию
+```shell
 docker exec -it mongos_router mongosh somedb --eval "db.helloDoc.getShardDistribution()"  
+```  
 
 # Проверить репликации для шардов
+```shell
 docker exec -it mongos_router mongosh --quiet --eval "
   db.getSiblingDB('admin').runCommand({ listShards: 1 }).shards.forEach(shard => {
     print('\nShard ID: ' + shard._id);
@@ -51,4 +57,8 @@ docker exec -it mongos_router mongosh --quiet --eval "
     print('Connection string: ' + shard.host);
   });
 "
+```  
+
+Отображение шардирования средствами MongoDB:  
+![replication of mongo](screens/check_replication.png)    
 
