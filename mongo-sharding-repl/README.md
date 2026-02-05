@@ -45,6 +45,10 @@ shard2 [direct: primary] somedb> db.helloDoc.countDocuments()
 docker exec -it mongos_router mongosh somedb --eval "db.helloDoc.getShardDistribution()"  
 ```  
 
+Данные с MongoDB - распределение коллекции по шардам:    
+
+![Отображение распределения по шардам](../mongo-sharding/screens/check_mongo2.png)  
+
 # Проверить репликации для шардов
 ```shell
 docker exec -it mongos_router mongosh --quiet --eval "

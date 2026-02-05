@@ -29,7 +29,9 @@ docker compose up -d
 ![Включенный кэш в pymongo](screens/check_pymongo_cached.png)  
 
 ## Проверка на уровне Redis:  
+```shell
 docker exec -it redis redis-cli INFO STATS  
+```  
 
 Статистика redis до вызова запроса http://localhost:8080/helloDoc/users в приложении:  
 ![Незадействованный redis](screens/check_redis_before.png)  
