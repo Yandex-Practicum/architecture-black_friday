@@ -17,8 +17,9 @@ docker compose up -d
 ## Как проверить через pymongo-api:
 
 Откройте в браузере http://localhost:8080 - данные о MongoDB
+![Отображение шардов в pymongo](screens/app_with_shard.png)
 
-Откройте в браузере http://localhost:8080/helloDoc/count - колличество записей в базе
+Откройте в браузере http://localhost:8080/helloDoc/count - количество записей в базе
 
 ## Проверка внутри контейнеров средствами mongosh:
 
@@ -35,5 +36,13 @@ shard2 [direct: primary] somedb> db.helloDoc.countDocuments()
 508  
 
 
+![Отображение распределения по шардам](screens/check_mongo.png)
+
 docker exec -it mongos_router mongosh somedb --eval "db.helloDoc.getShardDistribution()"  
+
+![Отображение распределения по шардам](screens/check_mongo2.png)
+
+
+![Ининциализация mongoDB](screens/init_mongo.png)
+
 
