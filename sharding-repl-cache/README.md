@@ -15,17 +15,24 @@ cd ./Task 1-2-3-4-5-6/sharding-repl-cache
 docker compose up -d
 ```
 
-4. Инициализируем и заполняем redis и mongodb данными (возможно понадобиться запустить скрипт еще раз, так как почему-то mongos_router при первом запуске в 9 из 10 случаем недоступен, хотя запущен)
+4. Инициализируем и заполняем redis и mongodb данными   
 
 ```shell
-./scripts/mongo-redis-init.sh
+./scripts/init.sh
 ```
+
 ## Как проверить
 
-Откройте в браузере http://localhost:8080/helloDoc/users - Второй и последующие вызовы должны выполнятся <100мс.
+Откройте в браузере http://localhost:8080/helloDoc/users - Второй и последующие вызовы должны выполнятся <100мс.  
+Можно наблюдать, что кэш включен в pymongo-api  
+![Включенный кэш в pymongo](screens/check_pymongo_cached.png)  
 
-## Проверка на уровне Redis:
-docker exec -it redis redis-cli INFO STATS
-До вызова запроса:
-После вызова:
+## Проверка на уровне Redis:  
+docker exec -it redis redis-cli INFO STATS  
+
+Статистика redis до вызова запроса http://localhost:8080/helloDoc/users в приложении:  
+![Незадействованный redis](screens/check_redis_before.png)  
+
+Статистика redis после вызова запроса http://localhost:8080/helloDoc/users в приложении:  
+![Применённый redis](screens/check_redis_after.png)  
 
