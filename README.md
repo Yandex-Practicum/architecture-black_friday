@@ -18,12 +18,14 @@
 
 ## Задание 5. Service Discovery и балансировка с API Gateway
 В ходе выполнения задания составлен четвёртый вариант схемы, на котором вы показана реализацию горизонтального масштабирования сайта.   Для этого за основу взят третий вариант, добавлен на схему API Gateway для балансировки и Consul для Service Discovery.  
-Финальная схема этого задания: [./schemas/task1_4.drawio](/schemas/task_1.4.drawio)  
-Финальная схема этого задания: [./schemas/task1_4.png](/schemas/task_1.4.png)  
+Финальная схема этого задания: [./schemas/task_1.4.drawio](/schemas/task_1.4.drawio)  
+Финальная схема этого задания:  
+![./schemas/task_1.4.png](/schemas/task_1.4.png)  
 
 ## Задание 6. CDN
 Доработана четвёртая схема.<br>  
 На схеме отображен CDN, взаимодействие пользователей из разных регионов с CDN.    
-Финальная схема этого задания: [./schemas/task1_5.drawio](/schemas/task1_5.drawio)  
-Финальная схема этого задания: [./schemas/task1_5.png](/schemas/task1_5.png)  
+Финальная схема этого задания: [./schemas/task_1.5.drawio](/schemas/task_1.5.drawio)  
+Финальная схема этого задания:   
+![./schemas/task_1.5.png](/schemas/task_1.5.png)  
 
