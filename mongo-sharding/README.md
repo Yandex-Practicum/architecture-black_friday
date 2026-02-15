@@ -1,11 +1,5 @@
 # pymongo-api
 
-## Итоговая схема
-```markdown
-[Итоговая схема по результатам всех заданий](schemas/mongo_sharding_final.drawio)
-```
-
-
 ## Как запустить
 
 Запускаем mongodb и приложение
@@ -14,10 +8,15 @@
 docker compose up -d
 ```
 
-Заполняем mongodb данными
-
+Запускаем по порядку скрипты для настройки шардирования и роутинга
 ```shell
-./scripts/mongo-init.sh
+./scripts/init-config.sh
+./scripts/init-shards.sh
+./scripts/init-mongos.sh
+```
+Заполняем БД тестовыми данными
+```shell
+./scripts/fill-data.sh
 ```
 
 ## Как проверить
