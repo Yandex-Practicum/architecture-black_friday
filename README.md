@@ -1,5 +1,11 @@
 # pymongo-api
 
+## Итоговая схема
+```markdown
+[Итоговая схема по результатам всех заданий](schemas/mongo_sharding_final.drawio)
+```
+
+
 ## Как запустить
 
 Запускаем mongodb и приложение
