@@ -1,0 +1,287 @@
+version: '3'
+services:
+
+  configSrv1:
+    image: mongo:latest
+    container_name: configSrv1
+    restart: always
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.11
+    volumes:
+      - config1-data:/data/db
+    command: [
+      "--configsvr",
+      "--replSet", "config_server",
+      "--bind_ip_all",
+      "--port", "27017"
+    ]
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+
+  configSrv2:
+    image: mongo:latest
+    container_name: configSrv2
+    restart: always
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.12
+    volumes:
+      - config2-data:/data/db
+    command: [
+      "--configsvr",
+      "--replSet", "config_server",
+      "--bind_ip_all",
+      "--port", "27017"
+    ]
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+
+  configSrv3:
+    image: mongo:latest
+    container_name: configSrv3
+    restart: always
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.13
+    volumes:
+      - config3-data:/data/db
+    command: [
+      "--configsvr",
+      "--replSet", "config_server",
+      "--bind_ip_all",
+      "--port", "27017"
+    ]
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+
+
+  mongodb1:
+    image: mongo:latest
+    container_name: mongodb1
+    restart: always
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.20
+    volumes:
+      - mongodb1-data:/data/db
+    ports:
+      - "27018:27018"
+    command: [
+      "--shardsvr",
+      "--replSet", "rs0",
+      "--bind_ip_all",
+      "--port", "27018"
+    ]
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+
+  mongodb2:
+    image: mongo:latest
+    container_name: mongodb2
+    restart: always
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.21
+    volumes:
+      - mongodb2-data:/data/db
+    ports:
+      - "27019:27019"
+    command: [
+      "--shardsvr",
+      "--replSet", "rs1",
+      "--bind_ip_all",
+      "--port", "27019"
+    ]
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+
+  mongodb3:
+    image: mongo:latest
+    container_name: mongodb3
+    restart: always
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.22
+    volumes:
+      - mongodb3-data:/data/db
+    ports:
+      - "27022:27022"
+    command: [
+      "--shardsvr",
+      "--replSet", "rs0",
+      "--bind_ip_all",
+      "--port", "27022"
+    ]
+    healthcheck:
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+
+  mongodb4:
+    image: mongo:latest
+    container_name: mongodb4
+    restart: always
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.23
+    volumes:
+      - mongodb4-data:/data/db
+    ports:
+      - "27023:27023"
+    command: [
+      "--shardsvr",
+      "--replSet", "rs1",
+      "--bind_ip_all",
+      "--port", "27023"
+    ]
+    healthcheck:
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+
+  mongodb5:
+    image: mongo:latest
+    container_name: mongodb5
+    restart: always
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.24
+    volumes:
+      - mongodb5-data:/data/db
+    ports:
+      - "27024:27024"
+    command: [
+      "--shardsvr",
+      "--replSet", "rs0",
+      "--bind_ip_all",
+      "--port", "27024"
+    ]
+    healthcheck:
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+
+  mongodb6:
+    image: mongo:latest
+    container_name: mongodb6
+    restart: always
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.25
+    volumes:
+      - mongodb6-data:/data/db
+    ports:
+      - "27025:27025"
+    command: [
+      "--shardsvr",
+      "--replSet", "rs1",
+      "--bind_ip_all",
+      "--port", "27025"
+    ]
+    healthcheck:
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 10s
+
+  # Mongos роутеры
+  mongos1:
+    image: mongo:latest
+    container_name: mongos1
+    restart: always
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.30
+    ports:
+      - "27020:27020"
+    depends_on:
+      - configSrv1
+      - configSrv2
+      - configSrv3
+      - mongodb1
+      - mongodb2
+      - mongodb3
+      - mongodb4
+    command: [
+      "mongos",
+      "--configdb", "config_server/configSrv1:27017,configSrv2:27017,configSrv3:27017",
+      "--bind_ip_all",
+      "--port", "27020"
+    ]
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+
+  mongos2:
+    image: mongo:latest
+    container_name: mongos2
+    restart: always
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.31
+    ports:
+      - "27021:27021"
+    depends_on:
+      - configSrv1
+      - configSrv2
+      - configSrv3
+      - mongodb1
+      - mongodb2
+      - mongodb3
+      - mongodb4
+    command: [
+      "mongos",
+      "--configdb", "config_server/configSrv1:27017,configSrv2:27017,configSrv3:27017",
+      "--bind_ip_all",
+      "--port", "27021"
+    ]
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 10s
+
+  mongo-sharding:
+    container_name: mongo-sharding
+    build:
+      context: api_app
+      dockerfile: Dockerfile
+    depends_on:
+      - mongos1
+      - mongos2
+    networks:
+      - app-network
+    ports:
+      - 8080:8080
+    environment:
+      MONGODB_URL: "mongodb://mongos1:27020"
+      MONGODB_DATABASE_NAME: "somedb"
+
+networks:
+  app-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 173.17.0.0/16
+
+
+volumes:
+  config1-data:
+  config2-data:
+  config3-data:
+  mongodb1-data:
+  mongodb2-data:
+  mongodb3-data:
+  mongodb4-data:
+  mongodb5-data:
+  mongodb6-data:
