@@ -1,0 +1,181 @@
+name: sharding-repl-cache
+
+services:
+  # --------------------------
+  # Config server
+  # --------------------------
+  config-server:
+    image: mongo:5.0
+    container_name: config-server
+    command: mongod --configsvr --replSet configReplSet --port 27019 --bind_ip_all
+    ports:
+      - "27019:27019"
+    volumes:
+      - config_db_data:/data/configdb
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD", "mongosh", "--host", "config-server", "--port", "27019", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 20s
+
+  # --------------------------
+  # Shard 1 (3 replicas)
+  # --------------------------
+  shard1-primary:
+    image: mongo:5.0
+    container_name: shard1-primary
+    command: mongod --shardsvr --replSet shard1ReplSet --port 27018 --bind_ip_all
+    ports:
+      - "27018:27018"
+    volumes:
+      - shard1-primary:/data/db
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD", "mongosh", "--host", "shard1-primary", "--port", "27018", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 20s
+
+  shard1-secondary1:
+    image: mongo:5.0
+    container_name: shard1-secondary1
+    command: mongod --shardsvr --replSet shard1ReplSet --port 27028 --bind_ip_all
+    ports:
+      - "27028:27028"
+    volumes:
+      - shard1-secondary1:/data/db
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD", "mongosh", "--host", "shard1-secondary1", "--port", "27028", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 20s
+
+  shard1-secondary2:
+    image: mongo:5.0
+    container_name: shard1-secondary2
+    command: mongod --shardsvr --replSet shard1ReplSet --port 27038 --bind_ip_all
+    ports:
+      - "27038:27038"
+    volumes:
+      - shard1-secondary2:/data/db
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD", "mongosh", "--host", "shard1-secondary2", "--port", "27038", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 20s
+
+  # --------------------------
+  # Shard 2 (3 replicas)
+  # --------------------------
+  shard2-primary:
+    image: mongo:5.0
+    container_name: shard2-primary
+    command: mongod --shardsvr --replSet shard2ReplSet --port 27020 --bind_ip_all
+    ports:
+      - "27020:27020"
+    volumes:
+      - shard2-primary:/data/db
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD", "mongosh", "--host", "shard2-primary", "--port", "27020", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 20s
+
+  shard2-secondary1:
+    image: mongo:5.0
+    container_name: shard2-secondary1
+    command: mongod --shardsvr --replSet shard2ReplSet --port 27030 --bind_ip_all
+    ports:
+      - "27030:27030"
+    volumes:
+      - shard2-secondary1:/data/db
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD", "mongosh", "--host", "shard2-secondary1", "--port", "27030", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 20s
+
+  shard2-secondary2:
+    image: mongo:5.0
+    container_name: shard2-secondary2
+    command: mongod --shardsvr --replSet shard2ReplSet --port 27040 --bind_ip_all
+    ports:
+      - "27040:27040"
+    volumes:
+      - shard2-secondary2:/data/db
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD", "mongosh", "--host", "shard2-secondary2", "--port", "27040", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 20s
+
+  # --------------------------
+  # Mongos
+  # --------------------------
+  mongos:
+    image: mongo:5.0
+    container_name: mongos
+    command: mongos --configdb configReplSet/config-server:27019 --port 27017 --bind_ip_all
+    ports:
+      - "27017:27017"
+    depends_on:
+      - config-server
+      - shard1-primary
+      - shard2-primary
+    networks:
+      - app-network
+    volumes:
+      - ./scripts/mongo-init.sh:/mongo-init.sh
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      start_period: 20s
+
+  pymongo_api:
+    container_name: pymongo_api
+    image: kazhem/pymongo_api:1.0.0
+    depends_on:
+      - mongos
+      - redis
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    environment:
+      MONGODB_URL: "mongodb://mongos:27017/somedb"
+      MONGODB_DATABASE_NAME: "somedb"
+      REDIS_URL: "redis://redis:6379"
+
+volumes:
+  config_db_data:
+  shard1-primary:
+  shard1-secondary1:
+  shard1-secondary2:
+  shard2-primary:
+  shard2-secondary1:
+  shard2-secondary2:
+  redis_data:
+
+networks:
+  app-network:
+    driver: bridge
