@@ -53,20 +53,11 @@ services:
       - "27020:27020"
 
   pymongo-api:
-    build: .
+    build: ./api_app
     container_name: pymongo-api
     environment:
-<<<<<<< HEAD
-      MONGODB_URL: "mongodb://mongodb1"
-      MONGODB_DATABASE_NAME: "somedb"
-
-
-volumes:
-  mongodb1_data_container:
-=======
       - MONGO_URL=mongodb://mongos_router:27020
     ports:
       - "8080:8080"
     depends_on:
       - mongos_router
->>>>>>> 2cf9dd88f31e5a035f6910819e18c2e13d012e49
