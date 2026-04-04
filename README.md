@@ -1,3 +1,27 @@
+# mongo-sharding
+Перейти в директорию mongo_sharding
+
+```shell
+cd mongo_sharding
+```
+Следовать инструкции в mongo_sharding/README.md
+
+# mongo-sharding-repl
+Перейти в директорию mongo_sharding_repl
+
+```shell
+cd mongo_sharding_repl
+```
+Следовать инструкции в mongo_sharding_repl/README.md
+
+# sharding-repl-cache
+Перейти в директорию sharding_repl_cache
+
+```shell
+cd sharding_repl_cache
+```
+Следовать инструкции в sharding_repl_cache/README.md
+
 # pymongo-api
 
 ## Как запустить

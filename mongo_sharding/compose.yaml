@@ -1,0 +1,86 @@
+version: '3'
+
+services:
+  config_service:
+    image: mongo:latest
+    container_name: config_service
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - config-data:/data/db
+    command:
+      [
+        "--configsvr",
+        "--replSet",
+        "config_repl",
+        "--bind_ip_all",
+        "--port", "27017"
+      ]
+
+  shard1:
+    image: mongo:latest
+    container_name: shard1
+    restart: always
+    ports:
+      - "27018:27018"
+    volumes:
+      - shard1-data:/data/db
+    command:
+      [
+        "--shardsvr",
+        "--replSet",
+        "shard1_repl",
+        "--bind_ip_all",
+        "--port", "27018"
+      ]
+
+  shard2:
+    image: mongo:latest
+    container_name: shard2
+    restart: always
+    ports:
+      - "27019:27019"
+    volumes:
+      - shard2-data:/data/db
+    command:
+      [
+        "--shardsvr",
+        "--replSet",
+        "shard2_repl",
+        "--bind_ip_all",
+        "--port", "27019"
+      ]
+
+  mongos_router:
+    image: mongo:latest
+    container_name: mongos_router
+    restart: always
+    ports:
+      - "27020:27020"
+    command:
+      [
+        "mongos",
+        "--configdb",
+        "config_repl/config_service:27017",
+        "--bind_ip_all",
+        "--port", "27020"
+      ]
+
+  mongo_sharding:
+    container_name: mongo_sharding
+    build: 
+      context: api_app
+      dockerfile: Dockerfile
+    depends_on:
+      - mongos_router
+    ports:
+      - "8080:8080"
+    environment:
+      MONGODB_URL: "mongodb://mongos_router:27020"
+      MONGODB_DATABASE_NAME: "somedb"
+
+volumes:
+  config-data:
+  shard1-data:
+  shard2-data:
