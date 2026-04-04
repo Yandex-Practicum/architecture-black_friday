@@ -1,5 +1,6 @@
 # Схемы
 Схемы хранятся в папке [images](images) от первой до пятой
+Для запуска sharding-repl-cache необходимо ознакомиться с инструкцией в README.md
 
 # mongo-sharding
 Перейти в директорию mongo_sharding
