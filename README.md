@@ -1,3 +1,6 @@
+# Схемы
+Схемы хранятся в папке [images](images) от первой до пятой
+
 # mongo-sharding
 Перейти в директорию mongo_sharding
 
