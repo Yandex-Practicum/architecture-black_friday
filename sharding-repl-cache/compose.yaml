@@ -1,0 +1,109 @@
+name: sharding-repl-cache  # Меняем имя проекта
+
+services:
+  # --- ДОБАВЛЯЕМ СЕРВИС REDIS ---
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+  pymongo_api:
+    image: kazhem/pymongo_api:1.0.0
+    container_name: pymongo_api
+    ports:
+      - "8080:8080"
+    environment:
+      MONGODB_URL: "mongodb://mongos:27117"
+      MONGODB_DATABASE_NAME: "somedb"
+      MONGODB_COLLECTION_NAME: "helloDoc"
+      REDIS_URL: "redis://redis:6379"  # <--- КРИТИЧНО: без этого кеш не заведется
+    depends_on:
+      - mongos
+      - redis
+
+  configSrv:
+    image: mongo:latest
+    container_name: configSrv
+    ports:
+      - "27119:27119"
+    command: mongod --configsvr --replSet configReplSet --port 27119 --bind_ip_all
+    volumes:
+      - config-data:/data/db
+
+  shard1-1:
+    image: mongo:latest
+    container_name: shard1-1
+    ports:
+      - "27111:27111"
+    command: mongod --shardsvr --replSet shard1ReplSet --port 27111 --bind_ip_all
+    volumes:
+      - shard1-1-data:/data/db
+
+  shard1-2:
+    image: mongo:latest
+    container_name: shard1-2
+    ports:
+      - "27112:27112"
+    command: mongod --shardsvr --replSet shard1ReplSet --port 27112 --bind_ip_all
+    volumes:
+      - shard1-2-data:/data/db
+
+  shard1-3:
+    image: mongo:latest
+    container_name: shard1-3
+    ports:
+      - "27113:27113"
+    command: mongod --shardsvr --replSet shard1ReplSet --port 27113 --bind_ip_all
+    volumes:
+      - shard1-3-data:/data/db
+
+  shard2-1:
+    image: mongo:latest
+    container_name: shard2-1
+    ports:
+      - "27121:27121"
+    command: mongod --shardsvr --replSet shard2ReplSet --port 27121 --bind_ip_all
+    volumes:
+      - shard2-1-data:/data/db
+
+  shard2-2:
+    image: mongo:latest
+    container_name: shard2-2
+    ports:
+      - "27122:27122"
+    command: mongod --shardsvr --replSet shard2ReplSet --port 27122 --bind_ip_all
+    volumes:
+      - shard2-2-data:/data/db
+
+  shard2-3:
+    image: mongo:latest
+    container_name: shard2-3
+    ports:
+      - "27123:27123"
+    command: mongod --shardsvr --replSet shard2ReplSet --port 27123 --bind_ip_all
+    volumes:
+      - shard2-3-data:/data/db
+
+  mongos:
+    image: mongo:latest
+    container_name: mongos
+    ports:
+      - "27117:27117"
+    command: mongos --configdb configReplSet/configSrv:27119 --bind_ip_all --port 27117
+    depends_on:
+      - configSrv
+      - shard1-1
+      - shard1-2
+      - shard1-3
+      - shard2-1
+      - shard2-2
+      - shard2-3
+
+volumes:
+  config-data:
+  shard1-1-data:
+  shard1-2-data:
+  shard1-3-data:
+  shard2-1-data:
+  shard2-2-data:
+  shard2-3-data:
