@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2024-01-01T00:00:00.000Z" agent="drawio" version="21.0.0">
+  <diagram name="MongoDB Sharding with Replication" id="mongo-sharding-repl">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- pymongo_api -->
+        <mxCell id="app" value="pymongo_api&#xa;(App Instance)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="560" y="30" width="140" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- mongos_router -->
+        <mxCell id="router" value="mongos_router&#xa;(Router)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="560" y="150" width="140" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- configSrv -->
+        <mxCell id="config" value="configSrv&#xa;(Config Server RS)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="260" y="300" width="140" height="80" as="geometry"/>
+        </mxCell>
+        
+        <!-- shard1 Replica Set Group -->
+        <mxCell id="shard1-group" value="shard1 Replica Set" style="swimlane;startSize=30;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="540" y="280" width="280" height="200" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="shard1-primary" value="shard1-primary&#xa;(Primary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="shard1-group">
+          <mxGeometry x="90" y="40" width="100" height="50" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="shard1-secondary1" value="shard1-secondary1&#xa;(Secondary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="shard1-group">
+          <mxGeometry x="20" y="120" width="110" height="50" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="shard1-secondary2" value="shard1-secondary2&#xa;(Secondary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="shard1-group">
+          <mxGeometry x="150" y="120" width="110" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- shard2 Replica Set Group -->
+        <mxCell id="shard2-group" value="shard2 Replica Set" style="swimlane;startSize=30;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="900" y="280" width="280" height="200" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="shard2-primary" value="shard2-primary&#xa;(Primary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="shard2-group">
+          <mxGeometry x="90" y="40" width="100" height="50" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="shard2-secondary1" value="shard2-secondary1&#xa;(Secondary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="shard2-group">
+          <mxGeometry x="20" y="120" width="110" height="50" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="shard2-secondary2" value="shard2-secondary2&#xa;(Secondary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="shard2-group">
+          <mxGeometry x="150" y="120" width="110" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- Стрелки: app -> router -->
+        <mxCell id="arrow1" edge="1" parent="1" source="app" target="router">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="arrow1_label" value="CRUD operations" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;" vertex="1" connectable="0" parent="arrow1">
+          <mxGeometry x="-0.1" relative="1" as="geometry">
+            <mxPoint as="offset"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- router -> config -->
+        <mxCell id="arrow2" edge="1" parent="1" source="router" target="config">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="560" y="240"/>
+              <mxPoint x="330" y="240"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arrow2_label" value="metadata" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;" vertex="1" connectable="0" parent="arrow2">
+          <mxGeometry x="-0.1" relative="1" as="geometry">
+            <mxPoint as="offset"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- router -> shard1 (primary) -->
+        <mxCell id="arrow3" edge="1" parent="1" source="router" target="shard1-primary">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="560" y="240"/>
+              <mxPoint x="680" y="240"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- router -> shard2 (primary) -->
+        <mxCell id="arrow4" edge="1" parent="1" source="router" target="shard2-primary">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="700" y="240"/>
+              <mxPoint x="1040" y="240"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Репликация внутри shard1 -->
+        <mxCell id="repl1-1" edge="1" parent="1" source="shard1-primary" target="shard1-secondary1" style="dashed=1;strokeColor=#9673a6;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="repl1-1_label" value="replication" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=8;fontColor=#9673a6;" vertex="1" connectable="0" parent="repl1-1">
+          <mxGeometry x="-0.1" relative="1" as="geometry">
+            <mxPoint as="offset"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="repl1-2" edge="1" parent="1" source="shard1-primary" target="shard1-secondary2" style="dashed=1;strokeColor=#9673a6;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="repl1-2_label" value="replication" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=8;fontColor=#9673a6;" vertex="1" connectable="0" parent="repl1-2">
+          <mxGeometry x="-0.1" relative="1" as="geometry">
+            <mxPoint as="offset"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Репликация внутри shard2 -->
+        <mxCell id="repl2-1" edge="1" parent="1" source="shard2-primary" target="shard2-secondary1" style="dashed=1;strokeColor=#9673a6;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="repl2-1_label" value="replication" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=8;fontColor=#9673a6;" vertex="1" connectable="0" parent="repl2-1">
+          <mxGeometry x="-0.1" relative="1" as="geometry">
+            <mxPoint as="offset"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="repl2-2" edge="1" parent="1" source="shard2-primary" target="shard2-secondary2" style="dashed=1;strokeColor=#9673a6;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="repl2-2_label" value="replication" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=8;fontColor=#9673a6;" vertex="1" connectable="0" parent="repl2-2">
+          <mxGeometry x="-0.1" relative="1" as="geometry">
+            <mxPoint as="offset"/>
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
