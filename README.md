@@ -1,35 +1,68 @@
-# pymongo-api
+# architecture-black_friday
 
-## Как запустить
+Репозиторий с решением проектной работы 4 спринта.
 
-Запускаем mongodb и приложение
+## Структура
 
-```shell
-docker compose up -d
+- `mongo-sharding` — шардирование (2 шарда)
+- `mongo-sharding-repl` — шардирование + репликация (по 3 реплики на каждый шард)
+- `sharding-repl-cache` — финальный стенд: шардирование + репликация + Redis cache
+- `architecture-final.drawio` — итоговая схема (включает шардирование, репликацию, кеш, API Gateway, Consul, CDN)
+
+## Что проверять ревьюеру
+
+Основная директория для проверки заданий 2, 3, 4:
+
+```bash
+cd sharding-repl-cache
 ```
 
-Заполняем mongodb данными
+## Запуск финального стенда
 
-```shell
+```bash
+docker compose up -d
+chmod +x scripts/init-repl-sharding.sh scripts/mongo-init.sh
+./scripts/init-repl-sharding.sh
 ./scripts/mongo-init.sh
 ```
 
-## Как проверить
+## Проверки
 
-### Если вы запускаете проект на локальной машине
+Статус сервисов:
 
-Откройте в браузере http://localhost:8080
-
-### Если вы запускаете проект на предоставленной виртуальной машине
-
-Узнать белый ip виртуальной машины
-
-```shell
-curl --silent http://ifconfig.me
+```bash
+docker compose ps
 ```
 
-Откройте в браузере http://<ip виртуальной машины>:8080
+Общее количество документов (должно быть >= 1000):
 
-## Доступные эндпоинты
+```bash
+docker compose exec -T mongos mongosh --port 27017 --quiet <<'EOF'
+use somedb
+db.helloDoc.countDocuments()
+EOF
+```
 
-Список доступных эндпоинтов, swagger http://<ip виртуальной машины>:8080/docs
+Проверка шардирования и реплик:
+
+```bash
+docker compose exec -T mongos mongosh --port 27017 --quiet <<'EOF'
+sh.status()
+EOF
+```
+
+Проверка кеша (второй и следующие запросы < 100ms):
+
+```bash
+time curl -s http://localhost:8080/helloDoc/users > /dev/null
+time curl -s http://localhost:8080/helloDoc/users > /dev/null
+```
+
+Проверка API:
+
+- `http://localhost:8080`
+- `http://localhost:8080/docs`
+
+## Используемый образ приложения
+
+Во всех новых стендах используется `kazhem/pymongo_api:1.0.0`.
