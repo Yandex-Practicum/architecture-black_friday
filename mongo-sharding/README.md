@@ -31,7 +31,7 @@ docker compose ps
 
 Откройте в браузере http://localhost:8080
 
-##Убедиться, что получен результат вида:
+Убедиться, что получен результат вида:
 
 ```quote
 {"mongo_topology_type":"Sharded","mongo_replicaset_name":null,"mongo_db":"somedb","read_preference":"Primary()","mongo_nodes":[["mongos_router",27020]],"mongo_primary_host":null,"mongo_secondary_hosts":[],"mongo_is_primary":true,"mongo_is_mongos":true,"collections":{"helloDoc":{"documents_count":1000}},"shards":{"shard1":"shard1/shard1:27018","shard2":"shard2/shard2:27019"},"cache_enabled":false,"status":"OK"}
