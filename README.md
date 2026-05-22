@@ -1,5 +1,5 @@
 
-# Выполенные задания
+# Выполненные задания
 
 [Задание 1. Планирование](https://github.com/ZergZet/architecture-black_friday/tree/develoment/Task1)
 
