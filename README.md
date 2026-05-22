@@ -4,10 +4,15 @@
 [Задание 1. Планирование](https://github.com/ZergZet/architecture-black_friday/tree/develoment/Task1)
 
 [Задание 2. Шардирование](https://github.com/ZergZet/architecture-black_friday/tree/develoment/mongo-sharding)
+
 [Задание 3. Репликация](https://github.com/ZergZet/architecture-black_friday/tree/develoment/mongo-sharding-repl)
+
 [Задание 4. Кеширование](https://github.com/ZergZet/architecture-black_friday/tree/develoment/sharding-repl-cache)
+
 [Задание 5. Service Discovery и балансировка с API Gateway](https://github.com/ZergZet/architecture-black_friday/tree/develoment/Task5)
+
 [Задание 6. CDN](https://github.com/ZergZet/architecture-black_friday/tree/develoment/Task6)
+
 
 # описание исходного pymongo-api
 
