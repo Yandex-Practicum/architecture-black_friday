@@ -1,35 +1,75 @@
-# pymongo-api
+# MongoDB: шардирование, репликация и кеширование
 
-## Как запустить
+Итоговая архитектура находится в `architecture.drawio` и содержит пять
+последовательных схем. Основной стенд для проверки находится в
+`sharding-repl-cache`.
 
-Запускаем mongodb и приложение
+## Запуск основного стенда
 
-```shell
+```bash
+cd sharding-repl-cache
 docker compose up -d
+./scripts/init.sh
 ```
 
-Заполняем mongodb данными
+Init-скрипт идемпотентен: его можно запускать повторно. Он создаёт два шарда,
+по три реплики в каждом, шардирует `somedb.helloDoc` по hashed `_id` и
+заполняет коллекцию 1200 документами.
 
-```shell
-./scripts/mongo-init.sh
+## Проверка
+
+Состояние сервисов:
+
+```bash
+docker compose ps
 ```
 
-## Как проверить
+JSON приложения:
 
-### Если вы запускаете проект на локальной машине
-
-Откройте в браузере http://localhost:8080
-
-### Если вы запускаете проект на предоставленной виртуальной машине
-
-Узнать белый ip виртуальной машины
-
-```shell
-curl --silent http://ifconfig.me
+```bash
+curl -s http://localhost:8080/ | jq
 ```
 
-Откройте в браузере http://<ip виртуальной машины>:8080
+Ожидаемые поля: `mongo_topology_type` равно `Sharded`, `documents_count` не
+меньше `1200`, в `shard_document_counts` присутствуют два шарда,
+`shard_replica_counts` равно `3` для каждого шарда, `cache_enabled` равно
+`true`.
 
-## Доступные эндпоинты
+Распределение документов по шардам:
 
-Список доступных эндпоинтов, swagger http://<ip виртуальной машины>:8080/docs
+```bash
+docker compose exec -T mongos mongosh --port 27017 --quiet --eval \
+  'db.getSiblingDB("somedb").helloDoc.getShardDistribution()'
+```
+
+Состояние реплик:
+
+```bash
+docker compose exec -T shard1-1 mongosh --port 27017 --quiet --eval \
+  'rs.status().members.map(({name,stateStr}) => ({name,stateStr}))'
+docker compose exec -T shard2-1 mongosh --port 27017 --quiet --eval \
+  'rs.status().members.map(({name,stateStr}) => ({name,stateStr}))'
+```
+
+Проверка Redis-кеша:
+
+```bash
+./scripts/verify-cache.sh
+```
+
+Первый вызов `/helloDoc/users` выполняется с искусственной задержкой около
+одной секунды, повторный вызов из кеша должен быть быстрее 100 мс.
+
+## Отдельные этапы
+
+Каждый этап запускается одинаково из соответствующей директории:
+
+```bash
+cd mongo-sharding        # или mongo-sharding-repl
+docker compose up -d
+./scripts/init.sh
+```
+
+Перед запуском другого этапа остановите текущий стенд командой
+`docker compose down`, поскольку все этапы публикуют приложение на порту
+`8080`.
