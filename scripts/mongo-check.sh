@@ -1,25 +1,45 @@
 #!/bin/bash
 
-# Total records
-docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF
+printf "\n\e[32m Total records: \e[0m\n"
+
+docker compose exec -T mongos_router mongosh --port 27017 --quiet <<EOF
+use somedb
+
+db.helloDoc.countDocuments({}) 
+exit();
+EOF
+
+printf "\n\e[32m Shard1 records: \e[0m\n"
+
+docker compose exec -T shard1-1 mongosh --port 27020 --quiet <<EOF
 use somedb
 
 db.helloDoc.countDocuments() 
 exit();
 EOF
 
-# Shard1 records
-docker compose exec -T shard1 mongosh --port 27018 --quiet <<EOF
+printf "\n\e[32m Shard1 replicas count: \e[0m\n"
+
+docker compose exec -T shard1-1 mongosh --port 27020 --quiet <<EOF
+db.adminCommand( { replSetGetStatus: 1 } ).members.length
+exit();
+EOF
+
+printf "\n\e[32m Shard2 records: \e[0m\n"
+
+docker compose exec -T shard2-1 mongosh --port 27030 --quiet <<EOF
 use somedb
 
 db.helloDoc.countDocuments() 
 exit();
 EOF
 
-# Shard2 records
-docker compose exec -T shard2 mongosh --port 27019 --quiet <<EOF
-use somedb
+printf "\n\e[32m Shard2 replicas count: \e[0m\n"
 
-db.helloDoc.countDocuments() 
+docker compose exec -T shard2-1 mongosh --port 27030 --quiet <<EOF
+db.adminCommand( { replSetGetStatus: 1 } ).members.length
 exit();
 EOF
+
+
+printf "\r"
