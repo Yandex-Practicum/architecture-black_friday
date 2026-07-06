@@ -2,7 +2,7 @@
 
 printf "\n\e[32m Total records: \e[0m\n"
 
-docker compose exec -T mongos_router mongosh --port 27017 --quiet <<EOF
+docker compose exec -T mongos-router mongosh --port 27017 --quiet <<EOF
 use somedb
 
 db.helloDoc.countDocuments({}) 

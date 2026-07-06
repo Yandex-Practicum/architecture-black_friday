@@ -1,18 +1,19 @@
-name: mongo-sharding-repl
+name: sharding-repl-cache
 
 services:
   pymongo_api:
     container_name: pymongo_api
     build: 
-      context: api_app
+      context: sharding-repl-cache
       dockerfile: Dockerfile
     depends_on:
-      - mongos_router
+      - mongos-router
     ports:
       - 8080:8080
     environment:
-      MONGODB_URL: "mongodb://mongos_router:27020"
+      MONGODB_URL: "mongodb://mongos-router:27017"
       MONGODB_DATABASE_NAME: "somedb"
+      REDIS_URL: "redis://redis:6379"
     networks:
       app-network:
         ipv4_address: 173.17.0.11
@@ -28,6 +29,7 @@ services:
         ipv4_address: 173.17.0.10
     volumes:
       - config-data:/data/db
+      - ./scripts/mongo-configsrv-init.sh:/docker-entrypoint-initdb.d/mongo-configsrv-init.sh
     command:
       [
         "--configsvr",
@@ -225,9 +227,9 @@ services:
       timeout: 5s
       retries: 3
 
-  mongos_router:
+  mongos-router:
     image: dh-mirror.gitverse.ru/mongo:latest
-    container_name: mongos_router
+    container_name: mongos-router
     restart: always
     ports:
       - "27017:27017"
@@ -263,6 +265,19 @@ services:
       timeout: 5s
       retries: 3
 
+  redis:
+    image: "redis:latest"
+    container_name: redis
+    ports:
+      - "6379"
+    volumes:
+      - redis-data:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    networks:
+      app-network:
+        ipv4_address: 173.17.1.2
+
 networks:
   app-network:
     driver: bridge
@@ -279,3 +294,4 @@ volumes:
   shard2-1-data:
   shard2-2-data:
   shard2-3-data:
+  redis-data:

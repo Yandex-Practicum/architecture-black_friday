@@ -2,16 +2,24 @@
 
 ## Как запустить
 
-Запускаем mongodb и приложение
-
-```shell
-docker compose up -d
-```
-
-Заполняем mongodb данными
+### Запускаем mongodb, заполняем mongodb данными
 
 ```shell
 ./scripts/mongo-init.sh
+```
+
+⚠️ В случае проблем с роутером `mongos-router` при повторной инициализации остановите docker, удалив volumes: `docker compose down -v` и инициализируйте mongodb заново
+
+### Запускаем кэширование
+Запускаем сервисы Redis
+```shell
+docker compose config --services | grep -E "redis" | xargs docker compose up -d --build
+```
+
+### Запускаем приложение
+
+```shell
+docker compose up pymongo_api -d --build
 ```
 
 ## Как проверить
