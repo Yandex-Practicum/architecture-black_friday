@@ -1,0 +1,218 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Итоговая" id="stage-5">
+    <mxGraphModel dx="2076" dy="2209" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2040" pageHeight="760" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="p5-user1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" value="Пользователи&#xa;регион 1" vertex="1">
+          <mxGeometry height="56" width="130" x="40" y="187" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-user2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" value="Пользователи&#xa;регион 2" vertex="1">
+          <mxGeometry height="56" width="130" x="40" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-origin" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Object Storage&lt;br&gt;статика магазина" vertex="1">
+          <mxGeometry height="56" width="160" x="230" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-cdn1" parent="1" style="shape=cloud;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="CDN&lt;br&gt;регион 1" vertex="1">
+          <mxGeometry height="90" width="150" x="230" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-cdn2" parent="1" style="shape=cloud;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="CDN&lt;br&gt;регион 2" vertex="1">
+          <mxGeometry height="90" width="150" x="230" y="430" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-gw" parent="1" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="API Gateway&#xa;балансировка" vertex="1">
+          <mxGeometry height="90" width="150" x="690" y="285" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-consulbox" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeColor=#9673a6;verticalAlign=top;fontStyle=2;container=1;collapsible=0;" value="Consul" vertex="1">
+          <mxGeometry height="180" width="180" x="680" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-consul1" parent="p5-consulbox" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="consul-1" vertex="1">
+          <mxGeometry height="36" width="140" x="20" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-consul2" parent="p5-consulbox" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="consul-2" vertex="1">
+          <mxGeometry height="36" width="140" x="20" y="86" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-consul3" parent="p5-consulbox" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="consul-3" vertex="1">
+          <mxGeometry height="36" width="140" x="20" y="132" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-appbox" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeColor=#6c8ebf;verticalAlign=top;fontStyle=2;container=1;collapsible=0;" value="pymongo-api (приложение)" vertex="1">
+          <mxGeometry height="300" width="180" x="1060" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-app1" parent="p5-appbox" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="pymongo-api-1" vertex="1">
+          <mxGeometry height="56" width="140" x="20" y="44" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-app2" parent="p5-appbox" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="pymongo-api-2" vertex="1">
+          <mxGeometry height="56" width="140" x="20" y="122" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-app3" parent="p5-appbox" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="pymongo-api-3" vertex="1">
+          <mxGeometry height="56" width="140" x="20" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-mongos" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="mongos&#xa;роутер запросов" vertex="1">
+          <mxGeometry height="70" width="140" x="1340" y="295" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-redis" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="redis&#xa;кеш" vertex="1">
+          <mxGeometry height="60" width="140" x="1080" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-cfg" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffe6cc;strokeColor=#d79b00;" value="configSrv&#xa;config_server" vertex="1">
+          <mxGeometry height="90" width="90" x="1870" y="285" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-rs1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeColor=#666666;verticalAlign=top;fontStyle=2;container=1;collapsible=0;" value="Replica set shard1" vertex="1">
+          <mxGeometry height="120" width="430" x="1500" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-s1a" parent="p5-rs1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="shard1-1&#xa;PRIMARY" vertex="1">
+          <mxGeometry height="70" width="110" x="20" y="35" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-s1b" parent="p5-rs1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="shard1-2&#xa;SECONDARY" vertex="1">
+          <mxGeometry height="70" width="110" x="160" y="35" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-s1c" parent="p5-rs1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="shard1-3&#xa;SECONDARY" vertex="1">
+          <mxGeometry height="70" width="110" x="300" y="35" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-rs2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeColor=#666666;verticalAlign=top;fontStyle=2;container=1;collapsible=0;" value="Replica set shard2" vertex="1">
+          <mxGeometry height="120" width="430" x="1500" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-s2a" parent="p5-rs2" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="shard2-1&#xa;PRIMARY" vertex="1">
+          <mxGeometry height="70" width="110" x="20" y="35" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-s2b" parent="p5-rs2" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="shard2-2&#xa;SECONDARY" vertex="1">
+          <mxGeometry height="70" width="110" x="160" y="35" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-s2c" parent="p5-rs2" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="shard2-3&#xa;SECONDARY" vertex="1">
+          <mxGeometry height="70" width="110" x="300" y="35" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-e-u1cdn" edge="1" parent="1" source="p5-user1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;entryX=0.16;entryY=0.55;entryDx=0;entryDy=0;entryPerimeter=0;" target="p5-cdn1" value="статика">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="200" y="208.04" />
+              <mxPoint x="200" y="219.52" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p5-e-u2cdn" edge="1" parent="1" source="p5-user2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;entryX=0.16;entryY=0.55;entryDx=0;entryDy=0;entryPerimeter=0;" target="p5-cdn2" value="статика">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="200" y="490.04" />
+              <mxPoint x="200" y="479.52" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p5-e-cdn1o" edge="1" parent="1" source="p5-cdn1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;exitX=0.4;exitY=0.1;exitDx=0;exitDy=0;exitPerimeter=0;" target="p5-origin" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="290" y="133" />
+              <mxPoint x="310" y="133" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p5-e-cdn2o" edge="1" parent="1" source="p5-cdn2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;exitX=0.4;exitY=0.1;exitDx=0;exitDy=0;exitPerimeter=0;" target="p5-origin" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="290" y="360.04" />
+              <mxPoint x="180" y="360.04" />
+              <mxPoint x="180" y="68.04" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p5-e-u1gw" edge="1" parent="1" source="p5-user1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" target="p5-gw" value="API (динамика)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="220" y="230.04" />
+              <mxPoint x="220" y="330.04" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p5-e-u2gw" edge="1" parent="1" source="p5-user2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" target="p5-gw" value="API (динамика)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="220" y="450.04" />
+              <mxPoint x="220" y="350.04" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p5-e-bal" edge="1" parent="1" source="p5-gw" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" target="p5-appbox" value="">
+          <mxGeometry relative="1" x="0.0097" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="1000" y="330" />
+              <mxPoint x="1000" y="330" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p5-e-reg" edge="1" parent="1" source="p5-appbox" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;" target="p5-consulbox" value="register / health-check">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="800" y="400.11" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p5-e-disc" edge="1" parent="1" source="p5-gw" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;" target="p5-consulbox" value="discovery">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="765.04" y="470" />
+              <mxPoint x="765.04" y="470" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p5-e-db" edge="1" parent="1" source="p5-appbox" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" target="p5-mongos" value="запросы к БД">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1270" y="330.04" />
+              <mxPoint x="1270" y="330.04" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p5-e-cache" edge="1" parent="1" source="p5-appbox" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" target="p5-redis" value="запросы в кеш">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-e-cfg" edge="1" parent="1" source="p5-mongos" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" target="p5-cfg" value="метаданные">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-e-rs1" edge="1" parent="1" source="p5-mongos" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" target="p5-rs1" value="запросы">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1715" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p5-e-rs2" edge="1" parent="1" source="p5-mongos" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" target="p5-rs2" value="запросы">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1715" y="350" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p5-r1b" edge="1" parent="1" source="p5-s1a" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;" target="p5-s1b" value="репликация">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1575" y="20" />
+              <mxPoint x="1715" y="20" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p5-r1c" edge="1" parent="1" source="p5-s1a" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;" target="p5-s1c" value="репликация">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1575" y="-20" />
+              <mxPoint x="1855" y="-20" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p5-r2b" edge="1" parent="1" source="p5-s2a" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;" target="p5-s2b" value="репликация">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1575" y="620" />
+              <mxPoint x="1715" y="620" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p5-r2c" edge="1" parent="1" source="p5-s2a" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;" target="p5-s2c" value="репликация">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1575" y="660" />
+              <mxPoint x="1855" y="660" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

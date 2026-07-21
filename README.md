@@ -1,35 +1,53 @@
-# pymongo-api
+## Инициализация репликации, шардирования и кеша
 
-## Как запустить
-
-Запускаем mongodb и приложение
-
+Перейдите в директорию sharding-repl-cache и запустите скрипт
 ```shell
-docker compose up -d
-```
-
-Заполняем mongodb данными
-
-```shell
-./scripts/mongo-init.sh
+cd sharding-repl-cache && ./mongo-init.sh
 ```
 
 ## Как проверить
 
-### Если вы запускаете проект на локальной машине
+1. Откройте http://localhost:8080
 
-Откройте в браузере http://localhost:8080
-
-### Если вы запускаете проект на предоставленной виртуальной машине
-
-Узнать белый ip виртуальной машины
+2. Состав реплика-сета каждого шарда:
 
 ```shell
-curl --silent http://ifconfig.me
+docker compose exec -T shard1-1 mongosh --port 27018 --quiet <<'EOF'
+rs.status().members.map(m => ({ name: m.name, state: m.stateStr }))
+EOF
 ```
 
-Откройте в браузере http://<ip виртуальной машины>:8080
+```shell
+docker compose exec -T shard2-1 mongosh --port 27018 --quiet <<'EOF'
+rs.status().members.map(m => ({ name: m.name, state: m.stateStr }))
+EOF
+```
 
-## Доступные эндпоинты
+3. Количество документов на каждом шарде:
 
-Список доступных эндпоинтов, swagger http://<ip виртуальной машины>:8080/docs
+```shell
+docker compose exec -T shard1-1 mongosh --port 27018 --quiet <<'EOF'
+use somedb
+db.helloDoc.countDocuments()
+EOF
+```
+
+```shell
+docker compose exec -T shard2-1 mongosh --port 27018 --quiet <<'EOF'
+use somedb
+db.helloDoc.countDocuments()
+EOF
+```
+
+4. Кеширование:
+
+```shell
+time curl -so /dev/null http://localhost:8080/helloDoc/users
+time curl -so /dev/null http://localhost:8080/helloDoc/users
+```
+
+## Остановить
+
+```shell
+docker compose down -v
+```
