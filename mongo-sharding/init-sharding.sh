@@ -38,7 +38,7 @@ wait_for_mongo shard2 27018
 
 compose exec -T configSrv mongosh --port 27019 --quiet <<'EOF'
 try {
-    rs.status()
+    void rs.status()
 } catch (error) {
     rs.initiate({
         _id: "config-rs",
@@ -50,7 +50,7 @@ EOF
 
 compose exec -T shard1 mongosh --port 27018 --quiet <<'EOF'
 try {
-    rs.status()
+    void rs.status()
 } catch (error) {
     rs.initiate({
         _id: "shard1-rs",
@@ -61,7 +61,7 @@ EOF
 
 compose exec -T shard2 mongosh --port 27018 --quiet <<'EOF'
 try {
-    rs.status()
+    void rs.status()
 } catch (error) {
     rs.initiate({
         _id: "shard2-rs",
@@ -94,12 +94,12 @@ if (!collectionMetadata) {
     sh.shardCollection("somedb.helloDoc", { name: "hashed" })
 }
 
-collection.deleteMany({})
+void collection.deleteMany({})
 const users = Array.from({ length: 1000 }, (_, index) => ({
     age: index,
     name: `ly${index}`
 }))
-collection.insertMany(users)
+void collection.insertMany(users)
 
 print(`Total documents: ${collection.countDocuments()}`)
 print(collection.getShardDistribution())

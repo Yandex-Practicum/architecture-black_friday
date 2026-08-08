@@ -13,9 +13,15 @@ compose() {
 wait_for_mongo() {
     service="$1"
     port="$2"
+    attempts=0
 
     until compose exec -T "$service" mongosh --port "$port" --quiet \
         --eval 'db.adminCommand({ ping: 1 }).ok' 2>/dev/null | grep -q 1; do
+        attempts=$((attempts + 1))
+        if [ "$attempts" -ge 120 ]; then
+            echo "Timed out waiting for $service:$port" >&2
+            return 1
+        fi
         echo "Waiting for $service:$port..."
         sleep 1
     done
@@ -24,10 +30,17 @@ wait_for_mongo() {
 wait_for_primary() {
     service="$1"
     port="$2"
+    attempts=0
 
     until compose exec -T "$service" mongosh --port "$port" --quiet \
-        --eval 'db.hello().isWritablePrimary' 2>/dev/null | grep -q true; do
-        echo "Waiting for primary on $service:$port..."
+        --eval 'rs.status().members.some((member) => member.stateStr === "PRIMARY")' \
+        2>/dev/null | grep -q true; do
+        attempts=$((attempts + 1))
+        if [ "$attempts" -ge 120 ]; then
+            echo "Timed out waiting for a primary in the $service replica set" >&2
+            return 1
+        fi
+        echo "Waiting for a primary in the $service replica set..."
         sleep 1
     done
 }
@@ -36,10 +49,16 @@ wait_for_members() {
     service="$1"
     port="$2"
     expected="$3"
+    attempts=0
 
     until compose exec -T "$service" mongosh --port "$port" --quiet \
         --eval 'rs.status().members.filter((member) => member.health === 1).length' \
         2>/dev/null | grep -q "^${expected}$"; do
+        attempts=$((attempts + 1))
+        if [ "$attempts" -ge 120 ]; then
+            echo "Timed out waiting for $expected healthy members in $service" >&2
+            return 1
+        fi
         echo "Waiting for $expected healthy members in $service replica set..."
         sleep 1
     done
@@ -55,7 +74,7 @@ done
 
 compose exec -T configSrv mongosh --port 27019 --quiet <<'EOF'
 try {
-    rs.status()
+    void rs.status()
 } catch (error) {
     rs.initiate({
         _id: "config-rs",
@@ -67,7 +86,7 @@ EOF
 
 compose exec -T shard1-1 mongosh --port 27018 --quiet <<'EOF'
 try {
-    rs.status()
+    void rs.status()
 } catch (error) {
     rs.initiate({
         _id: "shard1-rs",
@@ -82,7 +101,7 @@ EOF
 
 compose exec -T shard2-1 mongosh --port 27018 --quiet <<'EOF'
 try {
-    rs.status()
+    void rs.status()
 } catch (error) {
     rs.initiate({
         _id: "shard2-rs",
@@ -121,12 +140,12 @@ if (!collectionMetadata) {
     sh.shardCollection("somedb.helloDoc", { name: "hashed" })
 }
 
-collection.deleteMany({})
+void collection.deleteMany({})
 const users = Array.from({ length: 1000 }, (_, index) => ({
     age: index,
     name: `ly${index}`
 }))
-collection.insertMany(users)
+void collection.insertMany(users)
 
 print(`Total documents: ${collection.countDocuments()}`)
 print(collection.getShardDistribution())
