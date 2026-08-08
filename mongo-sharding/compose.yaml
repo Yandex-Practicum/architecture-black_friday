@@ -2,25 +2,25 @@ name: mongo-sharding
 
 services:
   configSrv:
-    image: dh-mirror.gitverse.ru/mongo:latest
+    image: mongo:8.0-noble
     command: mongod --configsvr --replSet config-rs --port 27019 --bind_ip_all
     volumes:
       - config_data:/data/db
 
   shard1:
-    image: dh-mirror.gitverse.ru/mongo:latest
+    image: mongo:8.0-noble
     command: mongod --shardsvr --replSet shard1-rs --port 27018 --bind_ip_all
     volumes:
       - shard1_data:/data/db
 
   shard2:
-    image: dh-mirror.gitverse.ru/mongo:latest
+    image: mongo:8.0-noble
     command: mongod --shardsvr --replSet shard2-rs --port 27018 --bind_ip_all
     volumes:
       - shard2_data:/data/db
 
   mongos:
-    image: dh-mirror.gitverse.ru/mongo:latest
+    image: mongo:8.0-noble
     command: mongos --configdb config-rs/configSrv:27019 --port 27017 --bind_ip_all
     depends_on:
       - configSrv
