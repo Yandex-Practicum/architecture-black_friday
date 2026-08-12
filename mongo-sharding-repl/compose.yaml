@@ -1,8 +1,10 @@
 name: mongo-sharding-repl
 
 x-shard-common: &shard-common
-  image: mongo:8.0-noble
+  image: mongo:8.0.29-noble
   restart: unless-stopped
+  environment:
+    MONGO_TCMALLOC_PER_CPU_CACHE_SIZE_BYTES: "0"
 
 services:
   configSrv:

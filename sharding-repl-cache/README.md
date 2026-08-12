@@ -2,6 +2,8 @@
 
 Проект содержит `pymongo-api`, `mongos`, config server, два шарда по три реплики и один Redis-инстанс. Redis кеширует ответы endpoint `/<collection_name>/users` на 60 секунд.
 
+MongoDB закреплена на `8.0.29-noble`. Для запуска на Linux kernel 6.19 во всех MongoDB-сервисах установлена переменная `MONGO_TCMALLOC_PER_CPU_CACHE_SIZE_BYTES=0`, отключающая несовместимый per-CPU cache TCMalloc (SERVER-121912).
+
 ## Запуск и настройка
 
 Остановите другой проект, если он уже занимает порт `8080`. Затем из директории `sharding-repl-cache` выполните:

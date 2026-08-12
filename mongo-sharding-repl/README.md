@@ -7,6 +7,8 @@
 
 База данных называется `somedb`, коллекция — `helloDoc`, hashed-ключ шардирования — поле `name`.
 
+MongoDB закреплена на `8.0.29-noble`. Для запуска на Linux kernel 6.19 во всех MongoDB-сервисах установлена переменная `MONGO_TCMALLOC_PER_CPU_CACHE_SIZE_BYTES=0`, отключающая несовместимый per-CPU cache TCMalloc (SERVER-121912).
+
 ## Запуск и настройка
 
 Из директории `mongo-sharding-repl` выполните:

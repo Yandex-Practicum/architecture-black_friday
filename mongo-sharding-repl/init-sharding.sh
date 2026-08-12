@@ -64,13 +64,7 @@ wait_for_members() {
     done
 }
 
-for service in configSrv shard1-1 shard1-2 shard1-3 shard2-1 shard2-2 shard2-3; do
-    if [ "$service" = "configSrv" ]; then
-        wait_for_mongo "$service" 27019
-    else
-        wait_for_mongo "$service" 27018
-    fi
-done
+wait_for_mongo configSrv 27019
 
 compose exec -T configSrv mongosh --port 27019 --quiet <<'EOF'
 try {
@@ -83,6 +77,12 @@ try {
     })
 }
 EOF
+
+wait_for_primary configSrv 27019
+
+for service in shard1-1 shard1-2 shard1-3 shard2-1 shard2-2 shard2-3; do
+    wait_for_mongo "$service" 27018
+done
 
 compose exec -T shard1-1 mongosh --port 27018 --quiet <<'EOF'
 try {
@@ -114,7 +114,6 @@ try {
 }
 EOF
 
-wait_for_primary configSrv 27019
 wait_for_primary shard1-1 27018
 wait_for_primary shard2-1 27018
 wait_for_members shard1-1 27018 3

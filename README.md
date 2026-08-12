@@ -15,7 +15,9 @@
 
 - Docker с Compose v2 (`docker compose`) или standalone Compose (`docker-compose`);
 - свободный порт `8080`;
-- доступ к Docker Hub для загрузки `mongo:8.0-noble`, `redis:7.2-alpine` и `python:3.12-alpine3.22`. (Поменяли версии для mongodb и python так как полный запуск заблокирован внешним registry: загрузка dh-mirror.gitverse.ru/mongo:latest оборвалась с unexpected EOF до создания контейнеров. Также VS Code показывает унаследованные уязвимости python:3.12.1-slim)
+- доступ к Docker Hub для загрузки `mongo:8.0.29-noble`, `redis:7.2-alpine` и `python:3.12-alpine3.22`.
+
+MongoDB зафиксирована на последнем доступном patch-релизе `8.0.29`. Для совместимости с Linux kernel 6.19 во всех MongoDB-контейнерах задано `MONGO_TCMALLOC_PER_CPU_CACHE_SIZE_BYTES=0`: это отключает затронутый per-CPU cache TCMalloc и предотвращает отказ запуска SERVER-121912. Исправление проверки kernel заявлено MongoDB для будущего релиза `8.0.30`, официальный Docker-образ которого на момент подготовки стенда ещё не опубликован.
 
 ## Запуск
 
