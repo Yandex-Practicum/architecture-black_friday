@@ -1,0 +1,101 @@
+name: sharding-repl-cache
+
+x-shard-common: &shard-common
+  image: mongo:8.0.29-noble
+  restart: unless-stopped
+  environment:
+    MONGO_TCMALLOC_PER_CPU_CACHE_SIZE_BYTES: "0"
+
+services:
+  configSrv:
+    <<: *shard-common
+    command: mongod --configsvr --replSet config-rs --port 27019 --bind_ip_all
+    volumes:
+      - config_data:/data/db
+
+  shard1-1:
+    <<: *shard-common
+    command: mongod --shardsvr --replSet shard1-rs --port 27018 --bind_ip_all
+    volumes:
+      - shard1_1_data:/data/db
+
+  shard1-2:
+    <<: *shard-common
+    command: mongod --shardsvr --replSet shard1-rs --port 27018 --bind_ip_all
+    volumes:
+      - shard1_2_data:/data/db
+
+  shard1-3:
+    <<: *shard-common
+    command: mongod --shardsvr --replSet shard1-rs --port 27018 --bind_ip_all
+    volumes:
+      - shard1_3_data:/data/db
+
+  shard2-1:
+    <<: *shard-common
+    command: mongod --shardsvr --replSet shard2-rs --port 27018 --bind_ip_all
+    volumes:
+      - shard2_1_data:/data/db
+
+  shard2-2:
+    <<: *shard-common
+    command: mongod --shardsvr --replSet shard2-rs --port 27018 --bind_ip_all
+    volumes:
+      - shard2_2_data:/data/db
+
+  shard2-3:
+    <<: *shard-common
+    command: mongod --shardsvr --replSet shard2-rs --port 27018 --bind_ip_all
+    volumes:
+      - shard2_3_data:/data/db
+
+  mongos:
+    <<: *shard-common
+    command: mongos --configdb config-rs/configSrv:27019 --port 27017 --bind_ip_all
+    depends_on:
+      - configSrv
+      - shard1-1
+      - shard1-2
+      - shard1-3
+      - shard2-1
+      - shard2-2
+      - shard2-3
+
+  redis:
+    image: redis:7.2-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  pymongo-api:
+    build:
+      context: api_app
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+      mongos:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    environment:
+      MONGODB_URL: mongodb://mongos:27017
+      MONGODB_DATABASE_NAME: somedb
+      REDIS_URL: redis://redis:6379
+
+volumes:
+  config_data:
+  shard1_1_data:
+  shard1_2_data:
+  shard1_3_data:
+  shard2_1_data:
+  shard2_2_data:
+  shard2_3_data:
+  redis_data:
