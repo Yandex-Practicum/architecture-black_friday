@@ -2,34 +2,23 @@
 
 ## Как запустить
 
-Запускаем mongodb и приложение
+Запускаем mongodb, redis и приложение из директории sharding-repl-cache
 
 ```shell
 docker compose up -d
 ```
 
-Заполняем mongodb данными
+Заполняем mongodb данными из директории sharding-repl-cache
 
 ```shell
-./scripts/mongo-init.sh
+./scripts/repl-shard-mongo-init.sh
 ```
+Ждем сообщения
 
-## Как проверить
+**MongoDB cluster and Redis initialized successfully**
 
-### Если вы запускаете проект на локальной машине
+<br><br>
 
-Откройте в браузере http://localhost:8080
+**Архитектурная схема взаимодействия сервисов онлайн магазина Мобильный мир**
+![scheme5.png](scheme5.png)
 
-### Если вы запускаете проект на предоставленной виртуальной машине
-
-Узнать белый ip виртуальной машины
-
-```shell
-curl --silent http://ifconfig.me
-```
-
-Откройте в браузере http://<ip виртуальной машины>:8080
-
-## Доступные эндпоинты
-
-Список доступных эндпоинтов, swagger http://<ip виртуальной машины>:8080/docs
