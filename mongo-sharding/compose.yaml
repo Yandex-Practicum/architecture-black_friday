@@ -1,0 +1,71 @@
+name: mongo-sharding
+
+services:
+  config-srv:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: config-srv
+    restart: unless-stopped
+    command: ["--configsvr", "--replSet", "config-rs", "--bind_ip_all", "--port", "27017"]
+    volumes:
+      - config-srv-data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --port 27017 --quiet --eval 'quit(db.adminCommand({ ping: 1 }).ok ? 0 : 1)'"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+
+  shard1:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: shard1
+    restart: unless-stopped
+    command: ["--shardsvr", "--replSet", "shard1-rs", "--bind_ip_all", "--port", "27018"]
+    volumes:
+      - shard1-data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --port 27018 --quiet --eval 'quit(db.adminCommand({ ping: 1 }).ok ? 0 : 1)'"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+
+  shard2:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: shard2
+    restart: unless-stopped
+    command: ["--shardsvr", "--replSet", "shard2-rs", "--bind_ip_all", "--port", "27019"]
+    volumes:
+      - shard2-data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --port 27019 --quiet --eval 'quit(db.adminCommand({ ping: 1 }).ok ? 0 : 1)'"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+
+  mongos-router:
+    image: dh-mirror.gitverse.ru/mongo:latest
+    container_name: mongos-router
+    restart: unless-stopped
+    command: ["mongos", "--configdb", "config-rs/config-srv:27017", "--bind_ip_all", "--port", "27020"]
+    depends_on:
+      config-srv:
+        condition: service_healthy
+
+  pymongo-api:
+    image: kazhem/pymongo_api:1.0.0
+    platform: linux/amd64
+    container_name: pymongo-api
+    restart: unless-stopped
+    depends_on:
+      - mongos-router
+    ports:
+      - "8080:8080"
+    environment:
+      MONGODB_URL: "mongodb://mongos-router:27020"
+      MONGODB_DATABASE_NAME: "somedb"
+
+volumes:
+  config-srv-data:
+  shard1-data:
+  shard2-data:
