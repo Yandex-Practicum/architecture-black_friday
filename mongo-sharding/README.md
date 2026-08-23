@@ -35,10 +35,7 @@ docker compose up -d
 
 Выполните инструкцию
 ```shell
-docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF
-use somedb
-db.helloDoc.getShardDistribution()
-EOF
+docker compose exec -T mongos_router mongosh --port 27020 --quiet --eval "db.getSiblingDB('somedb').helloDoc.getShardDistribution()"
 ```
 
 Пример вывода:

@@ -11,7 +11,7 @@ services:
     volumes:
       - config-srv-data:/data/db
     healthcheck:
-      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
       interval: 5s
       start_period: 10s
 
@@ -25,7 +25,7 @@ services:
       - shard1-data:/data/db
     command: [ "--shardsvr", "--replSet", "shard1", "--bind_ip_all", "--port", "27018" ]
     healthcheck:
-      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
       interval: 5s
       start_period: 10s
 
@@ -39,7 +39,7 @@ services:
       - shard2-data:/data/db
     command: [ "--shardsvr", "--replSet", "shard2", "--bind_ip_all", "--port", "27019" ]
     healthcheck:
-      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
       interval: 5s
       start_period: 10s 
 
@@ -55,7 +55,7 @@ services:
       - "27020:27020"
     command: [ "mongos", "--configdb", "config_server/configSrv:27017", "--bind_ip_all", "--port", "27020" ]
     healthcheck:
-      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
       interval: 5s
       start_period: 10s
 
