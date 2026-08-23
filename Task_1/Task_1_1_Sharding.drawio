@@ -1,0 +1,57 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.6.4 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36">
+  <diagram name="Page-1" id="-H_mtQnk-PTXWXPvYvuk">
+    <mxGraphModel dx="1329" dy="987" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="IQGfROc360RTSwifNJrp-12" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;dashed=1;dashPattern=8 8;" value="" vertex="1">
+          <mxGeometry height="260" width="500" x="200" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="zA23MoTUsTF4_91t8viU-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="Пользователи" vertex="1">
+          <mxGeometry height="60" width="120" x="350" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="IQGfROc360RTSwifNJrp-10" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="IQGfROc360RTSwifNJrp-2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="410" y="190" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="IQGfROc360RTSwifNJrp-11" edge="1" parent="1" source="IQGfROc360RTSwifNJrp-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="IQGfROc360RTSwifNJrp-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IQGfROc360RTSwifNJrp-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="pymongo-api" vertex="1">
+          <mxGeometry height="60" width="120" x="350" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="IQGfROc360RTSwifNJrp-13" edge="1" parent="1" source="IQGfROc360RTSwifNJrp-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="IQGfROc360RTSwifNJrp-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IQGfROc360RTSwifNJrp-17" edge="1" parent="1" source="IQGfROc360RTSwifNJrp-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="IQGfROc360RTSwifNJrp-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IQGfROc360RTSwifNJrp-18" edge="1" parent="1" source="IQGfROc360RTSwifNJrp-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="IQGfROc360RTSwifNJrp-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IQGfROc360RTSwifNJrp-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="mongos_router&lt;div&gt;port: 27020&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="350" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="IQGfROc360RTSwifNJrp-4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="configSrv&lt;div&gt;port: 27017&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="560" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="IQGfROc360RTSwifNJrp-20" edge="1" parent="1" source="IQGfROc360RTSwifNJrp-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="IQGfROc360RTSwifNJrp-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IQGfROc360RTSwifNJrp-5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="shard1&lt;div&gt;port: 27018&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="265" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="IQGfROc360RTSwifNJrp-21" edge="1" parent="1" source="IQGfROc360RTSwifNJrp-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="IQGfROc360RTSwifNJrp-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IQGfROc360RTSwifNJrp-6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="shard2&lt;div&gt;port: 27019&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="435" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="IQGfROc360RTSwifNJrp-19" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Mongo DB" vertex="1">
+          <mxGeometry height="30" width="60" x="210" y="320" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
