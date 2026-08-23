@@ -1,10 +1,10 @@
-# Задание 2. Шардирование MongoDB
+# Задание 3. Репликация в MongoDB
 
 ## Как запустить
 
-Запускаем mongo-sharding и приложение
+Запускаем mongo-sharding-repl и приложение
 
-Перейти в папку mongo-sharding
+Перейти в папку mongo-sharding-repl
 
 Выполните:
 ```shell
@@ -15,9 +15,9 @@ docker compose up -d
 
 Инициализация шардирования и наполнение данными
 
-В папке mongo-sharding выполните:
+В папке mongo-sharding-repl выполните:
 ```shell
-./scripts/init.sh
+./scripts/init-repl.sh
 ```
 
 ## Как проверить
@@ -28,37 +28,34 @@ docker compose up -d
 
 Пример вывода:
 ```
-{"mongo_topology_type":"Sharded","mongo_replicaset_name":null,"mongo_db":"somedb","read_preference":"Primary()","mongo_nodes":[["mongos_router",27020]],"mongo_primary_host":null,"mongo_secondary_hosts":[],"mongo_is_primary":true,"mongo_is_mongos":true,"collections":{"helloDoc":{"documents_count":1000}},"shards":{"shard1":"shard1/shard1:27018","shard2":"shard2/shard2:27019"},"cache_enabled":false,"status":"OK"}
+{"mongo_topology_type":"Sharded","mongo_replicaset_name":null,"mongo_db":"somedb","read_preference":"Primary()","mongo_nodes":[["mongos_router",27020]],"mongo_primary_host":null,"mongo_secondary_hosts":[],"mongo_is_primary":true,"mongo_is_mongos":true,"collections":{"helloDoc":{"documents_count":1000}},"shards":{"shard1":"shard1/shard1-1:27018,shard1-2:27018,shard1-3:27018","shard2":"shard2/shard2-1:27019,shard2-2:27019,shard2-3:27019"},"cache_enabled":false,"status":"OK"}
 ```
 
-### Перейдя в папку mongo-sharding можно проверить распределение документов по шардам
+### Перейдя в папку mongo-sharding-repl можно проверить распределение документов по шардам
 
 Выполните инструкцию
 ```shell
-docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF
-use somedb
-db.helloDoc.getShardDistribution()
-EOF
+docker compose exec -T mongos_router mongosh --port 27020 --quiet --eval "db.getSiblingDB('somedb').helloDoc.getShardDistribution()"
 ```
 
 Пример вывода:
 ```
-Shard shard2 at shard2/shard2:27019
+Shard shard1 at shard1/shard1-1:27018,shard1-2:27018,shard1-3:27018
 {
-  data: '22KiB',
-  docs: 491,
+  data: '21KiB',
+  docs: 478,
   chunks: 1,
-  'estimated data per chunk': '22KiB',
-  'estimated docs per chunk': 491
+  'estimated data per chunk': '21KiB',
+  'estimated docs per chunk': 478
 }
 ---
-Shard shard1 at shard1/shard1:27018
+Shard shard2 at shard2/shard2-1:27019,shard2-2:27019,shard2-3:27019
 {
   data: '23KiB',
-  docs: 509,
+  docs: 522,
   chunks: 1,
   'estimated data per chunk': '23KiB',
-  'estimated docs per chunk': 509
+  'estimated docs per chunk': 522
 }
 ---
 Totals
@@ -66,18 +63,45 @@ Totals
   data: '45KiB',
   docs: 1000,
   chunks: 2,
-  'Shard shard2': [
-    '49.1 % data',
-    '49.1 % docs in cluster',
+  'Shard shard1': [
+    '47.83 % data',
+    '47.8 % docs in cluster',
     '46B avg obj size on shard'
   ],
-  'Shard shard1': [
-    '50.89 % data',
-    '50.9 % docs in cluster',
+  'Shard shard2': [
+    '52.16 % data',
+    '52.2 % docs in cluster',
     '46B avg obj size on shard'
   ]
 }
 ```
+
+### Перейдя в папку mongo-sharding-repl можно проверить статус реплик
+
+Выполните инструкцию
+```shell
+docker compose exec -T shard2-1 mongosh --port 27019 --quiet --eval "rs.status().members.map(m => ({ name: m.name, state: m.stateStr }))"
+```
+```
+[
+  { name: 'shard2-1:27019', state: 'PRIMARY' },
+  { name: 'shard2-2:27019', state: 'SECONDARY' },
+  { name: 'shard2-3:27019', state: 'SECONDARY' }
+]
+```
+
+```shell
+docker compose exec -T shard1-1 mongosh --port 27018 --quiet --eval "rs.status().members.map(m => ({ name: m.name, state: m.stateStr }))"
+```
+```
+[
+  { name: 'shard1-1:27018', state: 'PRIMARY' },
+  { name: 'shard1-2:27018', state: 'SECONDARY' },
+  { name: 'shard1-3:27018', state: 'SECONDARY' }
+]
+```
+
+
 ### Если вы запускаете проект на предоставленной виртуальной машине
 
 Узнать белый ip виртуальной машины
