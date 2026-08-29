@@ -1,0 +1,110 @@
+name: mongo-sharding
+
+x-mongo-common: &mongo-common
+  image: dh-mirror.gitverse.ru/mongo:7.0
+  restart: unless-stopped
+
+services:
+  configsvr:
+    <<: *mongo-common
+    command:
+      - mongod
+      - --configsvr
+      - --replSet
+      - config-rs
+      - --port
+      - "27019"
+      - --bind_ip_all
+      - --wiredTigerCacheSizeGB
+      - "0.25"
+    volumes:
+      - configsvr-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--port", "27019", "--quiet", "--eval", "quit(db.adminCommand({ ping: 1 }).ok ? 0 : 1)"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  shard1:
+    <<: *mongo-common
+    command:
+      - mongod
+      - --shardsvr
+      - --replSet
+      - shard1-rs
+      - --port
+      - "27018"
+      - --bind_ip_all
+      - --wiredTigerCacheSizeGB
+      - "0.25"
+    volumes:
+      - shard1-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--port", "27018", "--quiet", "--eval", "quit(db.adminCommand({ ping: 1 }).ok ? 0 : 1)"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  shard2:
+    <<: *mongo-common
+    command:
+      - mongod
+      - --shardsvr
+      - --replSet
+      - shard2-rs
+      - --port
+      - "27018"
+      - --bind_ip_all
+      - --wiredTigerCacheSizeGB
+      - "0.25"
+    volumes:
+      - shard2-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--port", "27018", "--quiet", "--eval", "quit(db.adminCommand({ ping: 1 }).ok ? 0 : 1)"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  mongos:
+    <<: *mongo-common
+    command:
+      - mongos
+      - --configdb
+      - config-rs/configsvr:27019
+      - --port
+      - "27017"
+      - --bind_ip_all
+    depends_on:
+      configsvr:
+        condition: service_started
+      shard1:
+        condition: service_started
+      shard2:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "mongosh", "--port", "27017", "--quiet", "--eval", "quit(db.adminCommand({ ping: 1 }).ok ? 0 : 1)"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  pymongo_api:
+    image: kazhem/pymongo_api:1.0.0
+    restart: unless-stopped
+    depends_on:
+      mongos:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    environment:
+      MONGODB_URL: "mongodb://mongos:27017"
+      MONGODB_DATABASE_NAME: "somedb"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  configsvr-data:
+  shard1-data:
+  shard2-data:
