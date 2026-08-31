@@ -1,18 +1,13 @@
 # pymongo-api
 
+## [Схема](./task6/mongo.drawio.png)
+
 ## Как запустить
 
-Запускаем mongodb и приложение
+Инструкция:
 
-```shell
-docker compose up -d
-```
-
-Заполняем mongodb данными
-
-```shell
-./scripts/mongo-init.sh
-```
+1.[sharding-repl-cache](./sharding-repl-cache/README.md)
+2.Запустить приложение.
 
 ## Как проверить
 

@@ -1,0 +1,42 @@
+# mongo-sharding
+
+## Как запустить
+
+```sh
+docker compose up -d
+./scripts/mongo-init.sh
+```
+
+## Проверка
+
+Общее количество документов:
+
+```sh
+docker compose exec -T mongos_router mongosh --port 27020 --quiet <<EOF
+use somedb
+db.helloDoc.countDocuments()
+EOF
+```
+
+Количество документов в shard1:
+
+```sh
+docker compose exec -T shard1 mongosh --port 27018 --quiet <<EOF
+use somedb
+db.helloDoc.countDocuments()
+EOF
+```
+
+Количество документов в shard2:
+
+```sh
+docker compose exec -T shard2 mongosh --port 27019 --quiet <<EOF
+use somedb
+db.helloDoc.countDocuments()
+EOF
+```
+
+## Приложение
+
+- http://localhost:8080
+- http://localhost:8080/docs
