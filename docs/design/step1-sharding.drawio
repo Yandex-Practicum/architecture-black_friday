@@ -1,0 +1,37 @@
+<mxfile host="65bd71144e">
+    <diagram name="Step 1 - Sharding" id="task1-step1-sharding">
+        <mxGraphModel dx="1230" dy="811" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="api" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="pymongo-api" vertex="1">
+                    <mxGeometry height="60" width="140" x="80" y="300" as="geometry"/>
+                </mxCell>
+                <mxCell id="router" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="mongos\nquery router" vertex="1">
+                    <mxGeometry height="60" width="150" x="300" y="300" as="geometry"/>
+                </mxCell>
+                <mxCell id="config" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#e1d5e7;strokeColor=#9673a6;" value="configSrv\nconfig server" vertex="1">
+                    <mxGeometry height="80" width="120" x="690" y="290" as="geometry"/>
+                </mxCell>
+                <mxCell id="shard1" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;" value="shard1\nMongoDB" vertex="1">
+                    <mxGeometry height="80" width="120" x="510" y="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="shard2" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;" value="shard2\nMongoDB" vertex="1">
+                    <mxGeometry height="80" width="120" x="510" y="480" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge-api-router" edge="1" parent="1" source="api" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" target="router">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge-router-config" edge="1" parent="1" source="router" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" target="config">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge-router-shard1" edge="1" parent="1" source="router" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" target="shard1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge-router-shard2" edge="1" parent="1" source="router" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" target="shard2">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
