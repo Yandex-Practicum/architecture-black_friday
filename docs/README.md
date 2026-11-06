@@ -9,11 +9,13 @@ The source map is documented in [docs/internal/inventory.md](internal/inventory.
 1. [Step 1: sharding](design/step1-sharding.md) - application traffic goes through `mongos` to two MongoDB shards.
 2. [Step 2: replication](design/step2-replication.md) - each shard has three replica-set members.
 3. [Step 3: Redis caching](design/step3-cache.md) - Redis caches repeated application reads before MongoDB is queried.
+4. [Task 5: Service Discovery and API Gateway](design/step4-service-discovery.md) - APISIX balances multiple API instances and discovers them through Consul.
 
 The Draw.io files are linked from each step document:
 
 - [Step 1 diagram](design/step1-sharding.drawio)
 - [Step 2 diagram](design/step2-replication.drawio)
 - [Step 3 diagram](design/step3-cache.drawio)
+- [Task 5 diagram](design/step4-service-discovery.drawio)
 
-The final Task 1 design is the third diagram. It includes the application, Redis, `mongos`, `configSrv`, two shards, and three replica members for each shard, with network interactions and replica-set grouping shown.
+The third diagram is the final Task 1 design. The fourth diagram extends it for Task 5 with three application instances, APISIX, etcd, and a three-node Consul service-discovery cluster.

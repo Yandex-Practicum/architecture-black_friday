@@ -1,0 +1,189 @@
+<mxfile host="65bd71144e">
+    <diagram name="Step 4 - Service discovery and API Gateway" id="task1-step4-service-discovery">
+        <mxGraphModel dx="1484" dy="819" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="users" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" value="users" vertex="1">
+                    <mxGeometry height="60" width="110" x="20" y="350" as="geometry"/>
+                </mxCell>
+                <mxCell id="gateway" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="apisix\nAPI Gateway" vertex="1">
+                    <mxGeometry height="60" width="160" x="170" y="350" as="geometry"/>
+                </mxCell>
+                <mxCell id="apiGroup" parent="1" style="swimlane;html=1;rounded=1;horizontal=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Horizontally scaled application" vertex="1">
+                    <mxGeometry height="430" width="260" x="380" y="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="api1" parent="apiGroup" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;" value="pymongo-api-1" vertex="1">
+                    <mxGeometry height="60" width="170" x="45" y="65" as="geometry"/>
+                </mxCell>
+                <mxCell id="kKeoehl9MWGQ8XdptdLH-2" edge="1" parent="apiGroup" source="api2" style="edgeStyle=none;html=1;" target="api1" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="kKeoehl9MWGQ8XdptdLH-3" edge="1" parent="apiGroup" source="api2" style="edgeStyle=none;html=1;" target="api3" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="api2" parent="apiGroup" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;" value="pymongo-api-2" vertex="1">
+                    <mxGeometry height="60" width="170" x="45" y="175" as="geometry"/>
+                </mxCell>
+                <mxCell id="api3" parent="apiGroup" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;" value="pymongo-api-3" vertex="1">
+                    <mxGeometry height="60" width="170" x="45" y="285" as="geometry"/>
+                </mxCell>
+                <mxCell id="consulGroup" parent="1" style="swimlane;html=1;rounded=1;horizontal=0;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Consul service discovery cluster" vertex="1">
+                    <mxGeometry height="250" width="260" x="480" y="597.5" as="geometry"/>
+                </mxCell>
+                <mxCell id="consul1" parent="consulGroup" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;" value="consul-1" vertex="1">
+                    <mxGeometry height="45" width="190" x="35" y="55" as="geometry"/>
+                </mxCell>
+                <mxCell id="consul2" parent="consulGroup" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;" value="consul-2" vertex="1">
+                    <mxGeometry height="45" width="190" x="35" y="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="consul3" parent="consulGroup" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;" value="consul-3" vertex="1">
+                    <mxGeometry height="45" width="190" x="35" y="165" as="geometry"/>
+                </mxCell>
+                <mxCell id="etcd" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#fff2cc;strokeColor=#d6b656;" value="etcd\nAPISIX config" vertex="1">
+                    <mxGeometry height="80" width="140" x="180" y="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="redis" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f8cecc;strokeColor=#b85450;" value="redis\ncache" vertex="1">
+                    <mxGeometry height="80" width="120" x="690" y="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="router" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="mongos\nquery router" vertex="1">
+                    <mxGeometry height="60" width="150" x="770" y="385" as="geometry"/>
+                </mxCell>
+                <mxCell id="config" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#e1d5e7;strokeColor=#9673a6;" value="configSrv\nconfig server" vertex="1">
+                    <mxGeometry height="80" width="120" x="1280" y="375" as="geometry"/>
+                </mxCell>
+                <mxCell id="group1" parent="1" style="swimlane;html=1;rounded=1;horizontal=0;fillColor=#d5e8d4;strokeColor=#82b366;" value="Replica set: shard1" vertex="1">
+                    <mxGeometry height="250" width="300" x="950" y="125" as="geometry"/>
+                </mxCell>
+                <mxCell id="s1p" parent="group1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffffff;" value="shard1-1\nPRIMARY" vertex="1">
+                    <mxGeometry height="75" width="110" x="30" y="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="s1a" parent="group1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffffff;" value="shard1-2\nSECONDARY" vertex="1">
+                    <mxGeometry height="75" width="110" x="180" y="32.5" as="geometry"/>
+                </mxCell>
+                <mxCell id="s1b" parent="group1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffffff;" value="shard1-3\nSECONDARY" vertex="1">
+                    <mxGeometry height="75" width="110" x="180" y="142.5" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge-s1p-s1a" edge="1" parent="group1" source="s1p" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;" target="s1a" value="replication">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge-s1p-s1b" edge="1" parent="group1" source="s1p" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;" target="s1b" value="replication">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="group2" parent="1" style="swimlane;html=1;rounded=1;horizontal=0;fillColor=#d5e8d4;strokeColor=#82b366;" value="Replica set: shard2" vertex="1">
+                    <mxGeometry height="250" width="300" x="950" y="455" as="geometry"/>
+                </mxCell>
+                <mxCell id="s2p" parent="group2" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffffff;" value="shard2-1\nPRIMARY" vertex="1">
+                    <mxGeometry height="75" width="110" x="30" y="87.5" as="geometry"/>
+                </mxCell>
+                <mxCell id="s2a" parent="group2" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffffff;" value="shard2-2\nSECONDARY" vertex="1">
+                    <mxGeometry height="75" width="110" x="180" y="32.5" as="geometry"/>
+                </mxCell>
+                <mxCell id="s2b" parent="group2" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffffff;" value="shard2-3\nSECONDARY" vertex="1">
+                    <mxGeometry height="75" width="110" x="180" y="142.5" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge-s2p-s2a" edge="1" parent="group2" source="s2p" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;" target="s2a" value="replication">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge-s2p-s2b" edge="1" parent="group2" source="s2p" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;" target="s2b" value="replication">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge-users-gateway" edge="1" parent="1" source="users" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" target="gateway" value="HTTP">
+                    <mxGeometry relative="1" y="10" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge-gateway-api1" edge="1" parent="1" source="gateway" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" target="api1" value="load balance">
+                    <mxGeometry relative="1" x="0.5439" y="28" as="geometry">
+                        <mxPoint x="-20" y="8" as="offset"/>
+                        <Array as="points">
+                            <mxPoint x="360" y="380"/>
+                            <mxPoint x="360" y="190"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge-gateway-api2" edge="1" parent="1" source="gateway" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="api2" value="load balance">
+                    <mxGeometry relative="1" x="0.2353" y="-40" as="geometry">
+                        <mxPoint x="-40" y="-40" as="offset"/>
+                        <Array as="points">
+                            <mxPoint x="360" y="380"/>
+                            <mxPoint x="360" y="305"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge-gateway-api3" edge="1" parent="1" source="gateway" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" target="api3" value="load balance">
+                    <mxGeometry relative="1" y="-25" as="geometry">
+                        <mxPoint x="-20" y="-10" as="offset"/>
+                        <Array as="points">
+                            <mxPoint x="360" y="380"/>
+                            <mxPoint x="360" y="415"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge-gateway-etcd" edge="1" parent="1" source="gateway" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;" target="etcd" value="configuration">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge-api1-consul" edge="1" parent="1" source="api1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;exitX=1;exitY=1;exitDx=0;exitDy=0;" target="consulGroup" value="register">
+                    <mxGeometry relative="1" x="-1" y="-21" as="geometry">
+                        <mxPoint x="-15" y="-6" as="offset"/>
+                        <Array as="points">
+                            <mxPoint x="610" y="225"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge-api2-consul" edge="1" parent="1" source="api2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;exitX=1;exitY=1;exitDx=0;exitDy=0;" target="consulGroup" value="register">
+                    <mxGeometry relative="1" x="-1" y="-21" as="geometry">
+                        <mxPoint x="-15" y="-6" as="offset"/>
+                        <Array as="points">
+                            <mxPoint x="610" y="335"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge-api3-consul" edge="1" parent="1" source="api3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;exitX=1;exitY=1;exitDx=0;exitDy=0;" target="consulGroup" value="register">
+                    <mxGeometry relative="1" x="-1" y="-21" as="geometry">
+                        <mxPoint x="-15" y="-6" as="offset"/>
+                        <Array as="points">
+                            <mxPoint x="610" y="445"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge-consul-gateway" edge="1" parent="1" source="consulGroup" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;" target="gateway" value="service discovery">
+                    <mxGeometry relative="1" x="-0.1521" y="-18" as="geometry">
+                        <mxPoint x="-18" y="18" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge-api1-redis" edge="1" parent="1" source="api1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" target="redis" value="cached reads">
+                    <mxGeometry relative="1" x="-0.0455" y="35" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge-api1-router" edge="1" parent="1" source="api1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" target="router" value="cache miss">
+                    <mxGeometry relative="1" x="-0.0682" y="35" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge-api2-redis" edge="1" parent="1" source="api2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" target="redis">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge-api2-router" edge="1" parent="1" source="api2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" target="router">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge-api3-redis" edge="1" parent="1" source="api3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" target="redis">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge-api3-router" edge="1" parent="1" source="api3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" target="router">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge-router-config" edge="1" parent="1" source="router" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" target="config">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge-router-s1" edge="1" parent="1" source="router" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" target="s1p">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge-router-s2" edge="1" parent="1" source="router" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" target="s2p">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

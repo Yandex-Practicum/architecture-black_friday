@@ -22,8 +22,8 @@ This inventory maps the source materials used for the Task 1 planning artifacts 
 | [Redis cluster flow](task/Samples/replicas-sharding/redis/flow.txt) | Demonstrates Redis masters and replicas with `--cluster-replicas 1`. | Reference only; Redis clustering is outside Task 1’s requested single-cache-instance scope. |
 | [Redis API example](task/Samples/replicas-sharding/nodejs-api/index.js) | Reads by request URL and invalidates cache entries after writes. | Confirms the cache-before-database interaction shown in step 3. |
 | [Node.js API package](task/Samples/replicas-sharding/nodejs-api/package.json) | Lists Express, Mongoose, and Redis dependencies. | Dependency reference only; the project uses the existing Python API. |
-| [Load-balancer Compose](task/Samples/replicas-sharding/load-balancer/docker-compose.yml) | Demonstrates APISIX, etcd, multiple web instances, and Consul. | Reference for later Task 5 work, not included in Task 1 diagrams. |
-| [Load-balancer flow](task/Samples/replicas-sharding/load-balancer/flow.txt) | Shows Consul service registration and APISIX discovery. | Reference for later Service Discovery and API Gateway work. |
+| [Load-balancer Compose](task/Samples/replicas-sharding/load-balancer/docker-compose.yml) | Demonstrates APISIX, etcd, multiple web instances, and Consul. | Naming and control-plane relationships in the Task 5 diagram. |
+| [Load-balancer flow](task/Samples/replicas-sharding/load-balancer/flow.txt) | Shows Consul service registration and APISIX discovery. | Registration and discovery arrows in the Task 5 diagram. |
 | [PostgreSQL/Citus flow](task/Samples/replicas-sharding/PostgreSQL/sharding-flow.txt) | Demonstrates PostgreSQL distributed-table setup. | Not used; the assignment requires MongoDB sharding. |
 
 ## Produced artifacts
@@ -34,5 +34,6 @@ This inventory maps the source materials used for the Task 1 planning artifacts 
 | [Step 1 notes](../design/step1-sharding.md) and [diagram](../design/step1-sharding.drawio) | Two MongoDB shards behind `mongos`. |
 | [Step 2 notes](../design/step2-replication.md) and [diagram](../design/step2-replication.drawio) | Three replica members for each shard. |
 | [Step 3 notes](../design/step3-cache.md) and [diagram](../design/step3-cache.drawio) | Redis cache in front of the replicated sharded MongoDB cluster. |
+| [Task 5 notes](../design/step4-service-discovery.md) and [diagram](../design/step4-service-discovery.drawio) | Multiple API instances behind APISIX with Consul service discovery. |
 
-The diagrams remain intentionally limited to Task 1. API Gateway, Consul, horizontal application scaling, and CDN belong to later assignment stages and are tracked as reference material rather than being added here.
+The diagrams currently cover Task 1 and Task 5. CDN remains a later assignment stage and is tracked as reference material rather than being added here.
