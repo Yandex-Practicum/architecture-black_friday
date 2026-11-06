@@ -1,9 +1,9 @@
 services:
-  mongodb1:
-    container_name: mongodb1
-    image: dh-mirror.gitverse.ru/mongo:latest
+  mongodb1a:
+    container_name: mongodb1a
+    image: mongo:latest
     volumes:
-      - mongodb1_data_container:/data/db
+      - mongodb1a_data_container:/data/db
 
   pymongo_api:
     container_name: pymongo_api
@@ -11,13 +11,13 @@ services:
       context: api_app
       dockerfile: Dockerfile
     depends_on:
-      - mongodb1
+      - mongodb1a
     ports:
       - 8080:8080
     environment:
-      MONGODB_URL: "mongodb://mongodb1"
+      MONGODB_URL: "mongodb://mongodb1a"
       MONGODB_DATABASE_NAME: "somedb"
 
 
 volumes:
-  mongodb1_data_container:
+  mongodb1a_data_container:
