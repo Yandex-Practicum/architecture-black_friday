@@ -45,6 +45,30 @@ curl http://localhost:8080/helloDoc/count
 
 The initialization script also prints the total count and the count observed directly through each shard. The total must be at least 1000, and both shard counts should be non-zero.
 
+## Reproduce the verification
+
+Run these commands from `mongo-sharding` in Git Bash with Docker Desktop integration enabled:
+
+```shell
+docker compose down -v
+docker compose up -d --build
+./scripts/mongo-init.sh
+docker compose ps
+curl --silent http://localhost:8080/ | jq
+curl --silent http://localhost:8080/helloDoc/count | jq
+```
+
+The root response must contain `"mongo_topology_type": "Sharded"`, both `shard1` and `shard2`, and `"documents_count": 1000` for `helloDoc`. The count endpoint must return `"items_count": 1000`.
+
+Confirm distribution directly on the shards:
+
+```shell
+docker compose exec -T shard1 mongosh --port 27018 --quiet --eval 'db.getSiblingDB("somedb").helloDoc.countDocuments()'
+docker compose exec -T shard2 mongosh --port 27019 --quiet --eval 'db.getSiblingDB("somedb").helloDoc.countDocuments()'
+```
+
+Both commands must return a non-zero value, and their sum must be `1000`.
+
 To stop the stand:
 
 ```shell
