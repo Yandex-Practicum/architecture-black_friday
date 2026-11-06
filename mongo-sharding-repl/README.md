@@ -36,7 +36,7 @@ docker compose ps
 
 ## Verify
 
-Open the API response at http://localhost:8080 or its Swagger UI at http://localhost:8080/docs.
+Open the API response at <http://localhost:8080> or its Swagger UI at <http://localhost:8080/docs>.
 
 The root response reports the `Sharded` MongoDB topology, both shards, and their replica counts. The count endpoint reports the total:
 
