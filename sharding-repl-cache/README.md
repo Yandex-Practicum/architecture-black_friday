@@ -42,7 +42,7 @@ Open the API response at <http://localhost:8080> or its Swagger UI at <http://lo
 The root response must report:
 
 - `"mongo_topology_type": "Sharded"`
-- `"shard_replica_counts": {"shard1": 3, "shard2": 3}`
+- `shards` entries listing three members for both `shard1` and `shard2`
 - `"cache_enabled": true`
 - 1000 documents in `helloDoc`
 
@@ -55,8 +55,8 @@ curl http://localhost:8080/helloDoc/count
 Confirm distribution and replica membership directly:
 
 ```shell
-docker compose exec -T shard1-1 mongosh --port 27018 --quiet --eval 'db.getSiblingDB("somedb").helloDoc.countDocuments()'
-docker compose exec -T shard2-1 mongosh --port 27021 --quiet --eval 'db.getSiblingDB("somedb").helloDoc.countDocuments()'
+docker compose exec -T shard1-1 mongosh --port 27018 --quiet --eval 'db.getMongo().setReadPref("secondaryPreferred"); db.getSiblingDB("somedb").helloDoc.countDocuments()'
+docker compose exec -T shard2-1 mongosh --port 27021 --quiet --eval 'db.getMongo().setReadPref("secondaryPreferred"); db.getSiblingDB("somedb").helloDoc.countDocuments()'
 docker compose exec -T shard1-1 mongosh --port 27018 --quiet --eval 'rs.status().members.length'
 docker compose exec -T shard2-1 mongosh --port 27021 --quiet --eval 'rs.status().members.length'
 docker compose exec -T redis redis-cli ping

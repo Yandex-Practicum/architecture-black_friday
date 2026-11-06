@@ -14,11 +14,11 @@ wait_for_mongo() {
   done
 }
 
-wait_for_primary() {
+wait_for_replica_set() {
   local service="$1"
   local port="$2"
 
-  until docker compose exec -T "$service" mongosh --port "$port" --quiet --eval "db.hello().isWritablePrimary" 2>/dev/null | grep -q "true"; do
+  until docker compose exec -T "$service" mongosh --port "$port" --quiet --eval "rs.status().members.some((member) => member.stateStr === 'PRIMARY')" 2>/dev/null | grep -q "true"; do
     sleep 2
   done
 }
@@ -76,8 +76,8 @@ try {
 }
 EOF
 
-wait_for_primary shard1-1 27018
-wait_for_primary shard2-1 27021
+wait_for_replica_set shard1-1 27018
+wait_for_replica_set shard2-1 27021
 
 until docker compose exec -T mongos_router mongosh --port 27024 --quiet --eval "db.adminCommand({ ping: 1 }).ok" 2>/dev/null | grep -q "1"; do
   sleep 2
@@ -110,9 +110,9 @@ echo "MongoDB sharding and replication are initialized."
 echo "Total documents:"
 docker compose exec -T mongos_router mongosh --port 27024 --quiet --eval 'db.getSiblingDB("somedb").helloDoc.countDocuments()'
 echo "Documents on shard1:"
-docker compose exec -T shard1-1 mongosh --port 27018 --quiet --eval 'db.getSiblingDB("somedb").helloDoc.countDocuments()'
+docker compose exec -T shard1-1 mongosh --port 27018 --quiet --eval 'db.getMongo().setReadPref("secondaryPreferred"); db.getSiblingDB("somedb").helloDoc.countDocuments()'
 echo "Documents on shard2:"
-docker compose exec -T shard2-1 mongosh --port 27021 --quiet --eval 'db.getSiblingDB("somedb").helloDoc.countDocuments()'
+docker compose exec -T shard2-1 mongosh --port 27021 --quiet --eval 'db.getMongo().setReadPref("secondaryPreferred"); db.getSiblingDB("somedb").helloDoc.countDocuments()'
 echo "Replica members on shard1:"
 docker compose exec -T shard1-1 mongosh --port 27018 --quiet --eval 'rs.status().members.length'
 echo "Replica members on shard2:"

@@ -57,13 +57,13 @@ curl --silent http://localhost:8080/ | jq
 curl --silent http://localhost:8080/helloDoc/count | jq
 ```
 
-The root response must contain `"mongo_topology_type": "Sharded"`, both `shard1` and `shard2`, and `"shard_replica_counts": {"shard1": 3, "shard2": 3}`. The `helloDoc` collection and count endpoint must report 1000 documents.
+The root response must contain `"mongo_topology_type": "Sharded"` and both `shard1` and `shard2` entries with three members in their connection strings. The `helloDoc` collection and count endpoint must report 1000 documents.
 
 Confirm distribution and replica membership directly:
 
 ```shell
-docker compose exec -T shard1-1 mongosh --port 27018 --quiet --eval 'db.getSiblingDB("somedb").helloDoc.countDocuments()'
-docker compose exec -T shard2-1 mongosh --port 27021 --quiet --eval 'db.getSiblingDB("somedb").helloDoc.countDocuments()'
+docker compose exec -T shard1-1 mongosh --port 27018 --quiet --eval 'db.getMongo().setReadPref("secondaryPreferred"); db.getSiblingDB("somedb").helloDoc.countDocuments()'
+docker compose exec -T shard2-1 mongosh --port 27021 --quiet --eval 'db.getMongo().setReadPref("secondaryPreferred"); db.getSiblingDB("somedb").helloDoc.countDocuments()'
 docker compose exec -T shard1-1 mongosh --port 27018 --quiet --eval 'rs.status().members.length'
 docker compose exec -T shard2-1 mongosh --port 27021 --quiet --eval 'rs.status().members.length'
 ```
