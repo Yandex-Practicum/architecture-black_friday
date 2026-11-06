@@ -35,5 +35,6 @@ This inventory maps the source materials used for the Task 1 planning artifacts 
 | [Step 2 notes](../design/step2-replication.md) and [diagram](../design/step2-replication.drawio) | Three replica members for each shard. |
 | [Step 3 notes](../design/step3-cache.md) and [diagram](../design/step3-cache.drawio) | Redis cache in front of the replicated sharded MongoDB cluster. |
 | [Task 5 notes](../design/step4-service-discovery.md) and [diagram](../design/step4-service-discovery.drawio) | Multiple API instances behind APISIX with Consul service discovery. |
+| [Task 6 notes](../design/step5-cdn.md) and [diagram](../design/step5-cdn.drawio) | Regional CDN edges serving static content from an object-storage origin. |
 
-The diagrams currently cover Task 1 and Task 5. CDN remains a later assignment stage and is tracked as reference material rather than being added here.
+The diagrams cover Task 1, Task 5, and Task 6. The Task 6 CDN is represented as an architecture design only; no CDN runtime implementation is required by the assignment.
